@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Microscope Lab Demo | The Alchemist Classroom</title>
+<style>
+:root{
+  --bg:#eef2f5; --panel:#ffffff; --ink:#1c2631; --muted:#566473; --line:#d5dde5;
+  --accent:#1d63c9; --accent-soft:#e3edfb; --good:#18794e; --good-soft:#e2f4ea;
+  --warn:#a35200; --warn-soft:#fdf0e1; --bad:#b42318; --bad-soft:#fde8e6;
+  --steel:#33414f;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible,input:focus-visible{outline:3px solid #f2b705;outline-offset:2px}
+.hidden{display:none!important}
+
+/* top bar */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:10px 14px;background:var(--steel);color:#fff}
+.brand{font-weight:800;font-size:19px;letter-spacing:.2px;margin-right:auto}
+.brand small{font-weight:500;opacity:.8;font-size:14px;margin-left:6px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px}
+.tab{border:0;background:rgba(255,255,255,.12);color:#fff;padding:7px 12px;border-radius:999px;font-size:15px}
+.tab[aria-selected="true"]{background:#fff;color:var(--steel);font-weight:700}
+.topt{display:flex;gap:6px}
+.chipbtn{border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;padding:5px 10px;border-radius:999px;font-size:13px}
+.chipbtn[aria-pressed="true"]{background:#fff;color:var(--steel);font-weight:700}
+
+/* start */
+.start{max-width:560px;margin:40px auto;padding:28px;background:var(--panel);border-radius:16px;box-shadow:0 2px 10px rgba(20,30,40,.08)}
+.start h1{margin:0 0 6px;font-size:28px}
+.start p{color:var(--muted);margin:6px 0 18px}
+.start label{display:block;font-weight:700;margin:12px 0 6px}
+.start input{width:100%;font:inherit;font-size:18px;padding:10px 12px;border:2px solid var(--line);border-radius:10px}
+.start .row{display:flex;gap:10px}
+.btn{border:0;background:var(--accent);color:#fff;padding:10px 16px;border-radius:10px;font-weight:700}
+.btn.big{font-size:18px;padding:12px 22px}
+.btn.ghost{background:var(--accent-soft);color:var(--accent)}
+.btn.good{background:var(--good)}
+.btn.warn{background:var(--warn)}
+.btn:disabled{opacity:.45;cursor:default}
+
+/* lab layout */
+.lab{display:grid;grid-template-columns:minmax(300px,420px) minmax(320px,1fr);gap:14px;padding:14px;max-width:1180px;margin:0 auto}
+@media (max-width:820px){.lab{grid-template-columns:1fr}}
+.lab > *{min-width:0}
+/* ---------- full-screen layout: everything on one screen ---------- */
+#dirbar{display:none}
+.dirlbl{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#7a5a00}
+#dirfoot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dots{display:flex;flex-wrap:wrap;gap:4px;flex:1;min-width:0}
+.dot{width:24px;height:24px;border-radius:50%;background:#e2e8ee;color:var(--muted);font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;border:0;padding:0}
+button.dot{cursor:pointer}
+.dot.done{background:var(--good);color:#fff}
+.dot.cur{background:#f2b705;color:#1c2631;box-shadow:0 0 0 2px #1c2631}
+.pick{display:flex;gap:6px}
+.modal.wide{max-width:780px}
+.modal{max-height:94vh;overflow:auto}
+@media (min-width:900px){
+  body.fit{height:100vh;overflow:hidden;display:flex;flex-direction:column}
+  body.fit .top{padding:6px 12px;flex:0 0 auto}
+  body.fit .lab{flex:1 1 auto;min-height:0;max-width:none;width:100%;margin:0;padding:8px;gap:8px;
+    grid-template-columns:minmax(340px,400px) minmax(0,1fr);
+    grid-template-rows:auto minmax(0,1fr);grid-template-areas:"scope dir" "scope view"}
+  body.fit .scopecard{grid-area:scope;min-height:0;overflow:hidden;gap:6px;padding:8px}
+  body.fit #scope{flex:1 1 0;min-height:0;max-height:none;height:auto}
+  body.fit .viewcard{display:contents}
+  body.fit .viewtop{grid-area:view;background:var(--panel);border-radius:14px;box-shadow:0 1px 6px rgba(20,30,40,.07);padding:10px;
+    flex-direction:column;align-items:center;justify-content:center;flex-wrap:nowrap;gap:10px;min-height:0;min-width:0;overflow:hidden}
+  body.fit .side{flex:0 0 auto;height:66px;width:100%;min-width:0;overflow:hidden;flex-direction:row;flex-wrap:wrap;align-content:flex-start;justify-content:center;gap:6px}
+  body.fit .mag{padding:4px 10px;font-size:14px} body.fit .mag br{display:none} body.fit .mag b{font-size:17px}
+  body.fit .chips{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:5px}
+  body.fit .chip{padding:3px 10px;font-size:13px;border-radius:999px;gap:6px}
+  body.fit #toast{display:none!important}
+  body.fit #panel{display:none!important}
+  body.fit #dirbar{display:flex;grid-area:dir;flex-direction:column;gap:6px;background:#fffbea;border:2px solid #f2b705;border-radius:14px;padding:8px 14px;min-width:0}
+  body.fit #dirbar .stepbox{border:0;background:none;padding:0;margin:0}
+  body.fit #dirbar .stepbox p{margin:3px 0}
+  body.fit #dirbar .stepbox h3{margin:0 0 3px;font-size:16px}
+  body.fit #dirbar .info{background:none;padding:0}
+  body.fit #dirbar .q{margin-top:2px}
+  body.fit #dirbar .q .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:6px}
+  body.fit #dirbar .opt{padding:7px 10px}
+  body.fit #dirbar .t{font-size:17px}
+  body.fit #dirmsg{padding:6px 10px;font-size:14px}
+  body.fit #dirmsg:not(.show){display:none}
+  body.fit #panel{grid-area:panel;background:var(--panel);border-radius:14px;box-shadow:0 1px 6px rgba(20,30,40,.07);padding:10px 12px;overflow:auto;min-height:0}
+  body.fit .controls{gap:6px}
+  body.fit .cg{padding:5px 7px}
+  body.fit .cgt{font-size:11px;margin-bottom:3px}
+  body.fit .cbtn{min-height:34px;padding:4px 8px}
+  body.fit .dpad{grid-template-columns:repeat(3,38px);grid-template-rows:repeat(3,32px)}
+  body.fit .cg .small{display:none}
+  body.fit .stagebox{gap:8px}
+  body.fit .focusrow{gap:5px}
+  body.fit.quizmode .controls{display:none}
+}
+@media (max-width:460px){.lab{padding:8px;gap:8px}.controls{grid-template-columns:1fr}.cg.wide{grid-column:auto}.card{padding:9px}.focusrow .cbtn{padding:6px 4px;font-size:14px}}
+.card{background:var(--panel);border-radius:14px;box-shadow:0 1px 6px rgba(20,30,40,.07);padding:12px}
+.scopecard{display:flex;flex-direction:column;gap:10px}
+#scope{width:100%;height:auto;max-height:400px;display:block;user-select:none;-webkit-user-select:none;touch-action:none}
+#scope [data-part]{cursor:pointer}
+#scope .plabel{display:none;font-size:11px;font-weight:700;fill:#1c2631}
+#scope .pline{display:none;stroke:#7d8b99;stroke-width:1}
+#scope.showlabels .plabel,#scope.showlabels .pline{display:inline}
+#scope .hl{animation:hl 0.9s ease 2}
+@keyframes hl{50%{filter:drop-shadow(0 0 6px #f2b705) brightness(1.3)}}
+
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cg{border:1px solid var(--line);border-radius:10px;padding:7px 8px}
+.cg.wide{grid-column:1 / -1}
+.cgt{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px}
+.row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cbtn{border:1px solid #b9c5d1;background:#f7f9fb;padding:7px 10px;border-radius:9px;font-weight:700;min-width:40px;min-height:40px}
+.cbtn:active{background:#e3eaf1}
+.cbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.seg{display:flex;gap:4px}
+.seg .cbtn{flex:1}
+input[type=range]{flex:1;min-width:60px;accent-color:var(--accent)}
+.meter{flex:1;display:flex;gap:3px;min-width:70px}
+.meter i{flex:1;height:14px;border-radius:3px;background:#dfe5eb}
+.meter i.on{background:#56657a}
+.focusrow{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px;align-items:center}
+.focusrow span{font-size:13px;font-weight:700;color:var(--muted)}
+.dpad{display:grid;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,38px);gap:3px}
+.dpad .cbtn{min-width:0;min-height:0;padding:0}
+.stagebox{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.small{font-size:13px;color:var(--muted)}
+
+/* view */
+.viewcard{display:flex;flex-direction:column;gap:10px}
+.viewtop{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.eyewrap{position:relative;flex:0 0 auto;margin:0 auto}
+#eye{display:block;border-radius:50%;background:#000;box-shadow:0 0 0 8px #1e2730,0 0 0 10px #4a5866;cursor:crosshair;touch-action:manipulation}
+.side{flex:1;min-width:180px;display:flex;flex-direction:column;gap:8px}
+.mag{background:#f4f7fa;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:15px}
+.mag b{font-size:20px}
+.chips{display:flex;flex-direction:column;gap:5px}
+.chip{display:flex;justify-content:space-between;gap:8px;font-size:14px;padding:5px 9px;border-radius:8px;background:#f1f4f7}
+.chip b{font-weight:800}
+.chip.good{background:var(--good-soft);color:var(--good)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+
+.toast{border-radius:10px;padding:9px 12px;font-size:15px;font-weight:600;display:none}
+.toast.show{display:block}
+.toast.info{background:var(--accent-soft);color:#173f7a}
+.toast.good{background:var(--good-soft);color:var(--good)}
+.toast.warn{background:var(--warn-soft);color:var(--warn)}
+.toast.bad{background:var(--bad-soft);color:var(--bad)}
+
+/* panel */
+#panel h2{font-size:19px;margin:2px 0 8px}
+#panel h3{font-size:16px;margin:12px 0 6px}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.steps li{display:flex;gap:8px;align-items:flex-start;padding:5px 8px;border-radius:8px;font-size:15px;color:var(--muted)}
+.steps li .n{flex:0 0 24px;height:24px;border-radius:50%;background:#e2e8ee;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--muted)}
+.steps li.done{color:var(--good)}
+.steps li.done .n{background:var(--good);color:#fff}
+.steps li.cur{background:#fff8dc;color:var(--ink);border:2px solid #f2b705}
+.steps li.cur .n{background:#f2b705;color:#1c2631}
+.stepbox{border:2px solid #f2b705;background:#fffbea;border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.stepbox .t{font-weight:800;font-size:17px;display:flex;gap:8px;align-items:center;justify-content:space-between}
+.stepbox p{margin:6px 0}
+.say{border:0;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:14px;flex:0 0 auto}
+.q{margin-top:8px}
+.q .opts{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.opt{text-align:left;border:2px solid var(--line);background:#fff;padding:9px 12px;border-radius:10px;font-weight:600}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.fb{margin-top:6px;font-weight:700}
+.fb.good{color:var(--good)} .fb.bad{color:var(--bad)}
+.numin{font:inherit;font-size:20px;width:120px;padding:6px 10px;border:2px solid var(--line);border-radius:10px}
+.cathead{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:10px 0 4px}
+.slides{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+.slidebtn{text-align:left;border:2px solid var(--line);background:#fff;border-radius:10px;padding:7px 9px;font-size:14px}
+.slidebtn b{display:block;font-size:15px}
+.slidebtn.on{border-color:var(--accent);background:var(--accent-soft)}
+.chal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.chalbtn{text-align:left;border:2px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700}
+.chalbtn.done{border-color:var(--good);background:var(--good-soft);color:var(--good)}
+.chalbtn.on{border-color:#f2b705;background:#fffbea}
+.info{background:#f4f7fa;border-radius:10px;padding:8px 10px;font-size:15px}
+.report pre{white-space:pre-wrap;background:#f4f7fa;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:13px;max-height:420px;overflow:auto}
+.report .row{margin:8px 0}
+
+/* modal */
+.modalbg{position:fixed;inset:0;background:rgba(15,25,35,.55);display:flex;align-items:center;justify-content:center;padding:14px;z-index:20}
+.modal{background:#fff;border-radius:16px;max-width:560px;width:100%;padding:18px 20px;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.modal h2{margin:0 0 4px;font-size:21px}
+.modal .prog{font-size:13px;color:var(--muted);font-weight:700}
+.modal svg{width:100%;max-height:150px;margin:8px 0}
+</style>
+</head>
+<body><div style="background:#2DD4BF;color:#06241f;text-align:center;padding:8px 14px;font:14px system-ui,sans-serif" role="note"><b>Demo</b> · Everything works. Nothing is saved or sent. <a style="color:#06241f;font-weight:800" href="../../#microscope-simulator" target="_top">Get the full version →</a></div>
+
+<header class="top">
+  <div class="brand">&#x1f52c; Microscope Lab <small style="opacity:.6">v1.4</small> <small id="who"></small></div>
+  <nav class="tabs hidden" id="tabs" role="tablist">
+    <button class="tab" data-mode="guided" role="tab">Guided onion lab</button>
+    <button class="tab" data-mode="explore" role="tab">Explore</button>
+    <button class="tab" data-mode="challenge" role="tab">Challenges</button>
+    <button class="tab" data-mode="quiz" role="tab">Parts quiz</button>
+    <button class="tab" data-mode="report" role="tab">Send report</button>
+  </nav>
+  <div class="topt hidden" id="topt">
+    <button class="chipbtn" id="tFull" aria-pressed="false" title="Show the whole lab on one screen">&#x26F6; Full screen</button>
+    <button class="chipbtn" id="tHints" aria-pressed="true">Hints</button>
+    <button class="chipbtn" id="tLabels" aria-pressed="false">Part names</button>
+  </div>
+</header>
+
+<section class="start" id="startScreen">
+  <h1>Microscope Lab</h1>
+  <p>Use a compound microscope on the computer. Put a slide on the stage, choose a power, and adjust the knobs until the image is clear.</p>
+  <label for="nameIn">Your name (first name and last initial)</label>
+  <div class="row">
+    <input id="nameIn" autocomplete="off" maxlength="30" placeholder="Example: Maya R.">
+    <button class="btn big" id="startBtn">Start</button>
+  </div>
+  <p class="small" id="resumeNote"></p>
+</section>
+
+<main class="lab hidden" id="labScreen">
+  <div class="card scopecard">
+    <svg id="scope" viewBox="0 0 360 470" aria-label="Microscope. Click its parts to use them.">
+      <defs>
+        <linearGradient id="gMetal" x1="0" x2="1"><stop offset="0" stop-color="#4a5a6c"/><stop offset=".5" stop-color="#6f8196"/><stop offset="1" stop-color="#3f4d5d"/></linearGradient>
+        <linearGradient id="gArm" x1="0" x2="1"><stop offset="0" stop-color="#e8ecf0"/><stop offset="1" stop-color="#c3ccd5"/></linearGradient>
+        <radialGradient id="gGlow"><stop offset="0" stop-color="#fff7c2"/><stop offset=".6" stop-color="#ffd84d" stop-opacity=".7"/><stop offset="1" stop-color="#ffd84d" stop-opacity="0"/></radialGradient>
+      </defs>
+      <!-- arm -->
+      <path data-part="arm" d="M214 424 C 262 360 268 210 236 112 L 204 112 C 232 210 228 352 184 424 Z" fill="url(#gArm)" stroke="#8c99a6" stroke-width="2"/>
+      <!-- base -->
+      <rect data-part="base" x="40" y="420" width="280" height="36" rx="14" fill="#3a4757"/>
+      <rect x="60" y="452" width="240" height="8" rx="4" fill="#26313d"/>
+      <!-- light -->
+      <g data-part="light">
+        <rect x="134" y="384" width="52" height="38" rx="6" fill="#2b3642"/>
+        <ellipse id="glow" cx="160" cy="384" rx="34" ry="14" fill="url(#gGlow)" opacity="0"/>
+        <ellipse id="bulb" cx="160" cy="385" rx="16" ry="5" fill="#8a96a3"/>
+        <rect x="64" y="429" width="34" height="18" rx="5" fill="#1f2831"/>
+        <rect id="switchKnob" x="67" y="432" width="14" height="12" rx="3" fill="#c33"/>
+      </g>
+      <!-- head + tube -->
+      <rect x="132" y="96" width="112" height="34" rx="9" fill="url(#gMetal)"/>
+      <rect x="141" y="40" width="38" height="112" rx="4" fill="url(#gMetal)"/>
+      <!-- eyepiece -->
+      <g data-part="eyepiece">
+        <rect x="146" y="6" width="28" height="38" rx="4" fill="#20282f"/>
+        <rect x="144" y="4" width="32" height="8" rx="3" fill="#11171c"/>
+        <text id="eyeLbl" x="160" y="33" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">10&#xd7;</text>
+      </g>
+      <!-- stage group -->
+      <g id="stageG" style="transition:transform .12s">
+        <rect x="206" y="300" width="34" height="50" rx="4" fill="#2c3844"/>
+        <g data-part="diaphragm">
+          <ellipse cx="160" cy="322" rx="30" ry="6" fill="#525f6d"/>
+          <ellipse cx="160" cy="320" rx="30" ry="6" fill="#6d7b8a"/>
+          <circle id="diaHole" cx="160" cy="320" r="8" fill="#151b21"/>
+          <rect id="diaLever" x="186" y="317" width="14" height="5" rx="2" fill="#c9a227"/>
+        </g>
+        <g data-part="stage">
+          <rect x="66" y="300" width="182" height="11" rx="3" fill="#24303b"/>
+          <rect x="66" y="300" width="182" height="3" rx="1.5" fill="#3d4b59"/>
+        </g>
+        <g id="slideG" opacity="0" style="pointer-events:none">
+          <rect x="104" y="294" width="112" height="6" rx="1" fill="#cfe5f2" stroke="#8fb3c9" stroke-width="1"/>
+          <rect x="142" y="292.5" width="36" height="2" fill="#e8f4fb" stroke="#a9c6d6" stroke-width=".6"/>
+          <ellipse id="specDot" cx="160" cy="296.5" rx="9" ry="2" fill="#d6b56a"/>
+          <path id="crackLine" d="M120 294 L135 300 L150 295 L170 300 L190 294 L205 299" stroke="#333" stroke-width="1.2" fill="none" opacity="0"/>
+        </g>
+        <g data-part="clips">
+          <path id="clipL" d="M84 299 L84 293 L118 289 L118 293 Z" fill="#9aa6b2" stroke="#56626f" style="transform-origin:84px 296px;transform-box:view-box;transition:transform .2s"/>
+          <path id="clipR" d="M236 299 L236 293 L202 289 L202 293 Z" fill="#9aa6b2" stroke="#56626f" style="transform-origin:236px 296px;transform-box:view-box;transition:transform .2s"/>
+          <circle cx="84" cy="297" r="3" fill="#56626f"/><circle cx="236" cy="297" r="3" fill="#56626f"/>
+        </g>
+      </g>
+      <!-- nosepiece + objectives -->
+      <g id="objG">
+        <g class="obj" data-part="objectives" data-obj="4"  style="transform-origin:160px 158px;transform-box:view-box;transition:transform .35s">
+          <rect x="151" y="162" width="18" height="40" rx="3" fill="#cfd6dd" stroke="#7d8996"/><rect x="151" y="186" width="18" height="5" fill="#d32f2f"/><rect x="155" y="200" width="10" height="5" rx="2" fill="#2a333c"/>
+          <text x="160" y="180" text-anchor="middle" font-size="8" font-weight="800" fill="#2a333c">4</text></g>
+        <g class="obj" data-part="objectives" data-obj="10" style="transform-origin:160px 158px;transform-box:view-box;transition:transform .35s">
+          <rect x="151" y="162" width="18" height="56" rx="3" fill="#cfd6dd" stroke="#7d8996"/><rect x="151" y="200" width="18" height="5" fill="#f2c200"/><rect x="155" y="216" width="10" height="5" rx="2" fill="#2a333c"/>
+          <text x="160" y="182" text-anchor="middle" font-size="8" font-weight="800" fill="#2a333c">10</text></g>
+        <g class="obj" data-part="objectives" data-obj="40" style="transform-origin:160px 158px;transform-box:view-box;transition:transform .35s">
+          <rect x="152" y="162" width="16" height="76" rx="3" fill="#cfd6dd" stroke="#7d8996"/><rect x="152" y="218" width="16" height="5" fill="#1e64c8"/><rect x="155" y="236" width="10" height="5" rx="2" fill="#2a333c"/>
+          <text x="160" y="186" text-anchor="middle" font-size="8" font-weight="800" fill="#2a333c">40</text></g>
+      </g>
+      <g data-part="nosepiece">
+        <path d="M124 150 L196 150 L188 168 L132 168 Z" fill="url(#gMetal)" stroke="#2f3a46"/>
+        <ellipse cx="160" cy="150" rx="36" ry="7" fill="#7b8ca0"/>
+      </g>
+      <!-- knobs -->
+      <g data-part="coarse">
+        <circle cx="262" cy="320" r="24" fill="#2b3642" stroke="#151b21" stroke-width="2"/>
+        <g id="coarseTicks" style="transform-origin:262px 320px;transform-box:view-box">
+          <line x1="262" y1="298" x2="262" y2="308" stroke="#b9c4cf" stroke-width="3"/>
+          <line x1="262" y1="332" x2="262" y2="342" stroke="#56626f" stroke-width="3"/>
+          <line x1="240" y1="320" x2="250" y2="320" stroke="#56626f" stroke-width="3"/>
+          <line x1="274" y1="320" x2="284" y2="320" stroke="#56626f" stroke-width="3"/>
+        </g>
+        <circle cx="262" cy="320" r="7" fill="#3f4d5d"/>
+      </g>
+      <g data-part="fine">
+        <circle cx="262" cy="372" r="14" fill="#3a4757" stroke="#151b21" stroke-width="2"/>
+        <g id="fineTicks" style="transform-origin:262px 372px;transform-box:view-box">
+          <line x1="262" y1="359" x2="262" y2="365" stroke="#b9c4cf" stroke-width="2.5"/>
+          <line x1="262" y1="379" x2="262" y2="385" stroke="#56626f" stroke-width="2.5"/>
+        </g>
+      </g>
+      <!-- labels -->
+      <g>
+        <line class="pline" x1="144" y1="22" x2="92" y2="22"/><text class="plabel" x="20" y="26">Eyepiece</text>
+        <line class="pline" x1="126" y1="156" x2="92" y2="140"/><text class="plabel" x="18" y="140">Nosepiece</text>
+        <line class="pline" x1="150" y1="200" x2="92" y2="200"/><text class="plabel" x="8" y="204">Objective lenses</text>
+        <line class="pline" x1="70" y1="306" x2="44" y2="270"/><text class="plabel" x="8" y="266">Stage</text>
+        <line class="pline" x1="96" y1="292" x2="70" y2="244"/><text class="plabel" x="8" y="240">Stage clips</text>
+        <line class="pline" x1="130" y1="322" x2="92" y2="344"/><text class="plabel" x="20" y="350">Diaphragm</text>
+        <line class="pline" x1="134" y1="400" x2="92" y2="396"/><text class="plabel" x="44" y="400">Light</text>
+        <text class="plabel" x="150" y="444" fill="#fff" style="fill:#fff">Base</text>
+        <line class="pline" x1="250" y1="200" x2="282" y2="190"/><text class="plabel" x="284" y="194">Arm</text>
+        <line class="pline" x1="286" y1="320" x2="296" y2="310"/><text class="plabel" x="290" y="300">Coarse</text><text class="plabel" x="290" y="312">focus</text>
+        <line class="pline" x1="276" y1="372" x2="294" y2="372"/><text class="plabel" x="296" y="368">Fine</text><text class="plabel" x="296" y="380">focus</text>
+      </g>
+    </svg>
+
+    <div class="controls" id="controls">
+      <div class="cg">
+        <div class="cgt">Light</div>
+        <div class="row" style="margin-bottom:5px"><button class="cbtn" id="bLight" style="flex:1">Light: OFF</button></div>
+        <div class="row"><button class="cbtn" data-hold="bright-" aria-label="Dimmer">&#x2212;</button><input type="range" id="rBright" min="0" max="100" step="5" aria-label="Brightness"><button class="cbtn" data-hold="bright+" aria-label="Brighter">+</button></div>
+      </div>
+      <div class="cg">
+        <div class="cgt">Diaphragm</div>
+        <div class="meter" id="mDiaph" style="margin-bottom:5px"><i></i><i></i><i></i><i></i><i></i></div><div class="row" style="flex-wrap:nowrap"><button class="cbtn" style="flex:1" data-hold="diaph-" title="Open (more light)">Open</button><button class="cbtn" style="flex:1" data-hold="diaph+" title="Close (less light, more contrast)">Close</button></div>
+        <div class="small" style="margin-top:4px">Closed = less light, more contrast</div>
+      </div>
+      <div class="cg">
+        <div class="cgt">Objective (nosepiece)</div>
+        <div class="seg" id="segObj"><button class="cbtn" data-obj="4">4&#xd7;</button><button class="cbtn" data-obj="10">10&#xd7;</button><button class="cbtn" data-obj="40">40&#xd7;</button></div>
+      </div>
+      <div class="cg">
+        <div class="cgt">Eyepiece</div>
+        <div class="seg" id="segEye"><button class="cbtn" data-eye="10">10&#xd7;</button><button class="cbtn" data-eye="15">15&#xd7;</button></div>
+      </div>
+      <div class="cg wide">
+        <div class="cgt">Focus (moves the stage up and down)</div>
+        <div class="focusrow">
+          <span>Coarse<br>(big)</span>
+          <button class="cbtn" data-hold="coarse+">&#x25b2; Stage up</button>
+          <button class="cbtn" data-hold="coarse-">&#x25bc; Stage down</button>
+          <span>Fine<br>(small)</span>
+          <button class="cbtn" data-hold="fine+">&#x25b2; Up a little</button>
+          <button class="cbtn" data-hold="fine-">&#x25bc; Down a little</button>
+        </div>
+      </div>
+      <div class="cg wide">
+        <div class="cgt">Move the slide</div>
+        <div class="stagebox">
+          <div class="dpad">
+            <span></span><button class="cbtn" data-hold="away" aria-label="Move slide away from you">&#x2191;</button><span></span>
+            <button class="cbtn" data-hold="left" aria-label="Move slide left">&#x2190;</button><span></span><button class="cbtn" data-hold="right" aria-label="Move slide right">&#x2192;</button>
+            <span></span><button class="cbtn" data-hold="toward" aria-label="Move slide toward you">&#x2193;</button><span></span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:130px">
+            <button class="cbtn" id="bClip">Clip the slide</button>
+            <div class="small">Arrows move the <b>slide</b>. Keys: arrows move, Q/A coarse, W/S fine, 1/2/3 objective, E eyepiece, L light.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card viewcard">
+    <div id="dirbar" aria-live="polite"><div id="dirmain"></div><div id="dirmsg" class="toast" role="status"></div><div id="dirfoot"></div></div>
+    <div class="viewtop">
+      <div class="eyewrap" id="eyewrap"><canvas id="eye" width="400" height="400" aria-label="View through the eyepiece"></canvas></div>
+      <div class="side">
+        <div class="mag" id="mag"></div>
+        <div class="chips" id="chips"></div>
+      </div>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div id="panel"></div>
+  </div>
+</main>
+
+<div class="modalbg hidden" id="modalbg"><div class="modal" id="modal"></div></div>
+
+<script>
+'use strict';
+/* =================== TEACHER SETTINGS =================== */
+const SETTINGS = {
+  teacherEmail: '',   // optional: put your email here so students don't have to type it
+  teacherLabel: 'my teacher',
+  readAloud: true,        // show read-aloud buttons
+  hintsDefault: true,     // focus/light/specimen hint chips start ON
+  saveProgress: true      // keep progress in this browser
+};
+/* ======================================================== */
+
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const TAU = Math.PI * 2;
+const X = '\u00d7';
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function hsh(i, j){const s = Math.sin(i*127.1 + j*311.7)*43758.5453; return s - Math.floor(s);}
+function esc(s){return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---------- optics constants ---------- */
+const DOF   = {4: 6, 10: 2.5, 40: 0.8};   // depth of field (focus units)
+const PARF  = {4: 0, 10: 0.3, 40: 0.6};   // parfocal offset
+const CRASH = {4: 99, 10: 9, 40: 1.8};    // how far past focus before the lens hits the slide
+const COARSE = 2.5, FINE = 0.15, HMAX = 60;
+const AP = [1.2, 1.05, 0.92, 0.8, 0.7];   // diaphragm open -> closed
+const MDIM = {4: 1.15, 10: 0.92, 40: 0.62};
+const GLASS = '#f6f6f1';
+
+/* ---------- state ---------- */
+const STORE_KEY = 'microscopeLab.v1.' + (SETTINGS.teacherEmail || 'student').toLowerCase();
+function freshState(){
+  return {
+    v:1, name:'', seed:(Math.random()*1e9)|0, started:Date.now(), activeSec:0,
+    mode:'guided', hints:SETTINGS.hintsDefault, labels:false,
+    light:false, bright:30, diaph:0, obj:10, eye:10, h:12,
+    slide:null, clipped:false, px:0, py:0, F:{}, stain:{onion:false, cheek:true, potato:false}, hideName:false,
+    cracked:false, crack:null,
+    prep:{done:false, flat:false, retries:[]},
+    mistakes:{crack:0, lost:0, slid:0, highStart:0, coarseHigh:0},
+    flags:{lookedLow:false, highWarned:false, movedRight:false, fov40:false, fov400:false},
+    guided:{done:{}, nucleus:false, nucleusStained:null, nucleusPower:null, nucleusMisses:0},
+    answers:{},         // id -> {prompt, pick, correct, tries, first}
+    chal:{active:null, done:{}, target:null},
+    quiz:{order:null, i:0, first:{}, tries:{}, done:false, jobs:{}},
+    sent:0
+  };
+}
+let S = freshState();
+function save(){
+  if(!SETTINGS.saveProgress) return;
+  try{ const o = {}; for(const k in S) if(k[0] !== '_') o[k] = S[k]; (()=>{})(STORE_KEY, JSON.stringify(o)); }catch(e){}
+}
+function load(){
+  try{ const t = localStorage.getItem(STORE_KEY); if(!t) return null; const o = JSON.parse(t); if(!o || o.v !== 1) return null; return Object.assign(freshState(), o); }catch(e){ return null; }
+}
+let saveT = 0;
+function saveSoon(){ clearTimeout(saveT); saveT = setTimeout(save, 600); }
+
+/* ---------- read aloud ---------- */
+function speak(text){
+  try{ if(!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(String(text).replace(/\u00d7/g, ' times ')); u.rate = 0.95; speechSynthesis.speak(u); }catch(e){}
+}
+function sayBtn(text){ return SETTINGS.readAloud ? `<button class="say" data-say="${esc(text)}" aria-label="Read aloud">\ud83d\udd0a Read</button>` : ''; }
+
+/* =================== SPECIMENS =================== */
+const CACHE = {};
+function lw(v, px){ return px / v.ppm; }
+function pip(x, y, poly){ let c = false; for(let i = 0, j = poly.length - 1; i < poly.length; j = i++){ const [xi, yi] = poly[i], [xj, yj] = poly[j]; if(((yi > y) !== (yj > y)) && (x < (xj - xi)*(y - yi)/(yj - yi) + xi)) c = !c; } return c; }
+function polyNear(x, y, poly, r){ if(pip(x, y, poly)) return true; for(const [a, b] of poly) if(Math.hypot(a - x, b - y) < r) return true; return false; }
+function blobOutline(R, rx, ry, n){ const o = []; const p1 = R()*TAU, p2 = R()*TAU; for(let i = 0; i < n; i++){ const a = i/n*TAU; const k = 1 + 0.12*Math.sin(3*a + p1) + 0.08*Math.sin(5*a + p2) + 0.05*(R() - .5); o.push([Math.cos(a)*rx*k, Math.sin(a)*ry*k]); } return o; }
+function tracePoly(ctx, poly){ ctx.beginPath(); poly.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath(); }
+
+/* brick-pattern cell sheet used by onion and cork */
+function buildSheet(R, opt){
+  const rows = []; let y = opt.y0;
+  while(y < opt.y1){
+    const h = opt.hMin + R()*(opt.hMax - opt.hMin);
+    const xs = []; let x = opt.x0 - R()*opt.wMax;
+    while(x < opt.x1){ xs.push(x); x += opt.wMin + R()*(opt.wMax - opt.wMin); }
+    xs.push(x);
+    const n = xs.length - 1, nfx = [], nfy = [], nr = [], tl = [];
+    for(let k = 0; k <= n; k++){ nfx.push(0.22 + R()*0.56); nfy.push(0.3 + R()*0.4); nr.push(opt.nMin + R()*(opt.nMax - opt.nMin)); tl.push((R() - .5)*opt.tilt); }
+    rows.push({y0:y, y1:y + h, xs, nfx, nfy, nr, tl});
+    y += h;
+  }
+  return rows;
+}
+function wob(b, x, a, f){ f = f || 1; return a*(Math.sin(x*11*f + b*1.7)*0.6 + Math.sin(x*29*f + b*0.9)*0.4); }
+function visRows(rows, v){ const a = [], top = v.cy - v.r, bot = v.cy + v.r; for(let i = 0; i < rows.length; i++){ if(rows[i].y1 >= top && rows[i].y0 <= bot) a.push(i); } return a; }
+function drawSheet(ctx, v, rows, st){
+  const ri = visRows(rows, v); if(!ri.length) return;
+  const xl = v.cx - v.r, xr = v.cx + v.r;
+  // cell tints
+  if(v.ppm > 45 && st.tints){
+    const paths = st.tints.map(() => new Path2D());
+    for(const r of ri){ const R = rows[r]; for(let k = 0; k < R.xs.length - 1; k++){ const a = R.xs[k], b = R.xs[k + 1]; if(b < xl || a > xr) continue; const p = paths[Math.floor(hsh(r, k)*paths.length)]; p.moveTo(a + R.tl[k], R.y0); p.lineTo(b + R.tl[k + 1], R.y0); p.lineTo(b - R.tl[k + 1], R.y1); p.lineTo(a - R.tl[k], R.y1); } }
+    paths.forEach((p, i) => { ctx.fillStyle = st.tints[i]; ctx.fill(p); });
+  }
+  // nuclei
+  if(st.nuc && v.ppm > 40){
+    const np = new Path2D(), nl = new Path2D(), gr = new Path2D();
+    for(const r of ri){ const R = rows[r]; for(let k = 0; k < R.xs.length - 1; k++){ const a = R.xs[k], b = R.xs[k + 1]; if(b < xl || a > xr) continue;
+      const nx = a + (b - a)*R.nfx[k], ny = R.y0 + (R.y1 - R.y0)*R.nfy[k], nr = R.nr[k];
+      ell(np, nx, ny, nr*1.25, nr, hsh(k, r)*0.6 - .3);
+      if(v.ppm > 280){ const ox = (hsh(r, k + 3) - .5)*nr, oy = (hsh(r + 5, k) - .5)*nr*0.6; nl.moveTo(nx + ox + nr*0.28, ny + oy); nl.arc(nx + ox, ny + oy, nr*0.28, 0, TAU); }
+      if(v.ppm > 450){ for(let g = 0; g < 7; g++){ const gx = a + (b - a)*hsh(r*7 + g, k), gy = R.y0 + (R.y1 - R.y0)*(0.15 + 0.7*hsh(k*3 + g, r)); const gr0 = 0.0012 + 0.0012*hsh(g, r + k); gr.moveTo(gx + gr0, gy); gr.arc(gx, gy, gr0, 0, TAU); } }
+    } }
+    ctx.fillStyle = st.gran; ctx.fill(gr);
+    ctx.fillStyle = st.nuc; ctx.fill(np);
+    if(st.nucEdge){ ctx.strokeStyle = st.nucEdge; ctx.lineWidth = Math.max(lw(v, 1), 0.0012); ctx.stroke(np); }
+    ctx.fillStyle = st.nucleolus; ctx.fill(nl);
+  }
+  // walls
+  const wp = new Path2D(); const wf = st.wobF || 1; const step = Math.max(v.r/40, 0.004)/(wf > 1 ? 4 : 1);
+  const first = ri[0], last = ri[ri.length - 1];
+  for(let b = first; b <= last + 1; b++){
+    const yb = b < rows.length ? rows[b].y0 : rows[rows.length - 1].y1;
+    for(let x = xl, i = 0; x <= xr + step; x += step, i++){ const y = yb + wob(b, x, st.wob, wf); i ? wp.lineTo(x, y) : wp.moveTo(x, y); }
+  }
+  for(const r of ri){ const R = rows[r]; for(let k = 0; k < R.xs.length; k++){ const x = R.xs[k]; if(x < xl - 0.05 || x > xr + 0.05) continue; const xa = x + R.tl[k], ya = R.y0 + wob(r, x, st.wob, wf), xb = x - R.tl[k], yb = R.y1 + wob(r + 1, x, st.wob, wf); wp.moveTo(xa, ya);
+    if(st.vwob){ for(let q = 1; q < 8; q++){ const f = q/8; wp.lineTo(xa + (xb - xa)*f + st.vwob*Math.sin(f*TAU*1.5 + k*1.3 + r*0.7), ya + (yb - ya)*f); } }
+    wp.lineTo(xb, yb); } }
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = st.wall; ctx.lineWidth = Math.max(lw(v, 1.1), st.wallW); ctx.stroke(wp);
+  if(v.ppm > 330 && st.wallMid){ ctx.strokeStyle = st.wallMid; ctx.lineWidth = Math.max(lw(v, 0.6), st.wallW*0.3); ctx.stroke(wp); }
+}
+function sheetCell(rows, x, y){
+  for(let r = 0; r < rows.length; r++){ const R = rows[r]; if(y >= R.y0 && y < R.y1){ for(let k = 0; k < R.xs.length - 1; k++){ if(x >= R.xs[k] && x < R.xs[k + 1]) return {r, k}; } } }
+  return null;
+}
+
+/* ----- onion ----- */
+function getOnion(){
+  if(CACHE.onion) return CACHE.onion;
+  const R = mulberry32(S.seed ^ 0x0A10);
+  const outline = blobOutline(R, 3.9, 2.9, 64);
+  const rows = buildSheet(R, {x0:-4.8, x1:4.8, y0:-3.6, y1:3.6, hMin:0.052, hMax:0.075, wMin:0.19, wMax:0.33, nMin:0.0085, nMax:0.0115, tilt:0.035});
+  const bubbles = [{x:2.4, y:-1.4, r:0.22}];
+  const flatBubbles = [];
+  for(let i = 0; i < 7; i++) flatBubbles.push({x:(R() - .5)*2.2, y:(R() - .5)*1.6, r:0.06 + R()*0.22});
+  return CACHE.onion = {outline, rows, bubbles, flatBubbles};
+}
+function drawBubbles(ctx, v, list){
+  for(const b of list){
+    if(Math.hypot(b.x - v.cx, b.y - v.cy) > v.r + b.r) continue;
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, TAU); ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fill();
+    ctx.lineWidth = b.r*0.22; ctx.strokeStyle = 'rgba(35,35,35,.8)'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r*0.8, 0, TAU); ctx.lineWidth = b.r*0.05; ctx.strokeStyle = 'rgba(90,90,90,.5)'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(b.x - b.r*0.3, b.y - b.r*0.3, b.r*0.12, 0, TAU); ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.fill();
+  }
+}
+function drawOnion(ctx, v){
+  const O = getOnion(), st = S.stain.onion;
+  ctx.save(); tracePoly(ctx, O.outline);
+  ctx.fillStyle = st ? '#e6bf78' : '#eeede3'; ctx.fill(); ctx.clip();
+  drawSheet(ctx, v, O.rows, st ? {
+    tints:['#ebc985', '#e3b96e', '#eecf92'], nuc:'rgba(104,58,18,.9)', nucEdge:'rgba(70,35,8,.9)', nucleolus:'rgba(55,25,5,.95)', gran:'rgba(150,95,40,.35)',
+    wall:'rgba(118,70,22,.92)', wallMid:'rgba(232,196,128,.55)', wallW:0.0032, wob:0.006
+  } : {
+    tints:['#f0efe6', '#ecebe0', '#f2f1ea'], nuc:'rgba(160,158,136,.32)', nucEdge:'rgba(120,118,98,.35)', nucleolus:'rgba(120,118,98,.35)', gran:'rgba(150,150,130,.18)',
+    wall:'rgba(128,128,108,.55)', wallMid:'rgba(246,246,238,.55)', wallW:0.0032, wob:0.006
+  });
+  ctx.restore();
+  tracePoly(ctx, O.outline); ctx.lineWidth = Math.max(lw(v, 2), 0.014); ctx.strokeStyle = st ? 'rgba(120,75,25,.65)' : 'rgba(120,115,95,.45)'; ctx.stroke();
+  drawBubbles(ctx, v, O.bubbles);
+  if(S.prep.flat) drawBubbles(ctx, v, O.flatBubbles);
+}
+function onionNucleusAt(x, y){
+  const O = getOnion(); if(!pip(x, y, O.outline)) return false;
+  const c = sheetCell(O.rows, x, y); if(!c) return false;
+  for(let dr = -1; dr <= 1; dr++){ const R = O.rows[c.r + dr]; if(!R) continue;
+    for(let k = Math.max(0, c.k - 2); k < Math.min(R.xs.length - 1, c.k + 3); k++){
+      const a = R.xs[k], b = R.xs[k + 1]; const nx = a + (b - a)*R.nfx[k], ny = R.y0 + (R.y1 - R.y0)*R.nfy[k];
+      if(Math.hypot(nx - x, ny - y) < Math.max(R.nr[k]*2.2, 0.016)) return true; } }
+  return false;
+}
+
+/* ----- letter e ----- */
+function getE(){
+  if(CACHE.e) return CACHE.e;
+  const R = mulberry32(S.seed ^ 0x0E0E); const fib = [], ink = [];
+  for(let i = 0; i < 700; i++){ const x = (R() - .5)*5.6, y = (R() - .5)*4.2, a = R()*TAU, l = 0.08 + R()*0.4; fib.push([x, y, x + Math.cos(a)*l*.5, y + Math.sin(a)*l*.5 + (R() - .5)*0.05, x + Math.cos(a)*l, y + Math.sin(a)*l]); }
+  for(let i = 0; i < 260; i++){ const a = R()*TAU, d = 0.5 + R()*0.9; ink.push([Math.cos(a)*d, Math.sin(a)*d*0.95 - 0.05, 0.003 + R()*0.012]); }
+  return CACHE.e = {fib, ink};
+}
+function drawE(ctx, v){
+  const E = getE();
+  ctx.fillStyle = '#ebe5d2'; ctx.fillRect(-2.8, -2.1, 5.6, 4.2);
+  ctx.strokeStyle = 'rgba(150,135,105,.35)'; ctx.lineWidth = Math.max(lw(v, .8), 0.006);
+  ctx.beginPath(); for(const f of E.fib){ ctx.moveTo(f[0], f[1]); ctx.quadraticCurveTo(f[2], f[3], f[4], f[5]); } ctx.stroke();
+  ctx.save(); ctx.scale(0.01, 0.01);
+  ctx.font = 'bold 230px Georgia, "Times New Roman", "Liberation Serif", Tinos, serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = 'rgba(24,24,24,.93)';
+  ctx.fillText('e', 0, 62); ctx.restore();
+  ctx.fillStyle = 'rgba(30,30,30,.55)'; ctx.beginPath(); for(const [x, y, r] of E.ink){ ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, TAU); } ctx.fill();
+  ctx.strokeStyle = 'rgba(150,135,105,.25)'; ctx.beginPath(); for(let i = 0; i < E.fib.length; i += 3){ const f = E.fib[i]; ctx.moveTo(f[0], f[1]); ctx.quadraticCurveTo(f[2], f[3], f[4], f[5]); } ctx.stroke();
+}
+
+/* ----- crossed threads ----- */
+const THREAD_INFO = [
+  {name:'Red', c:['#b8352a', '#e2776c', '#7d1c13'], ang:0.42, off:0.05},
+  {name:'Blue', c:['#1f5fae', '#6597da', '#123c72'], ang:-0.78, off:-0.07},
+  {name:'Yellow', c:['#d1a116', '#f3cf55', '#97700a'], ang:1.47, off:0.02}
+];
+function getThreads(){
+  if(CACHE.threads) return CACHE.threads;
+  const R = mulberry32(S.seed ^ 0x7777); const zs = [1.15, 0, -1.15];
+  for(let i = 2; i > 0; i--){ const j = Math.floor(R()*(i + 1)); [zs[i], zs[j]] = [zs[j], zs[i]]; }
+  const fuzz = THREAD_INFO.map(() => { const f = []; for(let i = 0; i < 70; i++) f.push([(R() - .5)*9, R() < .5 ? -1 : 1, R()*0.12 + 0.03, (R() - .5)*1.2]); return f; });
+  const top = zs.indexOf(Math.max(...zs));
+  return CACHE.threads = {zs, fuzz, top};
+}
+function drawThread(ctx, v, i){
+  const T = THREAD_INFO[i], F = getThreads().fuzz[i], w = 0.24;
+  const dx = Math.cos(T.ang), dy = Math.sin(T.ang), nx = -dy, ny = dx;
+  const ox = nx*T.off, oy = ny*T.off;
+  const tc = (v.cx - ox)*dx + (v.cy - oy)*dy;
+  const t0 = clamp(tc - v.r*1.3, -4.6, 4.6), t1 = clamp(tc + v.r*1.3, -4.6, 4.6); if(t1 <= t0) return;
+  const P = (t, s) => [ox + dx*t + nx*s, oy + dy*t + ny*s];
+  ctx.beginPath(); let p = P(t0, -w/2); ctx.moveTo(...p); p = P(t1, -w/2); ctx.lineTo(...p); p = P(t1, w/2); ctx.lineTo(...p); p = P(t0, w/2); ctx.lineTo(...p); ctx.closePath();
+  ctx.fillStyle = T.c[0]; ctx.globalAlpha = .9; ctx.fill(); ctx.globalAlpha = 1;
+  if(v.ppm > 40){
+    const step = Math.max((t1 - t0)/220, 0.0015), pitch = 0.32;
+    for(let f = 0; f < 10; f++){
+      const ph = f/10*TAU; ctx.beginPath(); let pen = false;
+      for(let t = t0; t <= t1; t += step){ const a = TAU*t/pitch + ph; const front = Math.cos(a) > 0; const q = P(t, (w/2)*0.92*Math.sin(a)); if(front){ pen ? ctx.lineTo(...q) : ctx.moveTo(...q); pen = true; } else pen = false; }
+      ctx.strokeStyle = f % 2 ? T.c[1] : T.c[2]; ctx.globalAlpha = .6; ctx.lineWidth = Math.max(w/12, lw(v, 1)); ctx.stroke(); ctx.globalAlpha = 1;
+    }
+  }
+  ctx.strokeStyle = T.c[2]; ctx.lineWidth = Math.max(lw(v, 0.8), 0.005); ctx.globalAlpha = .7; ctx.beginPath();
+  for(const [t, side, len, bend] of F){ if(t < t0 || t > t1) continue; const a = P(t, side*w/2), b = P(t + bend*len, side*(w/2 + len)); ctx.moveTo(...a); ctx.quadraticCurveTo((a[0] + b[0])/2 + nx*0.01, (a[1] + b[1])/2 + ny*0.01, ...b); }
+  ctx.stroke(); ctx.globalAlpha = 1;
+}
+
+/* ----- cheek cells ----- */
+function getCheek(){
+  if(CACHE.cheek) return CACHE.cheek;
+  const R = mulberry32(S.seed ^ 0x0C4E); const cells = [], bact = [];
+  const centers = [[0, 0], [0.55, 0.3], [-0.5, 0.35], [0.15, -0.55], [-0.3, -0.25]];
+  for(const [cx, cy] of centers){ const n = 7 + Math.floor(R()*8); for(let i = 0; i < n; i++){
+    const x = cx + (R() - .5)*0.42, y = cy + (R() - .5)*0.36, r = 0.028 + R()*0.014, rot = R()*TAU; const pts = [];
+    for(let k = 0; k < 10; k++){ const a = k/10*TAU + rot, kk = 1 + (R() - .5)*0.42; pts.push([x + Math.cos(a)*r*kk, y + Math.sin(a)*r*kk*0.92]); }
+    cells.push({x, y, r, pts, nx:x + (R() - .5)*r*0.5, ny:y + (R() - .5)*r*0.5, nr:0.0042 + R()*0.0016, fold:R() < .35 ? [R()*TAU, 0.4 + R()*0.4] : null});
+  } }
+  for(let i = 0; i < 420; i++){ const c = cells[Math.floor(R()*cells.length)]; const a = R()*TAU, d = c.r*(0.4 + R()*1.4); bact.push([c.x + Math.cos(a)*d, c.y + Math.sin(a)*d, 0.0007 + R()*0.0005]); }
+  return CACHE.cheek = {cells, bact};
+}
+function drawCheek(ctx, v){
+  const C = getCheek(), st = S.stain.cheek;
+  const fill = st ? 'rgba(112,142,210,.32)' : 'rgba(205,205,195,.22)', edge = st ? 'rgba(40,72,155,.6)' : 'rgba(150,150,138,.4)', nuc = st ? 'rgba(28,40,125,.88)' : 'rgba(140,140,128,.35)';
+  ctx.lineJoin = 'round';
+  for(const c of C.cells){
+    if(Math.hypot(c.x - v.cx, c.y - v.cy) > v.r + c.r*1.5) continue;
+    ctx.beginPath(); const p = c.pts; ctx.moveTo((p[0][0] + p[1][0])/2, (p[0][1] + p[1][1])/2);
+    for(let k = 1; k <= p.length; k++){ const a = p[k % p.length], b = p[(k + 1) % p.length]; ctx.quadraticCurveTo(a[0], a[1], (a[0] + b[0])/2, (a[1] + b[1])/2); }
+    ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); ctx.strokeStyle = edge; ctx.lineWidth = Math.max(lw(v, 1), 0.0012); ctx.stroke();
+    if(c.fold && v.ppm > 150){ const [a, k] = c.fold; ctx.beginPath(); ctx.moveTo(c.x + Math.cos(a)*c.r*0.9, c.y + Math.sin(a)*c.r*0.9); ctx.quadraticCurveTo(c.x, c.y, c.x + Math.cos(a + 2.4*k)*c.r*0.9, c.y + Math.sin(a + 2.4*k)*c.r*0.9); ctx.strokeStyle = edge; ctx.globalAlpha = .6; ctx.stroke(); ctx.globalAlpha = 1; }
+    if(v.ppm > 35){ ctx.beginPath(); ctx.ellipse(c.nx, c.ny, c.nr*1.15, c.nr, 0.3, 0, TAU); ctx.fillStyle = nuc; ctx.fill(); }
+  }
+  if(v.ppm > 220){ ctx.fillStyle = st ? 'rgba(25,40,120,.7)' : 'rgba(120,120,110,.4)'; ctx.beginPath(); for(const [x, y, r] of C.bact){ if(Math.abs(x - v.cx) > v.r || Math.abs(y - v.cy) > v.r) continue; ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, TAU); } ctx.fill(); }
+}
+
+/* ----- cork ----- */
+function getCork(){
+  if(CACHE.cork) return CACHE.cork;
+  const R = mulberry32(S.seed ^ 0xC0C0);
+  const outline = blobOutline(R, 2.5, 1.8, 48);
+  const rows = buildSheet(R, {x0:-2.9, x1:2.9, y0:-2.2, y1:2.2, hMin:0.026, hMax:0.038, wMin:0.028, wMax:0.046, nMin:0, nMax:0, tilt:0.012});
+  return CACHE.cork = {outline, rows};
+}
+function drawCork(ctx, v){
+  const K = getCork();
+  ctx.save(); tracePoly(ctx, K.outline); ctx.fillStyle = '#ead6ad'; ctx.fill(); ctx.clip();
+  drawSheet(ctx, v, K.rows, {tints:v.ppm > 200 ? ['#efe0c0', '#e9d6b0', '#f2e6cc'] : null, nuc:null, wall:'rgba(112,66,28,.9)', wallMid:'rgba(190,140,80,.6)', wallW:0.0035, wob:0.003});
+  ctx.restore();
+  tracePoly(ctx, K.outline); ctx.lineWidth = Math.max(lw(v, 2), 0.02); ctx.strokeStyle = 'rgba(100,60,25,.7)'; ctx.stroke();
+}
+
+/* ----- pond water ----- */
+function getPond(){
+  if(CACHE.pond) return CACHE.pond;
+  const R = mulberry32(S.seed ^ 0x9090); const orgs = [], fil = [], deb = [];
+  const add = (type, n, f) => { for(let i = 0; i < n; i++){ const a = R()*TAU, d = Math.sqrt(R())*1.5; orgs.push(Object.assign({type, x:Math.cos(a)*d, y:Math.sin(a)*d, h:R()*TAU, ph:R()*10, turn:0}, f())); } };
+  add('para', 6, () => ({len:0.19 + R()*0.05, sp:0.09 + R()*0.05}));
+  add('eug', 10, () => ({len:0.055 + R()*0.02, sp:0.025 + R()*0.02, green:true}));
+  add('amoeba', 3, () => ({len:0.16 + R()*0.06, sp:0.004}));
+  add('volvox', 3, () => ({len:0.36 + R()*0.1, sp:0.012, green:true}));
+  add('diatom', 12, () => ({len:0.05 + R()*0.035, sp:0.006}));
+  for(let i = 0; i < 3; i++) fil.push({x:(R() - .5)*2, y:(R() - .5)*2, a:R()*TAU, len:1.2 + R()*0.8, w:0.034, green:true});
+  for(let i = 0; i < 160; i++) deb.push([(R() - .5)*5, (R() - .5)*5, 0.004 + R()*0.03, R()]);
+  return CACHE.pond = {orgs, fil, deb};
+}
+function updatePond(dt){
+  const P = getPond();
+  for(const o of P.orgs){
+    o.ph += dt;
+    if(o.type === 'volvox' || o.type === 'amoeba' || o.type === 'diatom'){ o.h += (Math.random() - .5)*dt*0.3; }
+    else { o.turn += (Math.random() - .5)*dt*3; o.turn *= 0.97; o.h += o.turn*dt; }
+    const d = Math.hypot(o.x, o.y);
+    if(d > 2.0){ const want = Math.atan2(-o.y, -o.x); let df = want - o.h; df = Math.atan2(Math.sin(df), Math.cos(df)); o.h += df*Math.min(1, dt*2); }
+    o.x += Math.cos(o.h)*o.sp*dt; o.y += Math.sin(o.h)*o.sp*dt;
+  }
+}
+function drawPond(ctx, v){
+  const P = getPond();
+  ctx.beginPath(); ctx.arc(0, 0, 3, 0, TAU); ctx.fillStyle = 'rgba(210,228,200,.35)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(0, 0, 3, 0, TAU); ctx.lineWidth = Math.max(lw(v, 3), 0.02); ctx.strokeStyle = 'rgba(120,140,120,.4)'; ctx.stroke();
+  const near = (x, y, r) => Math.abs(x - v.cx) < v.r + r && Math.abs(y - v.cy) < v.r + r;
+  ctx.fillStyle = 'rgba(120,95,60,.45)'; ctx.beginPath(); for(const [x, y, r, s] of P.deb){ if(!near(x, y, r)) continue; ctx.moveTo(x + r, y); ctx.ellipse(x, y, r, r*(0.5 + s*0.5), s*3, 0, TAU); } ctx.fill();
+  for(const f of P.fil){
+    if(!near(f.x, f.y, f.len)) continue;
+    ctx.save(); ctx.translate(f.x, f.y); ctx.rotate(f.a);
+    ctx.fillStyle = 'rgba(190,220,170,.5)'; ctx.fillRect(-f.len/2, -f.w/2, f.len, f.w);
+    ctx.strokeStyle = 'rgba(70,120,50,.6)'; ctx.lineWidth = Math.max(lw(v, 1), 0.0015); ctx.strokeRect(-f.len/2, -f.w/2, f.len, f.w);
+    ctx.beginPath(); for(let x = -f.len/2; x < f.len/2; x += 0.11){ ctx.moveTo(x, -f.w/2); ctx.lineTo(x, f.w/2); } ctx.stroke();
+    if(v.ppm > 60){ ctx.beginPath(); for(let x = -f.len/2, i = 0; x <= f.len/2; x += 0.003, i++){ const y = Math.sin(x*TAU/0.045)*f.w*0.38; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.strokeStyle = 'rgba(45,130,35,.85)'; ctx.lineWidth = f.w*0.22; ctx.stroke(); }
+    ctx.restore();
+  }
+  for(const o of P.orgs){
+    if(!near(o.x, o.y, o.len)) continue;
+    ctx.save(); ctx.translate(o.x, o.y); ctx.rotate(o.h); const L = o.len;
+    if(o.type === 'para'){
+      ctx.beginPath(); ctx.moveTo(L/2, 0); ctx.bezierCurveTo(L/2, -L*0.2, -L*0.4, -L*0.2, -L/2, -L*0.02); ctx.bezierCurveTo(-L*0.45, L*0.2, L*0.05, L*0.12, L*0.1, L*0.07); ctx.bezierCurveTo(L*0.2, L*0.17, L/2, L*0.16, L/2, 0);
+      ctx.fillStyle = 'rgba(216,208,170,.6)'; ctx.fill(); ctx.strokeStyle = 'rgba(100,90,55,.8)'; ctx.lineWidth = Math.max(lw(v, 1), L*0.012); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(-L*0.05, 0, L*0.12, L*0.06, 0, 0, TAU); ctx.fillStyle = 'rgba(150,135,95,.55)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(L*0.3, -L*0.04, L*0.035, 0, TAU); ctx.arc(-L*0.32, -L*0.02, L*0.035, 0, TAU); ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.fill();
+      if(v.ppm > 250){ ctx.beginPath(); for(let i = 0; i < 46; i++){ const a = i/46*TAU; const ex = Math.cos(a)*L*0.5, ey = Math.sin(a)*L*0.18; const k = 1.08 + 0.04*Math.sin(o.ph*20 + i); ctx.moveTo(ex, ey); ctx.lineTo(ex*k, ey*k*1.15); } ctx.strokeStyle = 'rgba(100,90,55,.5)'; ctx.lineWidth = lw(v, .7); ctx.stroke(); }
+    } else if(o.type === 'eug'){
+      ctx.beginPath(); ctx.moveTo(L/2, 0); ctx.quadraticCurveTo(0, -L*0.2, -L/2, 0); ctx.quadraticCurveTo(0, L*0.2, L/2, 0);
+      ctx.fillStyle = 'rgba(70,145,50,.82)'; ctx.fill(); ctx.strokeStyle = 'rgba(30,90,25,.8)'; ctx.lineWidth = Math.max(lw(v, .8), L*0.01); ctx.stroke();
+      if(v.ppm > 200){ ctx.fillStyle = 'rgba(30,110,25,.9)'; for(let i = 0; i < 8; i++){ ctx.beginPath(); ctx.arc(-L*0.35 + i*L*0.09, ((i % 2) - .5)*L*0.06, L*0.025, 0, TAU); ctx.fill(); }
+        ctx.beginPath(); ctx.moveTo(L/2, 0); for(let s = 0; s <= 1; s += 0.05) ctx.lineTo(L/2 + s*L*0.8, Math.sin(s*9 + o.ph*12)*L*0.06); ctx.strokeStyle = 'rgba(40,80,30,.6)'; ctx.lineWidth = lw(v, .8); ctx.stroke(); }
+      ctx.beginPath(); ctx.arc(L*0.36, -L*0.02, L*0.03, 0, TAU); ctx.fillStyle = '#d22'; ctx.fill();
+    } else if(o.type === 'amoeba'){
+      const r = L/2; ctx.beginPath();
+      for(let i = 0; i <= 16; i++){ const a = i/16*TAU; const k = 1 + 0.28*Math.sin(3*a + o.ph*0.4) + 0.18*Math.sin(5*a - o.ph*0.25); const x = Math.cos(a)*r*k, y = Math.sin(a)*r*k*0.8; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.closePath(); ctx.fillStyle = 'rgba(206,200,186,.5)'; ctx.fill(); ctx.strokeStyle = 'rgba(115,110,95,.65)'; ctx.lineWidth = Math.max(lw(v, 1), 0.0015); ctx.stroke();
+      ctx.beginPath(); ctx.arc(r*0.1, 0, r*0.16, 0, TAU); ctx.fillStyle = 'rgba(140,130,110,.6)'; ctx.fill();
+      ctx.fillStyle = 'rgba(160,150,120,.4)'; for(let i = 0; i < 5; i++){ ctx.beginPath(); ctx.arc(Math.cos(i*1.3)*r*0.45, Math.sin(i*2.1)*r*0.35, r*0.07, 0, TAU); ctx.fill(); }
+    } else if(o.type === 'volvox'){
+      const r = L/2; ctx.rotate(o.ph*0.3);
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fillStyle = 'rgba(130,195,100,.22)'; ctx.fill(); ctx.strokeStyle = 'rgba(55,125,40,.75)'; ctx.lineWidth = Math.max(lw(v, 1), r*0.015); ctx.stroke();
+      if(v.ppm > 50){ ctx.fillStyle = 'rgba(50,130,35,.8)'; ctx.beginPath(); for(let i = 0; i < 90; i++){ const a = i*2.39996, d = r*Math.sqrt((i + .5)/90)*0.96; ctx.moveTo(Math.cos(a)*d + r*0.03, Math.sin(a)*d); ctx.arc(Math.cos(a)*d, Math.sin(a)*d, r*0.03, 0, TAU); } ctx.fill(); }
+      ctx.fillStyle = 'rgba(40,115,30,.6)'; for(const [a, d] of [[0.5, 0.45], [2.6, 0.5], [4.4, 0.35]]){ ctx.beginPath(); ctx.arc(Math.cos(a)*r*d, Math.sin(a)*r*d, r*0.2, 0, TAU); ctx.fill(); }
+    } else if(o.type === 'diatom'){
+      ctx.beginPath(); ctx.moveTo(L/2, 0); ctx.lineTo(L*0.3, -L*0.13); ctx.lineTo(-L*0.3, -L*0.13); ctx.lineTo(-L/2, 0); ctx.lineTo(-L*0.3, L*0.13); ctx.lineTo(L*0.3, L*0.13); ctx.closePath();
+      ctx.fillStyle = 'rgba(205,165,70,.72)'; ctx.fill(); ctx.strokeStyle = 'rgba(120,90,25,.85)'; ctx.lineWidth = Math.max(lw(v, .8), L*0.012); ctx.stroke();
+      if(v.ppm > 280){ ctx.beginPath(); for(let x = -L*0.4; x <= L*0.4; x += L*0.045){ ctx.moveTo(x, -L*0.11); ctx.lineTo(x, L*0.11); } ctx.strokeStyle = 'rgba(120,90,25,.4)'; ctx.lineWidth = lw(v, .7); ctx.stroke(); }
+    }
+    ctx.restore();
+  }
+}
+function pondPick(x, y){
+  const P = getPond();
+  for(const o of P.orgs){ if(Math.hypot(o.x - x, o.y - y) < o.len*0.6 + 0.01) return o; }
+  for(const f of P.fil){ const dx = x - f.x, dy = y - f.y; const t = dx*Math.cos(f.a) + dy*Math.sin(f.a), n = -dx*Math.sin(f.a) + dy*Math.cos(f.a); if(Math.abs(t) < f.len/2 && Math.abs(n) < f.w) return f; }
+  return null;
+}
+
+/* ----- helpers for the added slides ----- */
+let animT = 0;
+function tileRand(i, j, salt){ return mulberry32(((i*73856093) ^ (j*19349663) ^ salt ^ S.seed) >>> 0); }
+function eachTile(v, T, pad, fn){ const x0 = Math.floor((v.cx - v.r - pad)/T), x1 = Math.floor((v.cx + v.r + pad)/T), y0 = Math.floor((v.cy - v.r - pad)/T), y1 = Math.floor((v.cy + v.r + pad)/T); for(let i = x0; i <= x1; i++) for(let j = y0; j <= y1; j++) fn(i, j); }
+function speckle(ctx, v, salt, T, n, px, color){ const s = px/v.ppm; ctx.fillStyle = color; ctx.beginPath(); eachTile(v, T, 0, (i, j) => { const R = tileRand(i, j, salt); for(let k = 0; k < n; k++) ctx.rect(i*T + R()*T, j*T + R()*T, s, s); }); ctx.fill(); }
+function lineView(v, ang, off, ext){ const dx = Math.cos(ang), dy = Math.sin(ang), nx = -dy, ny = dx, ox = nx*off, oy = ny*off; const tc = (v.cx - ox)*dx + (v.cy - oy)*dy; return {dx, dy, nx, ny, ox, oy, t0:clamp(tc - v.r*1.3, -ext, ext), t1:clamp(tc + v.r*1.3, -ext, ext)}; }
+function nearLine(cx, cy, ang, off, w){ return Math.abs(-Math.sin(ang)*cx + Math.cos(ang)*cy - off) < w; }
+function near(x, y, v, pad){ return Math.abs(x - v.cx) < v.r + pad && Math.abs(y - v.cy) < v.r + pad; }
+// rotated ellipse from 4 curves (Path2D.ellipse with a rotation is very slow in Chrome)
+function ell(p, x, y, rx, ry, a){
+  const c = Math.cos(a), s = Math.sin(a), k = 0.5523, ax = c*rx, ay = s*rx, bx = -s*ry, by = c*ry;
+  p.moveTo(x + ax, y + ay);
+  p.bezierCurveTo(x + ax + k*bx, y + ay + k*by, x + bx + k*ax, y + by + k*ay, x + bx, y + by);
+  p.bezierCurveTo(x + bx - k*ax, y + by - k*ay, x - ax + k*bx, y - ay + k*by, x - ax, y - ay);
+  p.bezierCurveTo(x - ax - k*bx, y - ay - k*by, x - bx - k*ax, y - by - k*ay, x - bx, y - by);
+  p.bezierCurveTo(x - bx + k*ax, y - by + k*ay, x + ax - k*bx, y + ay - k*by, x + ax, y + ay);
+  // (no closePath: it makes big paths very slow in Chrome; fill closes the shape anyway)
+}
+function circ(p, x, y, r){ p.moveTo(x + r, y); p.arc(x, y, r, 0, TAU); }
+
+/* ----- Elodea leaf ----- */
+function getElodea(){
+  if(CACHE.elodea) return CACHE.elodea;
+  const R = mulberry32(S.seed ^ 0xE10D), L = 1.9, N = 90, top = [], bot = [];
+  for(let i = 0; i <= N; i++){ const x = -L + 2*L*i/N; const w = 0.58*Math.sqrt(Math.max(0, 1 - (x/L)*(x/L)))*(1 - 0.2*(x/L)); const tooth = i % 4 === 0 ? 0.025 : 0; top.push([x, -(w + tooth)]); bot.push([x, w + tooth]); }
+  const outline = top.concat(bot.reverse());
+  const rows = buildSheet(R, {x0:-2.1, x1:2.1, y0:-0.75, y1:0.75, hMin:0.022, hMax:0.03, wMin:0.065, wMax:0.11, nMin:0, nMax:0, tilt:0.006});
+  return CACHE.elodea = {outline, rows};
+}
+function drawChloro(ctx, v, rows){
+  const ri = visRows(rows, v), xl = v.cx - v.r, xr = v.cx + v.r, p = new Path2D(), cr = 0.0026, m = 0.0045;
+  for(const r of ri){ const R = rows[r]; for(let k = 0; k < R.xs.length - 1; k++){ const a = R.xs[k], b = R.xs[k + 1]; if(b < xl || a > xr) continue;
+    const x0 = a + m, x1 = b - m, y0 = R.y0 + m, y1 = R.y1 - m, wd = x1 - x0, ht = y1 - y0; if(wd <= 0 || ht <= 0) continue;
+    const per = 2*(wd + ht), h1 = hsh(r, k), dir = h1 > .5 ? 1 : -1, sp = 0.035 + 0.04*hsh(k, r), n = 11 + Math.floor(h1*6);
+    for(let i = 0; i < n; i++){
+      let t = ((i + hsh(r + i, k)*0.6)/n + dir*sp*animT) % 1; if(t < 0) t += 1; let d = t*per, x, y;
+      if(d < wd){ x = x0 + d; y = y0; } else if((d -= wd) < ht){ x = x1; y = y0 + d; } else if((d -= ht) < wd){ x = x1 - d; y = y1; } else { d -= wd; x = x0; y = y1 - d; }
+      ell(p, x, y, cr, cr*0.78, t*9);
+    }
+    for(let i = 0; i < 6; i++){ const x = a + (b - a)*(0.18 + 0.64*hsh(r*3 + i, k)), y = R.y0 + (R.y1 - R.y0)*(0.25 + 0.5*hsh(k*5 + i, r)); ell(p, x, y, cr, cr*0.78, i); }
+  } }
+  ctx.fillStyle = 'rgba(38,118,30,.9)'; ctx.fill(p);
+  if(v.ppm > 300){ ctx.strokeStyle = 'rgba(18,70,14,.8)'; ctx.lineWidth = lw(v, .8); ctx.stroke(p); }
+}
+function drawElodea(ctx, v){
+  const E = getElodea();
+  ctx.save(); tracePoly(ctx, E.outline); ctx.fillStyle = '#b6d98a'; ctx.fill(); ctx.clip();
+  drawSheet(ctx, v, E.rows, {tints:['#c3e19b', '#b2d684', '#cbe5a8'], nuc:null, wall:'rgba(64,110,36,.85)', wallMid:'rgba(205,232,170,.6)', wallW:0.0018, wob:0.002});
+  if(v.ppm > 140) drawChloro(ctx, v, E.rows);
+  else speckle(ctx, v, 0xE1, 0.2, 40, 1.3, 'rgba(50,125,40,.6)');
+  ctx.restore();
+  tracePoly(ctx, E.outline); ctx.lineWidth = Math.max(lw(v, 1.5), 0.008); ctx.strokeStyle = 'rgba(60,105,35,.8)'; ctx.stroke();
+}
+
+/* ----- leaf peel with stomata ----- */
+function getLeaf(){
+  if(CACHE.leaf) return CACHE.leaf;
+  const R = mulberry32(S.seed ^ 0x1EAF);
+  const outline = blobOutline(R, 2.4, 1.7, 48);
+  const rows = buildSheet(R, {x0:-2.9, x1:2.9, y0:-2.1, y1:2.1, hMin:0.035, hMax:0.05, wMin:0.04, wMax:0.065, nMin:0.0028, nMax:0.0036, tilt:0.006});
+  const st = []; for(let i = 0; i < 700; i++){ const a = R()*TAU, d = Math.sqrt(R()); st.push([Math.cos(a)*d*2.3, Math.sin(a)*d*1.6, R()*Math.PI, 0.9 + R()*0.25]); }
+  return CACHE.leaf = {outline, rows, st};
+}
+function drawLeaf(ctx, v){
+  const L = getLeaf();
+  ctx.save(); tracePoly(ctx, L.outline); ctx.fillStyle = '#eef1e2'; ctx.fill(); ctx.clip();
+  const lo = v.ppm < 150; drawSheet(ctx, v, L.rows, {tints:lo ? null : ['#eff2e4', '#e9eddb', '#f2f4e9'], nuc:lo ? null : 'rgba(150,150,120,.3)', nucEdge:null, nucleolus:'rgba(0,0,0,0)', gran:'rgba(0,0,0,0)', wall:'rgba(92,108,66,.75)', wallMid:null, wallW:0.0012, wob:0.004, wobF:lo ? 1 : 20, vwob:lo ? 0 : 0.004});
+  const sp = new Path2D(), inner = new Path2D(), pore = new Path2D(), chl = new Path2D(), det = v.ppm > 300;
+  for(const [x, y, a, s] of L.st){
+    if(!near(x, y, v, 0.03)) continue;
+    const rx = 0.017*s, ry = 0.012*s;
+    ell(sp, x, y, rx, ry, a); ell(inner, x, y, rx*0.62, ry*0.4, a); ell(pore, x, y, rx*0.5, ry*0.14, a);
+    if(det){ for(const side of [1, -1]) for(let i = 0; i < 5; i++){ const th = side*(0.45 + i*0.56), lx = Math.cos(th)*rx*0.8, ly = Math.sin(th)*ry*0.72; circ(chl, x + lx*Math.cos(a) - ly*Math.sin(a), y + lx*Math.sin(a) + ly*Math.cos(a), 0.0012*s); } }
+  }
+  ctx.fillStyle = 'rgba(205,228,172,.97)'; ctx.fill(sp);
+  ctx.strokeStyle = 'rgba(58,88,38,.85)'; ctx.lineWidth = Math.max(lw(v, 1), 0.0008); ctx.stroke(sp);
+  ctx.strokeStyle = 'rgba(58,88,38,.55)'; ctx.stroke(inner);
+  ctx.fillStyle = 'rgba(45,55,35,.9)'; ctx.fill(pore);
+  ctx.fillStyle = 'rgba(45,125,35,.9)'; ctx.fill(chl);
+  ctx.restore();
+  tracePoly(ctx, L.outline); ctx.lineWidth = Math.max(lw(v, 1.5), 0.01); ctx.strokeStyle = 'rgba(100,115,80,.55)'; ctx.stroke();
+}
+
+/* ----- blood smear ----- */
+function getBlood(){ if(CACHE.blood) return CACHE.blood; const R = mulberry32(S.seed ^ 0xB100); return CACHE.blood = {outline:blobOutline(R, 3.4, 1.5, 48)}; }
+function drawBlood(ctx, v){
+  const B = getBlood();
+  ctx.save(); tracePoly(ctx, B.outline); ctx.fillStyle = 'rgba(232,196,204,.55)'; ctx.fill(); ctx.clip();
+  if(v.ppm < 150){ speckle(ctx, v, 0xB1, 0.25, 34, 1.6, 'rgba(200,110,125,.55)'); ctx.restore(); return; }
+  const rbc = new Path2D(), ctr = new Path2D(), wc = new Path2D(), wn = new Path2D(), pl = new Path2D(), det = v.ppm > 300, T = 0.05;
+  eachTile(v, T, 0.01, (i, j) => {
+    const R = tileRand(i, j, 0xB2);
+    for(let k = 0; k < 11; k++){ const x = (i + R())*T, y = (j + R())*T, r = 0.0036 + R()*0.0008; circ(rbc, x, y, r); if(det) circ(ctr, x, y, r*0.42); }
+    if(R() < 0.07){ const x = (i + R())*T, y = (j + R())*T, r = 0.0062; circ(wc, x, y, r);
+      if(R() < .65){ const a0 = R()*TAU; for(let l = 0; l < 3; l++){ const a = a0 + l*2.1, d = r*0.36; circ(wn, x + Math.cos(a)*d, y + Math.sin(a)*d, r*0.32); } }
+      else circ(wn, x, y, r*0.78); }
+    const np = R() < .6 ? 1 + Math.floor(R()*3) : 0; for(let l = 0; l < np; l++) circ(pl, (i + R())*T, (j + R())*T, 0.0011);
+  });
+  ctx.fillStyle = 'rgba(214,112,128,.88)'; ctx.fill(rbc);
+  if(det){ ctx.strokeStyle = 'rgba(150,55,70,.75)'; ctx.lineWidth = lw(v, 1); ctx.stroke(rbc); ctx.fillStyle = 'rgba(242,196,204,.85)'; ctx.fill(ctr); }
+  ctx.fillStyle = 'rgba(208,192,232,.97)'; ctx.fill(wc); ctx.fillStyle = 'rgba(82,36,132,.95)'; ctx.fill(wn); ctx.fillStyle = 'rgba(110,60,150,.9)'; ctx.fill(pl);
+  ctx.restore();
+}
+
+/* ----- potato starch ----- */
+function getPotato(){
+  if(CACHE.potato) return CACHE.potato;
+  const R = mulberry32(S.seed ^ 0x9070), g = [];
+  for(let i = 0; i < 1400; i++){ const a = R()*TAU, d = Math.sqrt(R()), big = R(), ra = 0.006 + big*big*0.03; g.push({x:Math.cos(a)*d*1.75, y:Math.sin(a)*d*1.35, a:ra, b:ra*(0.68 + R()*0.22), rot:R()*Math.PI, h:0.35 + R()*0.3, n:3 + Math.floor(R()*4)}); }
+  return CACHE.potato = {outline:blobOutline(R, 1.9, 1.5, 48), g};
+}
+function drawPotato(ctx, v){
+  const P = getPotato(), st = S.stain.potato;
+  tracePoly(ctx, P.outline); ctx.fillStyle = st ? 'rgba(225,200,140,.35)' : 'rgba(232,232,224,.3)'; ctx.fill();
+  const body = new Path2D(), ring = new Path2D(), hil = new Path2D();
+  for(const q of P.g){
+    if(!near(q.x, q.y, v, q.a)) continue;
+    ell(body, q.x, q.y, q.a, q.b, q.rot);
+    if(v.ppm > 220 && q.a*v.ppm > 8){
+      const hx = q.x - Math.cos(q.rot)*q.a*q.h, hy = q.y - Math.sin(q.rot)*q.a*q.h;
+      for(let k = 1; k <= q.n; k++){ const s = k/(q.n + 1); ell(ring, hx + (q.x - hx)*s, hy + (q.y - hy)*s, q.a*s, q.b*s, q.rot); }
+      circ(hil, hx, hy, q.b*0.08);
+    }
+  }
+  ctx.fillStyle = st ? 'rgba(50,34,104,.93)' : 'rgba(246,246,240,.85)'; ctx.fill(body);
+  ctx.strokeStyle = st ? 'rgba(24,14,58,.9)' : 'rgba(105,105,90,.75)'; ctx.lineWidth = Math.max(lw(v, 1), 0.0008); ctx.stroke(body);
+  ctx.strokeStyle = st ? 'rgba(125,105,195,.5)' : 'rgba(130,130,110,.38)'; ctx.lineWidth = lw(v, .7); ctx.stroke(ring);
+  ctx.fillStyle = st ? 'rgba(150,130,210,.6)' : 'rgba(100,100,85,.5)'; ctx.fill(hil);
+}
+
+/* ----- baker's yeast ----- */
+function getYeast(){ if(CACHE.yeast) return CACHE.yeast; const R = mulberry32(S.seed ^ 0x7EA5); return CACHE.yeast = {outline:blobOutline(R, 1.8, 1.4, 40)}; }
+function drawYeast(ctx, v){
+  const Y = getYeast();
+  ctx.save(); tracePoly(ctx, Y.outline); ctx.fillStyle = 'rgba(236,230,206,.4)'; ctx.fill(); ctx.clip();
+  if(v.ppm < 150){ speckle(ctx, v, 0x7E, 0.2, 40, 1.4, 'rgba(150,130,80,.5)'); ctx.restore(); return; }
+  const cells = new Path2D(), vac = new Path2D(), det = v.ppm > 300, T = 0.06;
+  eachTile(v, T, 0.01, (i, j) => {
+    const R = tileRand(i, j, 0x7E2), nc = 2 + Math.floor(R()*3);
+    for(let c = 0; c < nc; c++){ const cx = (i + R())*T, cy = (j + R())*T, m = 1 + Math.floor(R()*4);
+      for(let k = 0; k < m; k++){ const x = cx + (R() - .5)*0.018, y = cy + (R() - .5)*0.018, rx = 0.0042 + R()*0.0018, ry = rx*(0.75 + R()*0.15), rot = R()*Math.PI;
+        ell(cells, x, y, rx, ry, rot);
+        if(R() < 0.35){ const ba = R()*TAU, br = rx*(0.35 + R()*0.25); ell(cells, x + Math.cos(ba)*(rx + br*0.6), y + Math.sin(ba)*(rx + br*0.6), br, br*0.85, ba); }
+        if(det) circ(vac, x + (R() - .5)*rx*0.6, y + (R() - .5)*ry*0.6, rx*0.33);
+      } }
+  });
+  ctx.fillStyle = det ? 'rgba(232,220,182,.92)' : 'rgba(196,180,135,.9)'; ctx.fill(cells);
+  if(det){ ctx.strokeStyle = 'rgba(118,98,52,.85)'; ctx.lineWidth = Math.max(lw(v, 1), 0.0006); ctx.stroke(cells); }
+  if(det){ ctx.fillStyle = 'rgba(250,248,238,.9)'; ctx.fill(vac); ctx.strokeStyle = 'rgba(150,135,95,.5)'; ctx.stroke(vac); }
+  ctx.restore();
+}
+
+/* ----- bread mold ----- */
+function getMold(){
+  if(CACHE.mold) return CACHE.mold;
+  const R = mulberry32(S.seed ^ 0x3010), hy = [], sp = [], spores = [];
+  const grow = (x, y, h, n, depth) => {
+    const pts = [[x, y]];
+    for(let i = 0; i < n; i++){
+      h += (R() - .5)*0.5; x += Math.cos(h)*0.04; y += Math.sin(h)*0.04; pts.push([x, y]);
+      if(depth < 2 && R() < 0.06) grow(x, y, h + (R() < .5 ? 1 : -1)*(0.6 + R()*0.6), 10 + Math.floor(R()*25), depth + 1);
+      if(R() < 0.035){ const sa = h + (R() < .5 ? 1 : -1)*(0.8 + R()*0.8), sl = 0.12 + R()*0.3; sp.push({x, y, ex:x + Math.cos(sa)*sl, ey:y + Math.sin(sa)*sl, r:0.03 + R()*0.03, burst:R() < .2}); }
+    }
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; for(const [a, b] of pts){ x0 = Math.min(x0, a); x1 = Math.max(x1, a); y0 = Math.min(y0, b); y1 = Math.max(y1, b); }
+    hy.push({pts, bb:[x0, y0, x1, y1]});
+  };
+  for(let i = 0; i < 26; i++){ const a = R()*TAU, d = Math.sqrt(R())*1.6; grow(Math.cos(a)*d, Math.sin(a)*d, R()*TAU, 25 + Math.floor(R()*35), 0); }
+  for(const s of sp) if(s.burst) for(let k = 0; k < 40; k++){ const a = R()*TAU, d = s.r*(1 + R()*2.5); spores.push([s.ex + Math.cos(a)*d, s.ey + Math.sin(a)*d]); }
+  for(let k = 0; k < 500; k++){ const a = R()*TAU, d = Math.sqrt(R())*2; spores.push([Math.cos(a)*d, Math.sin(a)*d]); }
+  return CACHE.mold = {hy, sp, spores};
+}
+function drawMold(ctx, v){
+  const M = getMold(), w = 0.009, tube = new Path2D(), sporeP = new Path2D(), ball = new Path2D(), col = new Path2D(), tex = new Path2D();
+  for(const h of M.hy){ const [x0, y0, x1, y1] = h.bb; if(x1 < v.cx - v.r || x0 > v.cx + v.r || y1 < v.cy - v.r || y0 > v.cy + v.r) continue; h.pts.forEach(([x, y], i) => i ? tube.lineTo(x, y) : tube.moveTo(x, y)); }
+  for(const s of M.sp){ if(!near(s.ex, s.ey, v, 0.5)) continue; tube.moveTo(s.x, s.y); tube.lineTo(s.ex, s.ey);
+    if(s.burst) circ(col, s.ex, s.ey, s.r*0.55);
+    else { circ(ball, s.ex, s.ey, s.r); if(v.ppm > 220){ for(let k = 0; k < 60; k++){ const a = k*2.39996, d = s.r*0.92*Math.sqrt((k + .5)/60); circ(tex, s.ex + Math.cos(a)*d, s.ey + Math.sin(a)*d, s.r*0.07); } } } }
+  for(const [x, y] of M.spores) if(near(x, y, v, 0.01)) circ(sporeP, x, y, 0.0025);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(118,124,102,.8)'; ctx.lineWidth = Math.max(w, lw(v, 1.5)); ctx.stroke(tube);
+  if(v.ppm > 150){ ctx.strokeStyle = 'rgba(232,236,222,.92)'; ctx.lineWidth = w*0.55; ctx.stroke(tube); }
+  ctx.fillStyle = 'rgba(150,150,138,.85)'; ctx.fill(col);
+  ctx.fillStyle = 'rgba(32,32,28,.94)'; ctx.fill(ball);
+  ctx.fillStyle = 'rgba(95,95,85,.75)'; ctx.fill(tex);
+  ctx.fillStyle = 'rgba(48,48,40,.8)'; ctx.fill(sporeP);
+}
+
+/* ----- hair and fibers ----- */
+const FIBERS = [{k:'hair', ang:0.35, off:0.12, w:0.075}, {k:'cotton', ang:-0.95, off:-0.18, w:0.024}, {k:'poly', ang:1.75, off:0.08, w:0.02}];
+function band(ctx, v, P, t0, t1, w, fill, edge){ ctx.beginPath(); ctx.moveTo(...P(t0, -w/2)); ctx.lineTo(...P(t1, -w/2)); ctx.lineTo(...P(t1, w/2)); ctx.lineTo(...P(t0, w/2)); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); ctx.strokeStyle = edge; ctx.lineWidth = Math.max(lw(v, 1.2), w*0.04); ctx.stroke(); }
+function drawFibers(ctx, v){
+  for(const F of FIBERS){
+    const L = lineView(v, F.ang, F.off, 4.5); if(L.t1 <= L.t0) continue;
+    const P = (t, s) => [L.ox + L.dx*t + L.nx*s, L.oy + L.dy*t + L.ny*s], w = F.w;
+    if(F.k === 'hair'){
+      band(ctx, v, P, L.t0, L.t1, w, '#8d5e30', 'rgba(70,40,15,.95)');
+      if(v.ppm > 120){ const st = 0.004; ctx.fillStyle = 'rgba(58,30,10,.55)'; ctx.beginPath(); for(let t = Math.ceil(L.t0/st)*st; t < L.t1; t += st){ const n = Math.round(t/st); for(let g = 0; g < 2; g++){ const h = hsh(n, 7 + g); const q = P(t + h*st, (hsh(n + 3, g) - .5)*w*0.8); const r = 0.0011 + h*0.0012; ctx.moveTo(q[0] + r, q[1]); ctx.arc(q[0], q[1], r, 0, TAU); } } ctx.fill(); }
+      ctx.strokeStyle = 'rgba(52,28,8,.7)'; ctx.lineWidth = w*0.18; ctx.setLineDash([w*1.3, w*0.5]); ctx.beginPath(); ctx.moveTo(...P(L.t0, 0)); ctx.lineTo(...P(L.t1, 0)); ctx.stroke(); ctx.setLineDash([]);
+      if(v.ppm > 200){ const st = 0.008; ctx.beginPath(); for(let t = Math.ceil(L.t0/st)*st; t < L.t1; t += st){ ctx.moveTo(...P(t, -w/2)); ctx.quadraticCurveTo(...P(t + st*0.7, 0), ...P(t, w/2)); } ctx.strokeStyle = 'rgba(48,26,8,.45)'; ctx.lineWidth = lw(v, 1); ctx.stroke(); }
+    } else if(F.k === 'cotton'){
+      const st = Math.min(0.004, (L.t1 - L.t0)/400), top = [], bot = [];
+      for(let t = L.t0; t <= L.t1; t += st){ const tw = 0.3 + 0.7*Math.abs(Math.cos(t*TAU/0.09)); top.push(P(t, -w/2*tw)); bot.push(P(t, w/2*tw)); }
+      ctx.beginPath(); top.forEach((q, i) => i ? ctx.lineTo(...q) : ctx.moveTo(...q)); for(let i = bot.length - 1; i >= 0; i--) ctx.lineTo(...bot[i]); ctx.closePath();
+      ctx.fillStyle = 'rgba(244,244,236,.9)'; ctx.fill(); ctx.strokeStyle = 'rgba(112,112,98,.85)'; ctx.lineWidth = Math.max(lw(v, 1), 0.0015); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(...P(L.t0, 0)); ctx.lineTo(...P(L.t1, 0)); ctx.strokeStyle = 'rgba(150,150,135,.5)'; ctx.lineWidth = lw(v, .8); ctx.stroke();
+    } else {
+      band(ctx, v, P, L.t0, L.t1, w, 'rgba(212,227,244,.88)', 'rgba(58,84,125,.85)');
+      ctx.beginPath(); ctx.moveTo(...P(L.t0, -w*0.15)); ctx.lineTo(...P(L.t1, -w*0.15)); ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = w*0.14; ctx.stroke();
+    }
+  }
+}
+
+/* ----- salt and sugar crystals ----- */
+function getCrystals(){
+  if(CACHE.crys) return CACHE.crys;
+  const R = mulberry32(S.seed ^ 0x5A17), salt = [], sugar = [];
+  for(let i = 0; i < 45; i++) salt.push({x:-1.5 + R()*1.2, y:(R() - .5)*1.6, s:0.05 + R()*R()*0.28, a:R()*Math.PI/2});
+  for(let i = 0; i < 22; i++){ const L = 0.2 + R()*0.4; sugar.push({x:0.3 + R()*1.3, y:(R() - .5)*1.6, L, W:L*(0.45 + R()*0.3), a:R()*Math.PI, c:0.2 + R()*0.15}); }
+  return CACHE.crys = {salt, sugar};
+}
+function drawCrystals(ctx, v){
+  const C = getCrystals();
+  for(const c of C.salt){
+    if(!near(c.x, c.y, v, c.s)) continue; const s = c.s;
+    ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.a);
+    ctx.fillStyle = 'rgba(236,241,246,.65)'; ctx.fillRect(-s/2, -s/2, s, s);
+    ctx.strokeStyle = 'rgba(90,100,110,.4)'; ctx.lineWidth = Math.max(lw(v, 1), s*0.01); ctx.beginPath();
+    for(const k of [0.7, 0.45, 0.2]) ctx.rect(-s*k/2, -s*k/2, s*k, s*k);
+    for(const [a, b] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]){ ctx.moveTo(a*s/2, b*s/2); ctx.lineTo(a*s*0.1, b*s*0.1); } ctx.stroke();
+    ctx.strokeStyle = 'rgba(52,62,72,.9)'; ctx.lineWidth = Math.max(lw(v, 1.4), s*0.02); ctx.strokeRect(-s/2, -s/2, s, s);
+    ctx.restore();
+  }
+  for(const c of C.sugar){
+    if(!near(c.x, c.y, v, c.L)) continue; const L = c.L/2, W = c.W/2, k = c.c*c.L;
+    const pts = [[L, 0], [L - k, W], [-L + k, W], [-L, 0], [-L + k, -W], [L - k, -W]];
+    ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.a);
+    ctx.beginPath(); pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
+    ctx.fillStyle = 'rgba(244,244,236,.6)'; ctx.fill(); ctx.strokeStyle = 'rgba(68,68,58,.9)'; ctx.lineWidth = Math.max(lw(v, 1.4), c.L*0.012); ctx.stroke();
+    ctx.beginPath(); pts.forEach(([x, y], i) => { const q = [x*0.55 + L*0.08, y*0.55 - W*0.1]; i ? ctx.lineTo(...q) : ctx.moveTo(...q); }); ctx.closePath();
+    ctx.moveTo(L - k, W); ctx.lineTo((L - k)*0.55 + L*0.08, W*0.45); ctx.moveTo(-L, 0); ctx.lineTo(-L*0.55 + L*0.08, -W*0.1);
+    ctx.strokeStyle = 'rgba(100,100,88,.4)'; ctx.lineWidth = Math.max(lw(v, 1), c.L*0.006); ctx.stroke();
+    ctx.restore();
+  }
+}
+function crystalAt(cx, cy, r){ const C = getCrystals(); return C.salt.some(c => Math.hypot(c.x - cx, c.y - cy) < r + c.s*0.6) || C.sugar.some(c => Math.hypot(c.x - cx, c.y - cy) < r + c.L*0.5); }
+
+/* ----- slide catalog ----- */
+const CATS = ['Plant cells', 'Animal cells', 'Tiny living things', 'Everyday things & practice'];
+const outlined = get => ({inView:(cx, cy, r) => polyNear(cx, cy, get(), r), centered:(cx, cy) => pip(cx, cy, get())});
+const SLIDES = {
+  onion:Object.assign({cat:'Plant cells', name:'Onion skin', short:'Plant cells', clue:'brick-shaped cells with walls and a nucleus.', info:'Onion skin is one layer of plant cells. Look for the cell wall (the outline of each brick) and the nucleus (a round spot in each cell). Iodine stain makes them easier to see.',
+    layers:() => [{z:0, draw:drawOnion}], pale:() => !S.stain.onion}, outlined(() => getOnion().outline)),
+  elodea:Object.assign({cat:'Plant cells', name:'Elodea leaf', short:'Chloroplasts', clue:'green rectangle cells full of chloroplasts.', info:'Elodea is a pond plant with leaves only two cells thick. Each box is a cell with a cell wall. The green dots are chloroplasts, where the plant makes food from sunlight. At 400' + X + ' watch closely: the chloroplasts slowly ride around the cell (this is called cytoplasmic streaming).',
+    layers:() => [{z:0, draw:drawElodea}], pale:() => false, anim:() => FOV() < 0.7}, outlined(() => getElodea().outline)),
+  leaf:Object.assign({cat:'Plant cells', name:'Leaf peel (stomata)', short:'Leaf pores', clue:'puzzle-piece cells with stomata.', info:'A thin peel from the underside of a leaf. The cells fit together like puzzle pieces. Look for stomata: tiny openings with two bean-shaped guard cells. Stomata let carbon dioxide in and oxygen and water vapor out. Guard cells have chloroplasts, but the other skin cells do not.',
+    layers:() => [{z:0, draw:drawLeaf}], pale:() => false}, outlined(() => getLeaf().outline)),
+  potato:Object.assign({cat:'Plant cells', name:'Potato starch', short:'Iodine test', clue:'oval grains with rings that turn blue-black with iodine.', info:'Potato scrapings full of starch grains, the plant\'s stored food. Each oval grain has rings, like a tree. Without stain they are nearly see-through. Add iodine: starch turns blue-black. That is the iodine starch test.',
+    layers:() => [{z:0, draw:drawPotato}], pale:() => !S.stain.potato}, outlined(() => getPotato().outline)),
+  cork:Object.assign({cat:'Plant cells', name:'Cork', short:"Hooke's cells", clue:'empty boxes left by dead plant cells.', info:'A thin slice of cork. In 1665 Robert Hooke saw these little empty boxes and named them "cells." They are the walls of dead plant cells.',
+    layers:() => [{z:0, draw:drawCork}], pale:() => false}, outlined(() => getCork().outline)),
+  cheek:{cat:'Animal cells', name:'Cheek cells', short:'Animal cells', clue:'flat cells with a nucleus but no cell wall.', info:'Cheek cells are animal cells scraped from inside a cheek. They are flat with a nucleus, but have no cell wall. Methylene blue stain makes them show up. The tiny dots are bacteria.',
+    layers:() => [{z:0, draw:drawCheek}], pale:() => !S.stain.cheek,
+    inView:(cx, cy, r) => getCheek().cells.some(c => Math.hypot(c.x - cx, c.y - cy) < r + c.r), centered:(cx, cy) => getCheek().cells.some(c => Math.hypot(c.x - cx, c.y - cy) < Math.max(0.05, FOV()*0.2))},
+  blood:Object.assign({cat:'Animal cells', name:'Blood smear', short:'Blood cells', clue:'many small pink discs and a few purple cells.', info:'A prepared slide of human blood, stained so the cells show. Most cells are red blood cells: pink discs with a pale middle and no nucleus. They carry oxygen. Look for the bigger white blood cells with a purple nucleus. They fight germs. The tiny purple specks are platelets, which help blood clot.',
+    layers:() => [{z:0, draw:drawBlood}], pale:() => false}, outlined(() => getBlood().outline)),
+  pond:{cat:'Tiny living things', name:'Pond water', short:'Living things', clue:'living things swimming around.', info:'A drop of pond water. Look for paramecia (slipper shapes), euglena (small green swimmers), amoebas (blobs), volvox (green balls), diatoms (gold boats), and green algae strands. They move, so follow them with the slide arrows!',
+    layers:() => [{z:0, draw:drawPond}], pale:() => false, anim:() => true, update:dt => updatePond(dt),
+    inView:(cx, cy) => Math.hypot(cx, cy) < 3, centered:() => true},
+  yeast:Object.assign({cat:'Tiny living things', name:"Baker's yeast", short:'Fungus cells', clue:'tiny oval cells, some with little buds.', info:'Yeast is a fungus made of single cells. It is what makes bread rise. Look for the little bumps on some cells: those are buds. Yeast reproduces by budding: a new cell grows out of the old one and then breaks off.',
+    layers:() => [{z:0, draw:drawYeast}], pale:() => false}, outlined(() => getYeast().outline)),
+  mold:{cat:'Tiny living things', name:'Bread mold', short:'Fungus threads', clue:'thin threads with black balls on stalks.', info:'Mold from old bread. It is a fungus made of long thin threads called hyphae. The black balls on stalks are sporangia, full of thousands of spores. Some have burst open. Each spore can grow into new mold.',
+    layers:() => [{z:0, draw:drawMold}], pale:() => false,
+    inView:(cx, cy, r) => Math.hypot(cx, cy) < 2.2 + r, centered:(cx, cy) => Math.hypot(cx, cy) < 2},
+  e:{cat:'Everyday things & practice', name:'Letter e', short:'Which way is up?', clue:'a letter e.', info:'A tiny letter e cut from newspaper. Compare how it sits on the slide with how it looks in the eyepiece. At high power you can see paper fibers.',
+    layers:() => [{z:0, draw:drawE}], pale:() => false,
+    inView:(cx, cy, r) => Math.hypot(cx, cy) < r + 0.9, centered:(cx, cy) => Math.hypot(cx, cy) < Math.max(0.6, FOV()*0.18)},
+  threads:{cat:'Everyday things & practice', name:'Crossed threads', short:'Depth of focus', clue:'three colored threads.', info:'Three colored threads lie on top of each other. Only one layer can be sharp at a time. Use fine focus to find which thread is on top.',
+    layers:() => { const T = getThreads(); return [0, 1, 2].map(i => ({z:T.zs[i], draw:(c, v) => drawThread(c, v, i)})).sort((a, b) => a.z - b.z); }, pale:() => false,
+    inView:(cx, cy, r) => THREAD_INFO.some(T => Math.abs(-Math.sin(T.ang)*cx + Math.cos(T.ang)*cy - T.off) < r + 0.12), centered:(cx, cy) => Math.hypot(cx, cy) < Math.max(0.12, FOV()*0.3)},
+  fibers:{cat:'Everyday things & practice', name:'Hair and fibers', short:'Forensics', clue:'a brown hair with scales and two other fibers.', info:'Three fibers, like a crime lab would compare. The brown one is a human hair: see the overlapping scales (cuticle) and the dark line down the middle (medulla). The flat twisted ribbon is cotton, a plant fiber. The smooth, perfectly straight rod is polyester, a fiber made by people.',
+    layers:() => [{z:0, draw:drawFibers}], pale:() => false,
+    inView:(cx, cy, r) => FIBERS.some(F => nearLine(cx, cy, F.ang, F.off, r + F.w)), centered:(cx, cy) => FIBERS.some(F => nearLine(cx, cy, F.ang, F.off, Math.max(0.03, FOV()*0.25)))},
+  crystals:{cat:'Everyday things & practice', name:'Salt and sugar', short:'Crystals', clue:'clear crystals: cubes and long shapes.', info:'Grains of table salt and sugar. Salt crystals are cubes, often with stair-step patterns inside. Sugar crystals are longer, slanted shapes. On the slide, salt is on the left and sugar on the right. Remember: the image is flipped!',
+    layers:() => [{z:0, draw:drawCrystals}], pale:() => false,
+    inView:(cx, cy, r) => crystalAt(cx, cy, r), centered:(cx, cy) => crystalAt(cx, cy, Math.max(0.03, FOV()*0.15))}
+};
+function slideName(id){ return S.hideName && id === S.slide ? 'Mystery slide' : SLIDES[id].name; }
+
+/* =================== OPTICS =================== */
+function FOV(){ return 180/(S.eye*S.obj); }        // mm across the view
+function center(){ return {x:-S.px, y:-S.py}; }
+function focusPoint(){ return S.slide ? (S.F[S.slide] || 42) : 42; }
+function layerDelta(z){ return S.h + z - focusPoint() - PARF[S.obj]; }
+function blurFor(z){ return Math.min(18, Math.abs(layerDelta(z))/DOF[S.obj]*6)*(S.eye/10); }
+function isSharp(){ if(!S.slide) return false; return SLIDES[S.slide].layers().some(L => Math.abs(layerDelta(L.z)) < 0.3*DOF[S.obj]); }
+function bestBlur(){ if(!S.slide) return 99; return Math.min(...SLIDES[S.slide].layers().map(L => blurFor(L.z))); }
+function brightness(){ return (S.bright/40)*AP[S.diaph]*MDIM[S.obj]*(S.eye === 15 ? 0.82 : 1); }
+function lightOK(){ const B = brightness(); return S.light && B >= 0.72 && B <= 1.4; }
+function isPale(){ return S.slide ? SLIDES[S.slide].pale() : false; }
+function contrast(){ return 1 + 0.05*S.diaph; }
+function visibility(){ const B = brightness(); let a = isPale() ? clamp(0.2 + 0.2*S.diaph, 0, 1) : 1; if(B > 1.3) a *= Math.pow(Math.max(0.3, 1.3/B), 1.5); return a; }
+function specInView(){ if(!S.slide) return false; const c = center(); return SLIDES[S.slide].inView(c.x, c.y, FOV()/2); }
+function centered(){ if(!S.slide) return false; const c = center(); return SLIDES[S.slide].centered(c.x, c.y); }
+
+/* =================== RENDERING =================== */
+const eye = $('#eye'), ectx = eye.getContext('2d');
+const temp = document.createElement('canvas'), tctx = temp.getContext('2d');
+const crackCv = document.createElement('canvas');
+let rawCanvases = [], curLayers = [], dpr = 1, cssSize = 400, W = 400;
+let dirtyRaw = true, dirtyComp = true, rafOn = false;
+function fitOn(){ return document.body.classList.contains('fit') && window.matchMedia('(min-width:900px)').matches; }
+function sizeCanvas(){
+  if(fitOn()){ const vt = $('.viewtop'); cssSize = Math.round(Math.max(200, Math.min(820, vt.clientWidth - 44, vt.clientHeight - 66 - 10 - 44))); }
+  else { const wrap = $('#eyewrap'); const avail = Math.min(440, (wrap.parentElement.clientWidth || 440) - 24); cssSize = Math.max(240, Math.min(avail, 420)); }
+  dpr = Math.min(1.5, window.devicePixelRatio || 1); W = Math.round(cssSize*dpr);
+  eye.style.width = cssSize + 'px'; eye.style.height = cssSize + 'px'; eye.width = W; eye.height = W; temp.width = W; temp.height = W;
+  rawCanvases.forEach(c => { c.width = W; c.height = W; }); crackCv.width = W; crackCv.height = W;
+  dirtyRaw = true; requestDraw();
+}
+function renderRaw(){
+  const fov = FOV(), ppm = W/fov, c = center();
+  const v = {cx:c.x, cy:c.y, r:fov/2*1.08, ppm};
+  curLayers = S.slide ? SLIDES[S.slide].layers() : [];
+  while(rawCanvases.length < curLayers.length){ const cv = document.createElement('canvas'); cv.width = W; cv.height = W; rawCanvases.push(cv); }
+  curLayers.forEach((L, i) => {
+    const x = rawCanvases[i].getContext('2d');
+    x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, W, W);
+    x.translate(W/2, W/2); x.rotate(Math.PI); x.scale(ppm, ppm); x.translate(-v.cx, -v.cy);
+    L.draw(x, v);
+  });
+  const k = crackCv.getContext('2d'); k.setTransform(1, 0, 0, 1, 0, 0); k.clearRect(0, 0, W, W);
+  if(S.cracked && S.crack){ k.translate(W/2, W/2); k.rotate(Math.PI); k.scale(ppm, ppm); k.translate(-v.cx, -v.cy); drawCrack(k, v); }
+}
+function drawCrack(x, v){
+  const k = S.crack; x.lineCap = 'round'; x.lineJoin = 'round';
+  for(const [pts, w] of [[k.main, 3], [k.br, 2]]){ x.beginPath(); pts.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.strokeStyle = 'rgba(30,30,30,.85)'; x.lineWidth = lw(v, w); x.stroke(); x.strokeStyle = 'rgba(255,255,255,.7)'; x.lineWidth = lw(v, 1); x.stroke(); }
+}
+function compose(){
+  const c = ectx; c.setTransform(1, 0, 0, 1, 0, 0); c.filter = 'none';
+  c.fillStyle = '#000'; c.fillRect(0, 0, W, W);
+  if(!S.light) return;
+  tctx.setTransform(1, 0, 0, 1, 0, 0); tctx.filter = 'none'; tctx.fillStyle = GLASS; tctx.fillRect(0, 0, W, W);
+  const vis = visibility(); tctx.globalAlpha = vis;
+  curLayers.forEach((L, i) => { const b = blurFor(L.z)*dpr; tctx.filter = b > 0.35 ? `blur(${b.toFixed(2)}px)` : 'none'; tctx.drawImage(rawCanvases[i], 0, 0); });
+  tctx.globalAlpha = 1;
+  if(S.cracked){ const b = Math.min(2, bestBlur())*dpr; tctx.filter = b > 0.35 ? `blur(${b.toFixed(2)}px)` : 'none'; tctx.drawImage(crackCv, 0, 0); }
+  tctx.filter = 'none';
+  const B = clamp(brightness(), 0, 2.6), C = contrast();
+  c.save(); c.beginPath(); c.arc(W/2, W/2, W/2 - 1, 0, TAU); c.clip();
+  c.filter = `brightness(${B.toFixed(3)}) contrast(${C.toFixed(3)})`; c.drawImage(temp, 0, 0); c.filter = 'none';
+  const g = c.createRadialGradient(W/2, W/2, W*0.36, W/2, W/2, W/2);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.8, 'rgba(0,0,0,.18)'); g.addColorStop(1, 'rgba(0,0,0,.75)');
+  c.fillStyle = g; c.fillRect(0, 0, W, W); c.restore();
+}
+let lastT = 0;
+function requestDraw(){ dirtyComp = true; if(!rafOn){ rafOn = true; requestAnimationFrame(frame); } }
+function frame(t){
+  rafOn = false;
+  const sl = S.slide && SLIDES[S.slide];
+  const animate = !!(sl && sl.anim && S.light && !$('#labScreen').classList.contains('hidden') && sl.anim());
+  if(animate){ const dt = lastT ? Math.min(0.1, (t - lastT)/1000) : 0.016; lastT = t; animT += dt; if(sl.update) sl.update(dt); dirtyRaw = true; } else lastT = 0;
+  if(dirtyRaw){ renderRaw(); dirtyRaw = false; dirtyComp = true; }
+  if(dirtyComp){ compose(); dirtyComp = false; }
+  if(animate){ rafOn = true; requestAnimationFrame(frame); }
+}
+function markRaw(){ dirtyRaw = true; requestDraw(); }
+
+/* =================== MICROSCOPE ACTIONS =================== */
+let toastT = 0;
+function toast(msg, kind){
+  const el = fitOn() ? $('#dirmsg') : $('#toast'); $(fitOn() ? '#toast' : '#dirmsg').className = 'toast'; el.className = 'toast show ' + (kind || 'info'); el.innerHTML = esc(msg) + ' ' + sayBtn(msg);
+  clearTimeout(toastT); toastT = setTimeout(() => { el.className = 'toast'; }, kind === 'bad' ? 12000 : 7000);
+}
+function setLight(on){ S.light = on; if(on && S.slide && S.obj === 4) S.flags.lookedLow = true; changed(); }
+function setBright(b){ S.bright = clamp(b, 0, 100); changed(); }
+function setDiaph(d){ S.diaph = clamp(d, 0, 4); changed(); }
+function focusMove(dz, kind){
+  if(S.cracked && dz > 0){ toast('The slide is cracked. Lower the stage, then get a new slide.', 'bad'); return; }
+  S.h = clamp(S.h + dz, 0, HMAX);
+  if(kind === 'coarse' && S.obj === 40 && S.slide){ const now = Date.now(); if(!S._cw || now - S._cw > 5000){ S.mistakes.coarseHigh++; S._cw = now; if(dz < 0) toast('Careful: at 40' + X + ' use FINE focus only. Coarse focus moves too far.', 'warn'); } }
+  checkCrash(); changed();
+}
+function checkCrash(){
+  if(!S.slide || S.cracked) return;
+  const lim = focusPoint() + PARF[S.obj] + CRASH[S.obj];
+  if(S.h > lim){ S.h = lim; crackSlide(); }
+}
+function crackSlide(){
+  S.cracked = true; S.mistakes.crack++;
+  const c = center(), f = FOV(), a = Math.random()*Math.PI, dx = Math.cos(a), dy = Math.sin(a), main = [], br = [];
+  for(let i = 0; i <= 14; i++){ const t = (i/14 - .5)*f*1.6, j = (Math.random() - .5)*f*0.06; main.push([c.x + dx*t - dy*j, c.y + dy*t + dx*j]); }
+  const s = main[6]; br.push(s); for(let i = 1; i <= 6; i++){ const t = i*f*0.06; br.push([s[0] + Math.cos(a + 0.9)*t + (Math.random() - .5)*f*0.03, s[1] + Math.sin(a + 0.9)*t + (Math.random() - .5)*f*0.03]); }
+  S.crack = {main, br};
+  toast('CRACK! The ' + S.obj + X + ' lens hit the slide. At high power the lens sits very close to the slide, so the stage can crash into it. Lower the stage and get a new slide. Next time use only FINE focus at 40' + X + '.', 'bad');
+  markRaw(); renderPanel();
+}
+function newSlide(){
+  if(!S.slide) return;
+  S.cracked = false; S.crack = null; S.clipped = false; S.h = Math.min(S.h, 20);
+  if(S.slide === 'onion') S.stain.onion = false;
+  randomOffset();
+  toast('A fresh slide is on the stage. Clip it, then start again at low power.', 'info');
+  markRaw(); changed();
+}
+function randomOffset(){
+  const out = {onion:() => getOnion().outline, cork:() => getCork().outline, elodea:() => getElodea().outline, leaf:() => getLeaf().outline, potato:() => getPotato().outline}[S.slide];
+  if(out){ // start just past the edge of the tissue, so the student has to find and center it
+    const o = out(), v = o[Math.floor(Math.random()*o.length)], len = Math.hypot(v[0], v[1]), d = len + 0.6 + Math.random()*0.45;
+    S.px = -v[0]/len*d; S.py = -v[1]/len*d; return;
+  }
+  const a = Math.random()*TAU, d = 0.9 + Math.random()*0.6; S.px = Math.cos(a)*d; S.py = Math.sin(a)*d*0.8;
+}
+function placeSlide(id, hidden){
+  S.hideName = !!hidden;
+  if(S.slide === id && !S.cracked){ changed(); return; }
+  S.slide = id; S.clipped = false; S.cracked = false; S.crack = null;
+  if(!S.F[id]) S.F[id] = 42 + (Math.random() - .5)*3;
+  if(S.h > focusPoint() + PARF[S.obj] + CRASH[S.obj]) S.h = 20;
+  randomOffset();
+  if(id === 'pond') getPond();
+  toast((hidden ? 'A mystery slide' : SLIDES[id].name) + ' is on the stage. Clip it so it stays put.', 'info');
+  markRaw(); changed();
+}
+function toggleClip(){ if(!S.slide){ toast('Put a slide on the stage first.', 'warn'); return; } S.clipped = !S.clipped; changed(); }
+function moveSlide(dx, dy){
+  if(!S.slide) return;
+  const step = FOV()*0.07; let mx = dx*step, my = dy*step;
+  if(!S.clipped){
+    mx = mx*2.4 + (Math.random() - .5)*step*2; my = my*2.4 + (Math.random() - .5)*step*2;
+    const now = Date.now(); if(!S._sl || now - S._sl > 6000){ S._sl = now; S.mistakes.slid++; toast('Whoa, the slide slid! It is not clipped, so it moves too far. Clip the slide first.', 'warn'); }
+  }
+  S.px = clamp(S.px + mx, -6, 6); S.py = clamp(S.py + my, -6, 6);
+  if(dx > 0) S.flags.movedRight = true;
+  markRaw(); changed();
+}
+function setObj(o){
+  if(o === S.obj) return; const prev = S.obj; S.obj = o; markRaw();
+  if(S.slide && !S.cracked){ const lim = focusPoint() + PARF[o] + CRASH[o]; if(S.h > lim){ S.h = lim; crackSlide(); } }
+  if(o > prev && S.slide && S.light && !S.cracked && !specInView()){ S.mistakes.lost++; toast('Where did it go? You switched power without centering the specimen. Go back to a lower power, move it to the middle, then switch.', 'warn'); }
+  changed(); flashPart('objectives');
+}
+function setEye(e){ if(e === S.eye) return; S.eye = e; markRaw(); changed(); flashPart('eyepiece'); }
+function stain(){
+  if(S.slide === 'onion'){ if(S.stain.onion) return; S.stain.onion = true; toast('You added a drop of iodine at the edge of the cover slip. It soaks under and stains the cells. Refocus with FINE focus.', 'good'); }
+  else if(S.slide === 'potato'){ S.stain.potato = !S.stain.potato; toast(S.stain.potato ? 'A drop of iodine soaks under the cover slip. Watch the starch grains turn blue-black!' : 'Unstained potato starch. The grains are almost see-through, so close the diaphragm.', S.stain.potato ? 'good' : 'info'); }
+  else if(S.slide === 'cheek'){ S.stain.cheek = !S.stain.cheek; toast(S.stain.cheek ? 'Methylene blue stained slide on the stage.' : 'Unstained cheek cells on the stage. Try closing the diaphragm.', 'info'); }
+  markRaw(); changed();
+}
+
+/* every change */
+function changed(){
+  if(S.light && S.slide && S.obj === 4) S.flags.lookedLow = true;
+  if(S.light && S.slide && S.clipped && S.obj === 40 && !S.flags.lookedLow && !S.flags.highWarned){ S.flags.highWarned = true; S.mistakes.highStart++; toast('Tip: start at the lowest power (4' + X + '). It shows the biggest area, so the specimen is easy to find and focus.', 'warn'); }
+  if(S.slide === 'onion' && isSharp() && lightOK() && specInView()){ const t = S.eye*S.obj; if(t === 40) S.flags.fov40 = true; if(t === 400) S.flags.fov400 = true; }
+  requestDraw(); updateScope(); updateControls(); updateSide(); advance(); saveSoon();
+}
+
+/* =================== SCOPE SVG + CONTROLS =================== */
+function flashPart(p){ const el = $(`#scope [data-part="${p}"]`); if(!el) return; el.classList.remove('hl'); void el.getBBox(); el.classList.add('hl'); }
+function updateScope(){
+  $('#stageG').style.transform = `translateY(${-(S.h*1.2).toFixed(1)}px)`;
+  const ord = [4, 10, 40], a = ord.indexOf(S.obj);
+  $$('#objG .obj').forEach(g => { const i = ord.indexOf(+g.dataset.obj); const pos = (i - a + 3) % 3; g.style.transform = `rotate(${[0, 38, -38][pos]}deg)`; g.style.opacity = pos ? .8 : 1; });
+  $('#eyeLbl').textContent = S.eye + X;
+  $('#glow').setAttribute('opacity', S.light ? (0.3 + S.bright/100*0.7).toFixed(2) : 0);
+  $('#bulb').setAttribute('fill', S.light ? '#ffe680' : '#8a96a3');
+  $('#switchKnob').setAttribute('x', S.light ? 83 : 67); $('#switchKnob').setAttribute('fill', S.light ? '#2e9d4e' : '#c33');
+  $('#diaHole').setAttribute('r', [12, 10, 8, 6, 4][S.diaph]); $('#diaLever').setAttribute('x', 186 - S.diaph*4);
+  $('#slideG').setAttribute('opacity', S.slide ? 1 : 0);
+  const dotc = {onion:S.stain.onion ? '#c9963a' : '#e2dccb', e:'#222', threads:'#b8352a', cheek:S.stain.cheek ? '#6f8fd8' : '#d8d8d0', cork:'#a87a4a', pond:'#9cc58a', elodea:'#8cc06a', leaf:'#cfe0b0', potato:S.stain.potato ? '#3b2a6b' : '#e6e2d6', blood:'#c95a6b', yeast:'#d8c99a', mold:'#555', fibers:'#8d5e30', crystals:'#e8eef3'};
+  $('#specDot').setAttribute('fill', dotc[S.slide] || 'none');
+  $('#crackLine').setAttribute('opacity', S.cracked ? 1 : 0);
+  $('#clipL').style.transform = S.clipped ? 'rotate(0deg)' : 'rotate(-28deg)';
+  $('#clipR').style.transform = S.clipped ? 'rotate(0deg)' : 'rotate(28deg)';
+  $('#coarseTicks').style.transform = `rotate(${(S.h*14).toFixed(1)}deg)`;
+  $('#fineTicks').style.transform = `rotate(${(S.h*120).toFixed(1)}deg)`;
+  $('#scope').classList.toggle('showlabels', S.labels);
+}
+function updateControls(){
+  $('#bLight').textContent = 'Light: ' + (S.light ? 'ON' : 'OFF'); $('#bLight').classList.toggle('on', S.light);
+  $('#rBright').value = S.bright;
+  $$('#mDiaph i').forEach((el, i) => el.classList.toggle('on', i < S.diaph + 1));
+  $$('#segObj .cbtn').forEach(b => b.classList.toggle('on', +b.dataset.obj === S.obj));
+  $$('#segEye .cbtn').forEach(b => b.classList.toggle('on', +b.dataset.eye === S.eye));
+  $('#bClip').textContent = S.clipped ? 'Unclip the slide' : 'Clip the slide'; $('#bClip').classList.toggle('on', S.clipped);
+  $('#tHints').setAttribute('aria-pressed', S.hints); $('#tLabels').setAttribute('aria-pressed', S.labels);
+}
+function hideTotal(){
+  if(S.mode === 'guided'){ const s = curStep(); return s && s.hideTotal; }
+  if(S.mode === 'challenge' && S.chal.active === 'mag') return true;
+  return false;
+}
+function updateSide(){
+  const t = S.eye*S.obj;
+  $('#mag').innerHTML = `Eyepiece <b>${S.eye}${X}</b> ${X} Objective <b>${S.obj}${X}</b><br>= <b>${hideTotal() ? '?' : t + X}</b> total magnification`;
+  const chips = [];
+  if(S.hints){
+    if(!S.slide) chips.push(['Slide', 'none on the stage', 'warn']);
+    else chips.push(['Slide', slideName(S.slide) + (S.clipped ? ', clipped' : ', NOT clipped') + (S.cracked ? ', CRACKED' : ''), S.cracked ? 'bad' : S.clipped ? 'good' : 'warn']);
+    if(!S.light) chips.push(['Light', 'off', 'bad']);
+    else { const B = brightness(); chips.push(['Light', B < 0.72 ? 'too dark' : B > 1.4 ? 'too bright' : 'good', B < 0.72 || B > 1.4 ? 'warn' : 'good']); }
+    if(S.slide && S.light){
+      const b = bestBlur(); chips.push(['Focus', isSharp() ? 'sharp!' : b < 4 ? 'almost' : 'blurry', isSharp() ? 'good' : b < 4 ? 'warn' : 'bad']);
+      chips.push(['Specimen', specInView() ? (centered() ? 'centered' : 'in view') : 'not in view', specInView() ? (centered() ? 'good' : 'warn') : 'bad']);
+      if(isPale() && S.diaph < 2) chips.push(['Contrast', 'low: try the diaphragm', 'warn']);
+    }
+  }
+  $('#chips').innerHTML = chips.map(([a, b, k]) => `<div class="chip ${k}"><span>${a}</span><b>${esc(b)}</b></div>`).join('') || '<div class="small">Hints are off.</div>';
+}
+
+/* hold-to-repeat buttons */
+const HOLD = {
+  'bright-':() => setBright(S.bright - 5), 'bright+':() => setBright(S.bright + 5),
+  'diaph-':() => setDiaph(S.diaph - 1), 'diaph+':() => setDiaph(S.diaph + 1),
+  'coarse+':() => focusMove(COARSE, 'coarse'), 'coarse-':() => focusMove(-COARSE, 'coarse'),
+  'fine+':() => focusMove(FINE, 'fine'), 'fine-':() => focusMove(-FINE, 'fine'),
+  'left':() => moveSlide(-1, 0), 'right':() => moveSlide(1, 0), 'away':() => moveSlide(0, -1), 'toward':() => moveSlide(0, 1)
+};
+const SLOWREP = {'diaph-':1, 'diaph+':1, 'coarse+':1, 'coarse-':1};
+function bindHold(btn){
+  const fn = HOLD[btn.dataset.hold]; let t1 = 0, t2 = 0;
+  const stop = () => { clearTimeout(t1); clearInterval(t2); };
+  btn.addEventListener('pointerdown', e => { e.preventDefault(); btn.setPointerCapture && btn.setPointerCapture(e.pointerId); fn(); t1 = setTimeout(() => { t2 = setInterval(fn, SLOWREP[btn.dataset.hold] ? 260 : 90); }, 400); });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => btn.addEventListener(ev, stop));
+  btn.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fn(); } });
+}
+
+/* knob dragging + part clicks on the SVG */
+let drag = null;
+function svgPt(e){ const r = $('#scope').getBoundingClientRect(); return {x:(e.clientX - r.left)/r.width*360, y:(e.clientY - r.top)/r.height*470}; }
+function onScopeDown(e){
+  const part = e.target.closest('[data-part]'); if(!part) return;
+  const p = part.dataset.part;
+  if(S.mode === 'quiz'){ quizPick(p); return; }
+  if(p === 'coarse' || p === 'fine'){ e.preventDefault(); drag = {p, y:svgPt(e).y, moved:0}; $('#scope').setPointerCapture(e.pointerId); return; }
+  if(p === 'eyepiece') setEye(S.eye === 10 ? 15 : 10);
+  else if(p === 'objectives') setObj(+part.dataset.obj);
+  else if(p === 'nosepiece') setObj({4:10, 10:40, 40:4}[S.obj]);
+  else if(p === 'light') setLight(!S.light);
+  else if(p === 'clips') toggleClip();
+  else if(p === 'diaphragm') setDiaph(S.diaph >= 4 ? 0 : S.diaph + 1);
+  else if(p === 'stage' && !S.slide && S.mode === 'guided') toast('Use the button in the step box to put the onion slide on the stage.', 'info');
+}
+function onScopeMove(e){
+  if(!drag) return; const y = svgPt(e).y, dy = drag.y - y; drag.y = y;
+  if(drag.p === 'coarse'){ drag.moved += dy*0.12; while(Math.abs(drag.moved) >= 0.5){ const s = Math.sign(drag.moved)*0.5; drag.moved -= s; focusMove(s, 'coarse'); } }
+  else { drag.moved += dy*0.012; while(Math.abs(drag.moved) >= 0.03){ const s = Math.sign(drag.moved)*0.03; drag.moved -= s; focusMove(s, 'fine'); } }
+}
+function onScopeUp(){ drag = null; }
+
+/* =================== QUESTIONS =================== */
+function shuffled(n, seedStr){ let h = 0; for(const ch of seedStr) h = (h*31 + ch.charCodeAt(0))|0; const R = mulberry32(h ^ S.seed); const a = [...Array(n).keys()]; for(let i = n - 1; i > 0; i--){ const j = Math.floor(R()*(i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function mcHTML(id, q){
+  const A = S.answers[id]; const order = shuffled(q.opts.length, id);
+  return `<div class="q" data-qid="${id}"><div style="display:flex;gap:8px;justify-content:space-between;align-items:flex-start"><b>${esc(q.prompt)}</b>${sayBtn(q.prompt + ' ' + order.map(i => q.opts[i]).join('. '))}</div>
+  <div class="opts">${order.map(i => { let cls = ''; if(A && A.correct && i === q.ans) cls = 'right'; else if(A && A.wrongs && A.wrongs.includes(i)) cls = 'wrong';
+    return `<button class="opt ${cls}" data-opt="${i}" ${A && A.correct ? 'disabled' : ''}>${esc(q.opts[i])}</button>`; }).join('')}</div>
+  ${A && A.correct ? `<div class="fb good">\u2713 Correct${q.why ? ': ' + esc(q.why) : '!'}</div>` : A && A.wrongs && A.wrongs.length ? '<div class="fb bad">Not quite. Try again.</div>' : ''}</div>`;
+}
+function answerMC(id, q, i){
+  const A = S.answers[id] || (S.answers[id] = {prompt:q.prompt, tries:0, wrongs:[], correct:false});
+  if(A.correct) return; A.tries++;
+  if(i === q.ans){ A.correct = true; A.first = A.tries === 1; A.pick = q.opts[i]; }
+  else { if(!A.wrongs.includes(i)) A.wrongs.push(i); if(A.tries === 1) A.firstPick = q.opts[i]; }
+  saveSoon(); renderPanel(); advance();
+}
+function numHTML(id, prompt, ans){
+  const A = S.answers[id];
+  return `<div class="q" data-num="${id}"><div style="display:flex;gap:8px;justify-content:space-between;align-items:flex-start"><b>${esc(prompt)}</b>${sayBtn(prompt)}</div>
+  <div class="row" style="margin-top:6px"><input class="numin" type="number" inputmode="numeric" id="num_${id}" ${A && A.correct ? 'disabled value="' + ans + '"' : ''}> <b>${X}</b>
+  ${A && A.correct ? '' : `<button class="btn" data-numcheck="${id}">Check</button>`}</div>
+  ${A && A.correct ? `<div class="fb good">\u2713 Correct! ${esc(A.explain || '')}</div>` : A && A.tries ? `<div class="fb bad">Not quite. Multiply: eyepiece ${X} objective.</div>` : ''}</div>`;
+}
+function answerNum(id, prompt, ans, val, explain){
+  const A = S.answers[id] || (S.answers[id] = {prompt, tries:0, correct:false, given:[]});
+  if(A.correct) return; const n = parseFloat(val); if(isNaN(n)) return;
+  A.tries++; A.given.push(n);
+  if(n === ans){ A.correct = true; A.first = A.tries === 1; A.explain = explain; }
+  saveSoon(); renderPanel(); advance();
+}
+
+/* =================== GUIDED LAB =================== */
+const QSTAIN = {prompt:'What did the iodine stain do?', opts:['It made the nucleus and cell walls easier to see', 'It made the cells bigger', 'It made the cells start moving', 'It flipped the image'], ans:0, why:'stains color parts of the cell so they stand out.'};
+const QFOV = {prompt:'When you switched from 4' + X + ' up to 40' + X + ', what happened to the view?', opts:['You saw fewer cells, they looked bigger, and it got darker', 'You saw more cells and it got brighter', 'Nothing changed', 'The cells looked smaller'], ans:0, why:'higher power zooms into a smaller area, so less light reaches your eye.'};
+const GSTEPS = [
+  {id:'prep', t:'Make the onion slide', d:'Peel the onion skin, lay it on the slide, add water, and add the cover slip.', btn:['Make the slide', () => openPrep()], ok:() => S.prep.done},
+  {id:'place', t:'Put the slide on the stage', d:'Place your onion slide on the stage over the hole.', btn:['Put slide on stage', () => placeSlide('onion')], ok:() => S.slide === 'onion'},
+  {id:'clip', t:'Clip the slide', d:'Use the stage clips (or the "Clip the slide" button) so the slide can\'t slide around.', ok:() => S.slide === 'onion' && S.clipped},
+  {id:'light', t:'Turn on the light', d:'Click the light switch on the base, or the Light button.', ok:() => S.light},
+  {id:'low', t:'Start at low power: 4' + X, d:'Turn the nosepiece to the shortest objective, 4' + X + '. Low power shows the biggest area, so the specimen is easy to find.', ok:() => S.obj === 4},
+  {id:'center', t:'Center the onion skin', d:'The view may look empty or blurry. Use the "Move the slide" arrows until the onion skin is in the middle of the circle. Notice: the view moves the OPPOSITE way!', ok:() => S.slide === 'onion' && S.obj === 4 && centered()},
+  {id:'coarse', t:'Coarse focus', d:'Use COARSE focus (Stage up) until shapes like little bricks appear. Those are cells!', ok:() => S.obj === 4 && centered() && bestBlur() < 4},
+  {id:'fine', t:'Fine focus', d:'Use FINE focus until the edges of the cells look sharp.', ok:() => S.obj === 4 && centered() && isSharp()},
+  {id:'diaph', t:'Adjust the light for contrast', d:'Onion cells are almost see-through. Close the diaphragm part way (at least 3 bars), then change the brightness until the cell walls stand out.', ok:() => S.diaph >= 2 && lightOK()},
+  {id:'mid', t:'Switch to 10' + X, d:'Keep the cells in the middle. Turn the nosepiece to 10' + X + '. It should be almost in focus. Use FINE focus only.', ok:() => S.obj === 10 && centered() && isSharp()},
+  {id:'high', t:'Switch to 40' + X, d:'Turn the nosepiece to 40' + X + '. Use ONLY fine focus. The lens is very close to the slide now. You may need more light.', ok:() => S.obj === 40 && centered() && isSharp() && lightOK()},
+  {id:'nucleus', t:'Find a nucleus', d:'Each cell has a nucleus: a small, round, gray spot. Click one in the eyepiece view.', ok:() => S.guided.nucleus},
+  {id:'stain', t:'Add iodine stain', d:'Click "Add a drop of iodine." Then refocus with FINE focus and look again.', btn:['Add a drop of iodine', () => stain()], ok:() => S.stain.onion},
+  {id:'qstain', q:QSTAIN},
+  {id:'eye15', t:'Swap to the 15' + X + ' eyepiece', d:'Click the 15' + X + ' eyepiece (or the eyepiece on the microscope). The image gets bigger.', hideTotal:true, ok:() => S.eye === 15},
+  {id:'qmag', num:true, hideTotal:true},
+  {id:'qfov', q:QFOV},
+  {id:'done', t:'Guided lab complete!', d:'Great work. Try the Challenges, take the Parts quiz, then send your report.'}
+];
+function stepDone(s){ if(s.q) return !!(S.answers['g_' + s.id] && S.answers['g_' + s.id].correct); if(s.num) return !!(S.answers.g_qmag && S.answers.g_qmag.correct); return !!S.guided.done[s.id]; }
+function curStep(){ return GSTEPS.find(s => s.id !== 'done' && !stepDone(s)) || GSTEPS[GSTEPS.length - 1]; }
+let lastStepId = null;
+function advance(){
+  if(S.mode === 'guided'){
+    const s = curStep();
+    if(s.ok && s.id !== 'done' && s.ok()){ S.guided.done[s.id] = true; saveSoon(); setTimeout(() => { renderPanel(); changed(); }, 350); return; }
+    if(s.id !== lastStepId){ lastStepId = s.id; renderPanel(); }
+  } else if(S.mode === 'challenge'){ chalCheck(); }
+}
+
+/* slide prep modal */
+const PREP = [
+  {t:'Peel a layer of onion skin', art:'peel', opts:[['A thin, see-through layer from the inside of an onion piece', true], ['A thick chunk of onion', false, 'Too thick! Light can\'t pass through a thick piece, so you would only see a dark blur. Specimens must be thin enough for light to shine through.']]},
+  {t:'Lay it on the slide', art:'lay', opts:[['Flat, with no folds or wrinkles', true], ['Folded or bunched up', false, 'Folds stack cells on top of each other, so they overlap and blur. Lay it flat.']]},
+  {t:'Add a drop', art:'drop', opts:[['One drop of water on the onion skin', true], ['Nothing. Leave it dry.', false, 'A dry onion skin curls up and dries out. A drop of water keeps it flat and lets light pass through evenly.']]},
+  {t:'Add the cover slip', art:'slip', opts:[['Touch one edge to the drop, then lower it slowly at an angle', true], ['Drop it flat from above', 'flat']]}
+];
+function prepArt(k){
+  const base = '<rect x="40" y="96" width="240" height="22" rx="3" fill="#d7ecf7" stroke="#8fb3c9"/>';
+  if(k === 'peel') return `<svg viewBox="0 0 320 140"><path d="M70 110 Q120 20 200 40 Q250 55 260 110 Z" fill="#f3e3c3" stroke="#c9a46b" stroke-width="3"/><path d="M110 92 Q150 60 200 66 L206 76 Q156 74 118 100Z" fill="#fbf7ec" stroke="#bbb" opacity=".9"/><text x="230" y="30" font-size="13" fill="#555">thin layer</text></svg>`;
+  if(k === 'lay') return `<svg viewBox="0 0 320 140">${base}<rect x="120" y="92" width="80" height="5" rx="2" fill="#f4efe0" stroke="#c9b98f"/></svg>`;
+  if(k === 'drop') return `<svg viewBox="0 0 320 140">${base}<rect x="120" y="92" width="80" height="5" rx="2" fill="#f4efe0" stroke="#c9b98f"/><rect x="150" y="10" width="20" height="50" rx="4" fill="#cfd8de" stroke="#7b8a96"/><path d="M155 60 L165 60 L160 74Z" fill="#7b8a96"/><path d="M160 78 Q154 88 160 90 Q166 88 160 78Z" fill="#7ab8e6"/></svg>`;
+  return `<svg viewBox="0 0 320 140">${base}<rect x="120" y="92" width="80" height="5" rx="2" fill="#f4efe0" stroke="#c9b98f"/><g transform="rotate(-28 120 90)"><rect x="118" y="86" width="70" height="3" fill="#e9f6fd" stroke="#8fb3c9"/></g><path d="M200 40 l18 -8" stroke="#555" stroke-width="2"/><text x="208" y="28" font-size="13" fill="#555">lower slowly</text></svg>`;
+}
+let prepI = 0, prepMsg = '';
+function openPrep(){ prepI = 0; prepMsg = ''; $('#modalbg').classList.remove('hidden'); renderPrep(); }
+function renderPrep(){
+  const p = PREP[prepI];
+  $('#modal').innerHTML = `<div class="prog">Make the onion slide: step ${prepI + 1} of ${PREP.length}</div>
+    <h2 style="display:flex;justify-content:space-between;gap:8px">${esc(p.t)} ${sayBtn(p.t + '. ' + p.opts.map(o => o[0]).join('. Or. '))}</h2>${prepArt(p.art)}
+    <div class="opts" style="display:flex;flex-direction:column;gap:6px">${p.opts.map((o, i) => `<button class="opt" data-prep="${i}">${esc(o[0])}</button>`).join('')}</div>
+    ${prepMsg ? `<div class="fb bad" style="margin-top:8px">${esc(prepMsg)}</div>` : ''}`;
+}
+function prepPick(i){
+  const o = PREP[prepI].opts[i];
+  if(o[1] === false){ prepMsg = o[2]; S.prep.retries.push(PREP[prepI].t + ': ' + o[0]); renderPrep(); return; }
+  if(o[1] === 'flat') S.prep.flat = true; else if(prepI === 3) S.prep.flat = false;
+  prepMsg = ''; prepI++;
+  if(prepI >= PREP.length){
+    S.prep.done = true; $('#modalbg').classList.add('hidden');
+    if(S.prep.flat) toast('Plop! Dropping the cover slip flat trapped air. You will see air bubbles: round circles with thick dark edges. They are NOT cells.', 'warn');
+    else toast('Nice slide! Lowering the cover slip at an angle pushes the air out.', 'good');
+    CACHE.onion = null; markRaw(); changed(); return;
+  }
+  renderPrep();
+}
+
+/* =================== CHALLENGES =================== */
+function magTarget(){ if(!S.chal.target){ const R = mulberry32(S.seed ^ 0x3A3A); S.chal.target = [60, 150, 100, 600][Math.floor(R()*4)]; } return S.chal.target; }
+const CHALL = [
+  {id:'e', title:'The letter e', goal:() => 'Put the letter e slide on the stage. Get the e sharp and centered at 40' + X + ' total magnification.', hint:'40' + X + ' total = 10' + X + ' eyepiece ' + X + ' 4' + X + ' objective.',
+    ready:() => S.slide === 'e' && S.eye*S.obj === 40 && isSharp() && centered() && lightOK(),
+    q:{prompt:'How does the e in the eyepiece look compared with the e on the slide?', opts:['Upside down and backward', 'Exactly the same', 'Upside down, but not backward', 'Bigger, but not flipped'], ans:0, why:'the lenses flip the image both ways.'}},
+  {id:'move', title:'Which way does it move?', goal:() => 'Use the letter e slide, sharp and in view. Then press the \u2192 arrow to move the slide to the RIGHT. Watch the e.', hint:'Watch the e, not the button.',
+    onStart:() => { S.flags.movedRight = false; },
+    ready:() => S.slide === 'e' && isSharp() && specInView() && S.flags.movedRight,
+    q:{prompt:'You moved the slide to the right. Which way did the e move in the eyepiece?', opts:['Left', 'Right', 'Up', 'It did not move'], ans:0, why:'the image is flipped, so it moves the opposite way.'}},
+  {id:'threads', title:'Which thread is on top?', goal:() => 'Put the crossed threads slide on the stage. Center the spot where the threads cross. Use the 10' + X + ' or 40' + X + ' objective.', hint:'Lower the stage, then raise it slowly with FINE focus. The FIRST thread to get sharp is the one on top (closest to the lens).',
+    ready:() => S.slide === 'threads' && S.obj >= 10 && centered() && lightOK() && bestBlur() < 2,
+    q:() => ({prompt:'Which thread is on top?', opts:THREAD_INFO.map(t => t.name + ' thread'), ans:getThreads().top, why:'it came into focus first as the stage went up.'})},
+  {id:'nucleus', title:'Nucleus hunt', goal:() => 'Use the onion skin WITH iodine stain at 400' + X + ' total or more. Get it sharp, then click a nucleus in the view.', hint:'The guided lab shows how to add iodine. Use the 40' + X + ' objective.',
+    ready:() => S.slide === 'onion' && S.stain.onion && S.eye*S.obj >= 400 && isSharp() && lightOK(), click:'nucleus'},
+  {id:'cheek', title:'Plant cell vs. animal cell', goal:() => 'Look at the cheek cells at 400' + X + ' total or more. Get them sharp and centered.', hint:'Find a clump of cells at low power first, center it, then go up.',
+    ready:() => S.slide === 'cheek' && S.eye*S.obj >= 400 && isSharp() && specInView() && lightOK(),
+    q:{prompt:'Cheek cells are animal cells. What do onion (plant) cells have that cheek cells do NOT?', opts:['A cell wall', 'A nucleus', 'Cytoplasm', 'A cell membrane'], ans:0, why:'plant cells have a stiff cell wall around the cell membrane. Animal cells do not.'}},
+  {id:'cork', title:"Robert Hooke's cork", goal:() => 'Look at the cork at exactly 100' + X + ' total. Get it sharp.', hint:'100' + X + ' = 10' + X + ' eyepiece ' + X + ' 10' + X + ' objective.',
+    ready:() => S.slide === 'cork' && S.eye*S.obj === 100 && isSharp() && specInView() && lightOK(),
+    q:{prompt:'In 1665 Robert Hooke saw these little boxes in cork and called them "cells." What are they?', opts:['Walls left behind by dead plant cells', 'Living animal cells', 'Air bubbles', 'Grains of sand'], ans:0, why:'cork cells are dead. Only their walls are left.'}},
+  {id:'pond', title:'Pond life', goal:() => 'Look at pond water at 100' + X + ' total or more. Find a GREEN living thing and click it.', hint:'Things move! Follow them with the slide arrows.',
+    ready:() => S.slide === 'pond' && S.eye*S.obj >= 100 && isSharp() && lightOK(), click:'green',
+    q:{prompt:'Green living things have chlorophyll. What does chlorophyll let them do?', opts:['Make food from sunlight', 'Swim faster', 'See in the dark', 'Stay warm'], ans:0, why:'chlorophyll captures light energy to make food.'}},
+  {id:'elodea', title:'Moving chloroplasts', goal:() => 'Look at the Elodea leaf at 400' + X + ' total or more. Get it sharp and watch the green dots.', hint:'Find the leaf at 4' + X + ', center it, then go up to 10' + X + ' and 40' + X + '. Watch for about 10 seconds.',
+    ready:() => S.slide === 'elodea' && S.eye*S.obj >= 400 && isSharp() && specInView() && lightOK(),
+    q:{prompt:'The green dots moving around inside each Elodea cell are...', opts:['Chloroplasts, which make food from sunlight', 'Nuclei', 'Air bubbles', 'Bacteria'], ans:0, why:'chloroplasts do photosynthesis, and the moving cytoplasm carries them around the cell.'}},
+  {id:'stomata', title:'Leaf pores', goal:() => 'Look at the leaf peel at 400' + X + ' total or more. Find a stoma: two bean-shaped guard cells around a tiny opening.', hint:'They look like little green lips scattered between the puzzle-piece cells.',
+    ready:() => S.slide === 'leaf' && S.eye*S.obj >= 400 && isSharp() && specInView() && lightOK(),
+    q:{prompt:'What do stomata do?', opts:['Let gases like carbon dioxide and oxygen in and out of the leaf', 'Hold the leaf onto the stem', 'Store starch', 'Make the leaf green'], ans:0, why:'the guard cells open and close the opening.'}},
+  {id:'starch', title:'Starch test', goal:() => 'Put potato starch on the stage and add a drop of iodine. Look at it sharp at 100' + X + ' total or more.', hint:'An "Add a drop of iodine" button shows up in this box once potato starch is on the stage.',
+    ready:() => S.slide === 'potato' && S.stain.potato && S.eye*S.obj >= 100 && isSharp() && specInView() && lightOK(),
+    q:{prompt:'The potato grains turned blue-black with iodine. What does that tell you?', opts:['The potato has starch', 'The potato is rotten', 'The grains are alive', 'The grains are salt'], ans:0, why:'iodine turns blue-black when it touches starch.'}},
+  {id:'blood', title:'Blood cells', goal:() => 'Look at the blood smear at 400' + X + ' total or more. Most cells are red blood cells. Can you find a purple white blood cell?', hint:'Move the slide around. White blood cells are rare.',
+    ready:() => S.slide === 'blood' && S.eye*S.obj >= 400 && isSharp() && specInView() && lightOK(),
+    q:{prompt:'What is the main job of red blood cells?', opts:['Carry oxygen around the body', 'Fight germs', 'Make food', 'Help you think'], ans:0, why:'red blood cells carry oxygen. White blood cells fight germs.'}},
+  {id:'mag', title:'Magnification math', goal:() => 'Set the microscope to ' + magTarget() + X + ' total magnification. (The total is hidden for this one!) Turn the light on.', hint:'Total = eyepiece ' + X + ' objective. Try different pairs.',
+    ready:() => S.eye*S.obj === magTarget() && S.light, num:true},
+  {id:'fov', title:'Field of view', goal:() => 'Look at onion cells sharp at 40' + X + ' total. Then look at them sharp at 400' + X + ' total.', hint:'40' + X + ' = 10' + X + ' ' + X + ' 4' + X + '. 400' + X + ' = 10' + X + ' ' + X + ' 40' + X + '.',
+    ready:() => S.flags.fov40 && S.flags.fov400,
+    q:{prompt:'At 400' + X + ' compared with 40' + X + ', what do you see?', opts:['Fewer cells, bigger, and a darker view', 'More cells and a brighter view', 'The same number of cells', 'Smaller cells and a wider view'], ans:0, why:'higher power shows a smaller area, magnified more, with less light.'}},
+  {id:'mystery', title:'Mystery slide', goal:() => 'A mystery slide is on the stage. Get it sharp at 100' + X + ' total or more, then figure out what it is.', hint:'Look at shapes and colors. Are there cells? Are they green? Do they have walls? Are they moving?',
+    onStart:() => { if(!S.chal.done.mystery){ S.slide = null; placeSlide(mysteryId(), true); } },
+    ready:() => S.slide === mysteryId() && S.eye*S.obj >= 100 && isSharp() && specInView() && lightOK(),
+    q:() => { const id = mysteryId(), R = mulberry32(S.seed ^ 0x4158), o = MYSTERY_POOL.filter(x => x !== id);
+      for(let k = o.length - 1; k > 0; k--){ const r = Math.floor(R()*(k + 1)); [o[k], o[r]] = [o[r], o[k]]; }
+      return {prompt:'What is on the mystery slide?', opts:[SLIDES[id].name].concat(o.slice(0, 3).map(x => SLIDES[x].name)), ans:0, why:'it has ' + SLIDES[id].clue}; }}
+];
+const MYSTERY_POOL = ['elodea', 'leaf', 'potato', 'cork', 'blood', 'cheek', 'yeast', 'mold', 'fibers', 'crystals'];
+function mysteryId(){ if(!S.chal.mystery){ const R = mulberry32(S.seed ^ 0x4157); S.chal.mystery = MYSTERY_POOL[Math.floor(R()*MYSTERY_POOL.length)]; } return S.chal.mystery; }
+function chalQ(c){ return typeof c.q === 'function' ? c.q() : c.q; }
+function chalNum(){ const other = S.eye === 10 ? 15 : 10; return {prompt:`You are at ${magTarget()}${X} with the ${S.eye}${X} eyepiece. If you switched to the ${other}${X} eyepiece and kept the ${S.obj}${X} objective, what would the total be?`, ans:other*S.obj}; }
+function chalReadyNow(c){ return S.chal.ready && S.chal.ready[c.id]; }
+function chalCheck(){
+  const c = CHALL.find(x => x.id === S.chal.active); if(!c) return;
+  S.chal.ready = S.chal.ready || {};
+  if(!S.chal.ready[c.id] && c.ready()){ S.chal.ready[c.id] = true; toast('Goal reached! ' + (c.click ? 'Now click it in the eyepiece view.' : 'Answer the question.'), 'good'); renderPanel(); }
+  const qid = 'c_' + c.id; const A = S.answers[qid];
+  const needQ = c.q || c.num; const clicked = !c.click || S.chal.clicked && S.chal.clicked[c.id];
+  if(S.chal.ready[c.id] && clicked && (!needQ || (A && A.correct)) && !S.chal.done[c.id]){ S.chal.done[c.id] = true; if(c.id === 'mystery'){ S.hideName = false; toast('Solved! It was ' + SLIDES[S.slide].name + '.', 'good'); } saveSoon(); setTimeout(renderPanel, 300); }
+}
+function startChal(id){ const c = CHALL.find(x => x.id === id); S.chal.active = id; if(c.onStart) c.onStart(); renderPanel(); changed(); }
+
+/* clicks in the eyepiece */
+function onEyeClick(e){
+  if(!S.slide || !S.light) return;
+  const r = eye.getBoundingClientRect(); const dx = (e.clientX - r.left - r.width/2), dy = (e.clientY - r.top - r.height/2);
+  if(Math.hypot(dx, dy) > r.width/2) return;
+  const ppmCss = r.width/FOV(), c = center(); const x = c.x - dx/ppmCss, y = c.y - dy/ppmCss;
+  const guidedNuc = S.mode === 'guided' && curStep().id === 'nucleus';
+  const chalNuc = S.mode === 'challenge' && S.chal.active === 'nucleus' && S.chal.ready && S.chal.ready.nucleus;
+  const chalGreen = S.mode === 'challenge' && S.chal.active === 'pond' && S.chal.ready && S.chal.ready.pond;
+  if(guidedNuc || chalNuc){
+    if(S.slide !== 'onion') return;
+    if(bestBlur() > 3){ toast('Get it sharp first, then click.', 'warn'); return; }
+    if(onionNucleusAt(x, y)){
+      if(guidedNuc){ S.guided.nucleus = true; S.guided.nucleusStained = S.stain.onion; S.guided.nucleusPower = S.eye*S.obj; }
+      else { S.chal.clicked = S.chal.clicked || {}; S.chal.clicked.nucleus = true; }
+      toast('Yes! That is a nucleus. It controls the cell.', 'good'); changed(); renderPanel();
+    } else {
+      if(guidedNuc){ S.guided.nucleusMisses++; }
+      toast(guidedNuc && S.guided.nucleusMisses >= 2 ? 'Not a nucleus. Look for a small round spot inside a cell, a little darker than the rest. Closing the diaphragm helps.' : 'Not a nucleus. Try again.', 'warn'); saveSoon();
+    }
+  } else if(chalGreen){
+    const o = pondPick(x, y);
+    if(o && o.green){ S.chal.clicked = S.chal.clicked || {}; S.chal.clicked.pond = true; const nm = {eug:'a euglena', volvox:'a volvox colony'}[o.type] || 'green algae (spirogyra)'; toast('You found ' + nm + '! It is green because it has chlorophyll.', 'good'); changed(); renderPanel(); }
+    else if(o){ toast('That one is alive, but it is not green. Keep looking!', 'warn'); }
+    else toast('Nothing there. Try clicking right on a green living thing.', 'warn');
+  }
+}
+
+/* =================== PARTS QUIZ =================== */
+const PARTS = [
+  ['eyepiece', 'Eyepiece', 'You look through it. It magnifies 10' + X + ' or 15' + X + '.'],
+  ['nosepiece', 'Nosepiece', 'Turns to switch between objective lenses.'],
+  ['objectives', 'Objective lenses', 'The 4' + X + ', 10' + X + ', and 40' + X + ' lenses near the slide.'],
+  ['stage', 'Stage', 'The flat platform that holds the slide.'],
+  ['clips', 'Stage clips', 'Hold the slide still.'],
+  ['coarse', 'Coarse focus knob', 'Moves the stage a lot. Use it only at low power.'],
+  ['fine', 'Fine focus knob', 'Moves the stage a tiny bit. Use it at high power.'],
+  ['diaphragm', 'Diaphragm', 'Controls how much light passes through the slide. Closing it adds contrast.'],
+  ['light', 'Light', 'Shines up through the slide.'],
+  ['arm', 'Arm', 'Holds the top of the microscope. Carry it by the arm.'],
+  ['base', 'Base', 'The bottom. Put your other hand under it when you carry the microscope.']
+];
+const JOBS = [
+  {prompt:'Which knob should you use at 40' + X + '?', opts:['Fine focus', 'Coarse focus', 'Nosepiece', 'Diaphragm'], ans:0},
+  {prompt:'Which part helps see-through cells show up by changing the light?', opts:['Diaphragm', 'Stage clips', 'Arm', 'Base'], ans:0},
+  {prompt:'Which part do you turn to switch from 10' + X + ' to 40' + X + '?', opts:['Nosepiece', 'Coarse focus', 'Stage', 'Light'], ans:0},
+  {prompt:'How should you carry a microscope?', opts:['One hand on the arm, one hand under the base', 'By the eyepiece', 'By the stage', 'By the nosepiece'], ans:0},
+  {prompt:'Why should you start with the 4' + X + ' objective?', opts:['It shows the biggest area, so the specimen is easy to find', 'It magnifies the most', 'It is the only one that focuses', 'It makes the image right side up'], ans:0},
+  {prompt:'What is the total magnification with a 15' + X + ' eyepiece and a 10' + X + ' objective?', opts:['150' + X, '25' + X, '1510' + X, '105' + X], ans:0}
+];
+function quizStart(){ if(!S.quiz.order) S.quiz.order = shuffled(PARTS.length, 'parts'); }
+function quizPick(p){
+  quizStart(); if(S.quiz.i >= PARTS.length) return;
+  const want = PARTS[S.quiz.order[S.quiz.i]];
+  S.quiz.tries[want[0]] = (S.quiz.tries[want[0]] || 0) + 1;
+  if(p === want[0]){ if(S.quiz.tries[want[0]] === 1) S.quiz.first[want[0]] = true; flashPart(p); toast('Yes! ' + want[1] + ': ' + want[2], 'good'); S.quiz.i++; }
+  else { const got = PARTS.find(x => x[0] === p); toast('That is the ' + (got ? got[1].toLowerCase() : p) + '. Try again.', 'warn'); }
+  saveSoon(); renderPanel();
+}
+
+/* =================== REPORT =================== */
+function mins(){ return Math.max(1, Math.round(S.activeSec/60)); }
+function ansLine(id, label){ const A = S.answers[id]; if(!A) return `- ${label}: not answered`; if(!A.correct) return `- ${label}: not finished (${A.tries} tries)`;
+  const v = A.pick ? '"' + A.pick + '"' : A.given ? A.given[A.given.length - 1] : ''; return `- ${label}: ${v} - correct on ${A.first ? 'the first try' : 'try ' + A.tries}${!A.first && A.firstPick ? ' (first said "' + A.firstPick + '")' : ''}${!A.first && A.given ? ' (tried ' + A.given.join(', ') + ')' : ''}`; }
+function buildReport(){
+  const d = new Date(); const L = [];
+  const gDone = GSTEPS.filter(s => s.id !== 'done' && stepDone(s)).length, gAll = GSTEPS.length - 1;
+  L.push('MICROSCOPE LAB REPORT');
+  L.push('Student: ' + S.name);
+  L.push('Sent: ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}));
+  L.push('Time in the app: about ' + mins() + ' min');
+  L.push('');
+  L.push(`GUIDED ONION LAB: ${gDone} of ${gAll} steps${gDone === gAll ? ' (COMPLETE)' : ''}`);
+  L.push('- Slide prep: ' + (S.prep.done ? (S.prep.flat ? 'done, cover slip dropped flat (air bubbles)' : 'done, cover slip lowered at an angle') : 'not done') + (S.prep.retries.length ? '; fixed: ' + S.prep.retries.join('; ') : ''));
+  L.push('- Found a nucleus: ' + (S.guided.nucleus ? `yes, at ${S.guided.nucleusPower}x, ${S.guided.nucleusStained ? 'stained' : 'unstained'}` : 'no') + (S.guided.nucleusMisses ? ` (${S.guided.nucleusMisses} missed clicks)` : ''));
+  L.push(ansLine('g_qstain', 'What iodine did'));
+  L.push(ansLine('g_qmag', 'Total magnification, 15x eyepiece x 40x objective'));
+  L.push(ansLine('g_qfov', '4x vs 40x view'));
+  L.push('');
+  const cDone = CHALL.filter(c => S.chal.done[c.id]).length;
+  L.push(`CHALLENGES: ${cDone} of ${CHALL.length}`);
+  for(const c of CHALL){
+    if(!S.chal.done[c.id] && !S.answers['c_' + c.id]){ L.push(`- ${c.title}: not done`); continue; }
+    if(c.q || c.num) L.push(ansLine('c_' + c.id, c.title)); else L.push(`- ${c.title}: ${S.chal.done[c.id] ? 'done' : 'not finished'}`);
+  }
+  L.push('');
+  const pf = Object.keys(S.quiz.first).length;
+  L.push(`PARTS QUIZ: ${S.quiz.i >= PARTS.length ? 'finished' : S.quiz.i + ' of ' + PARTS.length + ' found'}; ${pf} of ${PARTS.length} right on the first click`);
+  const missed = PARTS.filter(p => S.quiz.tries[p[0]] && !S.quiz.first[p[0]]).map(p => p[1]); if(missed.length) L.push('- Needed more than one try: ' + missed.join(', '));
+  const jr = JOBS.filter((q, i) => S.answers['j_' + i] && S.answers['j_' + i].first).length, ja = JOBS.filter((q, i) => S.answers['j_' + i] && S.answers['j_' + i].correct).length;
+  L.push(`- Part jobs: ${jr} of ${JOBS.length} right on the first try (${ja} finished)`);
+  L.push('');
+  const m = S.mistakes;
+  L.push('LEARNING MOMENTS (mistakes the sim caught):');
+  L.push('- Cracked a slide (lens hit the slide): ' + m.crack);
+  L.push('- Used coarse focus at 40x: ' + m.coarseHigh);
+  L.push('- Lost the specimen after switching power: ' + m.lost);
+  L.push('- Moved an unclipped slide: ' + m.slid);
+  L.push('- Started at high power: ' + m.highStart);
+  return L.join('\n');
+}
+function demoSend(){ $('#modalbg').classList.remove('hidden'); $('#modal').classList.add('wide'); $('#modal').innerHTML = `<h2>Sending is in the full version</h2><p>In the full version, this opens Gmail, Outlook or the student's email app with this report filled in, addressed to you. Nothing is sent from the demo.</p><pre style="white-space:pre-wrap;background:#f4f7fa;border:1px solid var(--line);border-radius:10px;padding:12px;max-height:50vh;overflow:auto">${esc(buildReport())}</pre><div class="row"><a class="btn good" href="${'../../#microscope-simulator'}" target="_top">Get the full version</a><button class="btn ghost" data-act="closemodal" onclick="closeModal()">Close</button></div>`; }
+const sendGmail = demoSend, sendOutlook = demoSend, sendMailto = demoSend;
+function copyReport(){ const t = buildReport(); const done = () => toast('Report copied. Paste it into an email to ' + SETTINGS.teacherLabel + '.', 'good');
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, fallback); else fallback();
+  function fallback(){ const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){} ta.remove(); } }
+
+/* =================== PANEL =================== */
+function slideBox(){
+  return `<h3>Slide box</h3>` + CATS.map(c => `<div class="cathead">${esc(c)}</div><div class="slides">${Object.entries(SLIDES).filter(([k, s]) => s.cat === c).map(([k, s]) => `<button class="slidebtn ${S.slide === k && !S.hideName ? 'on' : ''}" data-slide="${k}"><b>${esc(s.name)}</b>${esc(s.short)}</button>`).join('')}</div>`).join('');
+}
+function slideTools(){
+  let h = '';
+  if(S.cracked) h += `<button class="btn warn" data-act="newslide">Get a new slide</button> `;
+  if(S.slide === 'onion' && !S.stain.onion && S.mode !== 'guided') h += `<button class="btn ghost" data-act="stain">Add a drop of iodine</button> `;
+  if(S.slide === 'potato') h += `<button class="btn ghost" data-act="stain">${S.stain.potato ? 'Use an unstained slide' : 'Add a drop of iodine'}</button> `;
+  if(S.slide === 'cheek') h += `<button class="btn ghost" data-act="stain">${S.stain.cheek ? 'Use an unstained slide' : 'Use a stained slide'}</button> `;
+  return h ? `<div class="row" style="margin-top:8px">${h}</div>` : '';
+}
+function guidedBox(s){
+  if(s.q) return `<div class="stepbox">${mcHTML('g_' + s.id, s.q)}</div>`;
+  if(s.num) return `<div class="stepbox">${numHTML('g_qmag', `You are using the ${S.eye}${X} eyepiece and the ${S.obj}${X} objective. What is the total magnification? (eyepiece ${X} objective)`, S.eye*S.obj)}</div>`;
+  return `<div class="stepbox"><div class="t"><span>${esc(s.t)}</span>${sayBtn(s.t + '. ' + s.d)}</div><p>${esc(s.d)}</p>${s.btn && !s.ok() ? `<button class="btn" data-gbtn="1">${esc(s.btn[0])}</button>` : ''}${s.id === 'done' ? `<div class="row"><button class="btn" data-goto="challenge">Go to Challenges</button><button class="btn ghost" data-goto="report">Send my report</button></div>` : ''}${slideTools()}</div>`;
+}
+function chalBox(c){
+  const ready = chalReadyNow(c), done = S.chal.done[c.id];
+  return `<div class="stepbox"><div class="t"><span>${esc(c.title)}${done ? ' \u2713' : ''}</span>${sayBtn(c.goal())}</div><p>${esc(c.goal())}</p>
+    ${S.hints ? `<p class="small">Hint: ${esc(c.hint)}</p>` : ''}
+    ${ready ? '' : '<p class="small"><b>Goal not reached yet.</b> The challenge checks your microscope as you work.</p>'}
+    ${ready && c.click && !(S.chal.clicked && S.chal.clicked[c.id]) ? '<p><b>Goal reached!</b> Now click it in the eyepiece view.</p>' : ''}
+    ${ready && c.q && (!c.click || (S.chal.clicked && S.chal.clicked[c.id])) ? mcHTML('c_' + c.id, chalQ(c)) : ''}
+    ${ready && c.num ? (() => { const n = chalNum(); return numHTML('c_' + c.id, n.prompt, n.ans); })() : ''}
+    ${done ? '<div class="fb good">Challenge complete!</div>' : ''}${slideTools()}</div>`;
+}
+function chalGrid(){ return `<div class="chal">${CHALL.map(x => `<button class="chalbtn ${S.chal.done[x.id] ? 'done' : ''} ${x.id === S.chal.active ? 'on' : ''}" data-chal="${x.id}">${S.chal.done[x.id] ? '\u2713 ' : ''}${esc(x.title)}</button>`).join('')}</div>`; }
+function slideInfo(){ return S.slide ? (S.hideName ? '<h3>Mystery slide</h3><div class="info">Figure out what it is in the Challenges tab.</div>' : `<h3>${esc(SLIDES[S.slide].name)}</h3><div class="info">${esc(SLIDES[S.slide].info)} ${sayBtn(SLIDES[S.slide].info)}</div>`) : ''; }
+const REPORT_BTNS = () => (SETTINGS.teacherEmail ? '' : `<label style="display:block;font-weight:700;margin:8px 0 4px">Your teacher's email</label><input class="acTo" type="email" autocomplete="off" placeholder="teacher@yourschool.org" value="${esc(S.temail || '')}" style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid #c7d0da;font:inherit;margin-bottom:8px">`) +
+  `<div class="row"><button class="btn good big" data-act="gmail">Send with Gmail</button><button class="btn good big" data-act="outlook">Send with Outlook</button><button class="btn ghost" data-act="mailto">Use my email app</button><button class="btn ghost" data-act="copy">Copy my report</button></div>`;
+
+/* full-screen direction bar: one fixed card, nothing scrolls */
+function renderDir(){
+  let lbl = '', main = '', dots = '', pick = '';
+  const dot = (cls, txt, attrs) => `<span class="dot ${cls}" ${attrs || ''}>${txt}</span>`;
+  if(S.mode === 'guided'){
+    const steps = GSTEPS.filter(x => x.id !== 'done'), s = curStep(), n = steps.indexOf(s) + 1;
+    lbl = s.id === 'done' ? 'Guided onion lab \u00b7 all steps done' : `Guided onion lab \u00b7 Step ${n} of ${steps.length}`;
+    main = guidedBox(s);
+    dots = steps.map((x, i) => dot(stepDone(x) ? 'done' : x === s ? 'cur' : '', stepDone(x) ? '\u2713' : i + 1, `title="${esc(x.t || 'Question')}"`)).join('');
+  } else if(S.mode === 'explore'){
+    lbl = 'Explore';
+    main = S.slide ? `<div class="stepbox">${slideInfo()}${slideTools()}</div>` : '<div class="stepbox"><p><b>Pick a slide</b> to put on the stage. Click <b>Slides</b>.</p></div>';
+    pick = '<button class="btn ghost" data-act="pick-slides">Slides</button>';
+  } else if(S.mode === 'challenge'){
+    const c = CHALL.find(x => x.id === S.chal.active);
+    lbl = `Challenges \u00b7 ${CHALL.filter(x => S.chal.done[x.id]).length} of ${CHALL.length} done`;
+    main = c ? chalBox(c) : '<div class="stepbox"><p><b>Pick a challenge.</b> Click a numbered circle below or the <b>Challenges</b> button. Each one checks your microscope.</p></div>';
+    dots = CHALL.map((x, i) => `<button class="dot ${S.chal.done[x.id] ? 'done' : x.id === S.chal.active ? 'cur' : ''}" data-chal="${x.id}" title="${esc(x.title)}" aria-label="${esc(x.title)}">${S.chal.done[x.id] ? '\u2713' : i + 1}</button>`).join('');
+    pick = '<button class="btn ghost" data-act="pick-chal">Challenges</button><button class="btn ghost" data-act="pick-slides">Slides</button>';
+  } else if(S.mode === 'quiz'){
+    quizStart(); lbl = 'Parts quiz';
+    if(S.quiz.i < PARTS.length){
+      const want = PARTS[S.quiz.order[S.quiz.i]];
+      lbl += ` \u00b7 Part ${S.quiz.i + 1} of ${PARTS.length}`;
+      main = `<div class="stepbox"><div class="t"><span>Click the <u>${esc(want[1].toLowerCase())}</u> on the microscope.</span>${sayBtn('Click the ' + want[1])}</div><p class="small">Tip: turn off "Part names" at the top to test yourself.</p></div>`;
+      dots = PARTS.map((x, i) => dot(i < S.quiz.i ? 'done' : i === S.quiz.i ? 'cur' : '', i < S.quiz.i ? '\u2713' : i + 1)).join('');
+    } else {
+      const j = JOBS.findIndex((q, i) => !(S.answers['j_' + i] && S.answers['j_' + i].correct));
+      if(j >= 0){ lbl += ` \u00b7 What does each part do? ${j + 1} of ${JOBS.length}`; main = `<div class="stepbox">${mcHTML('j_' + j, JOBS[j])}</div>`; }
+      else main = `<div class="stepbox"><p><b>Parts quiz complete!</b> You found all ${PARTS.length} parts (${Object.keys(S.quiz.first).length} on the first click) and answered every question.</p><div class="row"><button class="btn ghost" data-act="quizagain">Try the parts again</button></div></div>`;
+      dots = JOBS.map((q, i) => { const ok = S.answers['j_' + i] && S.answers['j_' + i].correct; return dot(ok ? 'done' : i === j ? 'cur' : '', ok ? '\u2713' : i + 1); }).join('');
+    }
+  } else if(S.mode === 'report'){
+    lbl = 'Send your report';
+    main = `<div class="stepbox"><p>${SETTINGS.teacherEmail ? `Your report goes to ${esc(SETTINGS.teacherLabel)} (${esc(SETTINGS.teacherEmail)}).` : `Type your teacher's email, then choose how to send.`} Press <b>Send</b> in the email that opens.</p>${REPORT_BTNS()}<div class="row" style="margin-top:6px"><button class="btn ghost" data-act="preview">See my report</button><button class="btn ghost" data-act="restart" style="background:#fde8e6;color:#b42318">Start over (erase my progress)</button></div></div>`;
+  }
+  $('#dirmain').innerHTML = `<div class="dirlbl">${esc(lbl)}</div>${main}`;
+  $('#dirfoot').innerHTML = `<div class="dots">${dots}</div><div class="pick">${pick}</div>`;
+  $('#dirfoot').style.display = dots || pick ? '' : 'none';
+}
+function openPicker(kind){
+  $('#modalbg').classList.remove('hidden'); $('#modal').classList.add('wide');
+  $('#modal').innerHTML = (kind === 'chal' ? `<h2>Pick a challenge</h2>${chalGrid()}` : `<h2>Pick a slide</h2>${slideBox()}`) + '<div class="row" style="margin-top:12px"><button class="btn ghost" data-act="closemodal">Close</button></div>';
+}
+function closeModal(){ $('#modalbg').classList.add('hidden'); $('#modal').classList.remove('wide'); }
+
+function renderPanel(){
+  const P = $('#panel');
+  if(fitOn()){ P.innerHTML = ''; renderDir(); updateSide(); return; }
+  if(S.mode === 'guided'){
+    const s = curStep();
+    const list = GSTEPS.filter(x => x.id !== 'done').map((x, i) => `<li class="${stepDone(x) ? 'done' : x === s ? 'cur' : ''}"><span class="n">${stepDone(x) ? '\u2713' : i + 1}</span><span>${esc(x.t || (x.q ? 'Question: ' + x.q.prompt : 'Magnification math'))}</span></li>`).join('');
+    P.innerHTML = `<h2>Guided onion lab</h2>${guidedBox(s)}<ol class="steps">${list}</ol>`;
+  } else if(S.mode === 'explore'){
+    P.innerHTML = `<h2>Explore</h2>${slideBox()}${slideTools()}${S.slide ? slideInfo() : '<p class="small">Pick a slide to put on the stage.</p>'}`;
+  } else if(S.mode === 'challenge'){
+    const c = CHALL.find(x => x.id === S.chal.active);
+    P.innerHTML = `<h2>Challenges</h2>${c ? chalBox(c) : '<p>Pick a challenge. Each one checks your microscope.</p>'}${chalGrid()}${slideBox()}`;
+  } else if(S.mode === 'quiz'){
+    quizStart();
+    if(S.quiz.i < PARTS.length){
+      const want = PARTS[S.quiz.order[S.quiz.i]];
+      P.innerHTML = `<h2>Parts quiz</h2><div class="stepbox"><div class="t"><span>Click the <u>${esc(want[1].toLowerCase())}</u> on the microscope.</span>${sayBtn('Click the ' + want[1])}</div><p class="small">Part ${S.quiz.i + 1} of ${PARTS.length}. Tip: turn off "Part names" at the top to test yourself.</p></div>`;
+    } else {
+      P.innerHTML = `<h2>Parts quiz</h2><div class="info">You found all ${PARTS.length} parts! ${Object.keys(S.quiz.first).length} right on the first click.</div><h3>What does each part do?</h3>${JOBS.map((q, i) => mcHTML('j_' + i, q)).join('')}<div class="row" style="margin-top:10px"><button class="btn ghost" data-act="quizagain">Try the parts again</button></div>`;
+    }
+  } else if(S.mode === 'report'){
+    P.innerHTML = `<div class="report"><h2>Send your report</h2><p>${SETTINGS.teacherEmail ? `Your report goes to ${esc(SETTINGS.teacherLabel)} (${esc(SETTINGS.teacherEmail)}).` : `Type your teacher's email, then choose how to send.`} Press <b>Send</b> in the email that opens.</p>
+      ${REPORT_BTNS()}
+      <pre>${esc(buildReport())}</pre><div class="row"><button class="btn ghost" data-act="restart" style="background:#fde8e6;color:#b42318">Start over (erase my progress)</button></div></div>`;
+  }
+  updateSide();
+}
+
+/* =================== FULL SCREEN =================== */
+let fitFallback = false;
+function isFull(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+function browserFull(){ try{ return window.top === window.self && window.innerHeight >= screen.height - 4 && window.innerWidth >= screen.width - 4; }catch(e){ return false; } }
+function updateFit(){
+  const on = isFull() || fitFallback || browserFull();
+  if(document.body.classList.contains('fit') !== on){ document.body.classList.toggle('fit', on); }
+  const b = $('#tFull'); b.innerHTML = (isFull() || fitFallback) ? '&#x2715; Exit full screen' : '&#x26F6; Full screen'; b.setAttribute('aria-pressed', isFull() || fitFallback);
+  if(!$('#labScreen').classList.contains('hidden')){ renderPanel(); requestAnimationFrame(() => sizeCanvas()); }
+}
+function toggleFull(){
+  if(isFull()){ const ex = document.exitFullscreen || document.webkitExitFullscreen; if(ex) ex.call(document); return; }
+  if(fitFallback){ fitFallback = false; updateFit(); return; }
+  const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
+  const ok = (document.fullscreenEnabled || document.webkitFullscreenEnabled) && req;
+  if(!ok){ fullBlocked(); return; }
+  try{ const pr = req.call(el); if(pr && pr.catch) pr.catch(fullBlocked); }catch(e){ fullBlocked(); }
+}
+function fullBlocked(){
+  // full screen is blocked (for example inside an embed). Fit the layout to the frame if the frame is not taller than the screen.
+  if(window.innerHeight <= (screen.availHeight || screen.height || 900) + 20){ fitFallback = true; updateFit(); }
+  const canTab = /^https?:/.test(location.href);
+  $('#modalbg').classList.remove('hidden');
+  $('#modal').innerHTML = `<h2>Full screen is blocked here</h2>
+    <p>This page is not allowed to go full screen by itself. To see the whole lab at once:</p>
+    <ul><li><b>Chromebook:</b> press the full-screen key in the top row of the keyboard (a box with corners).</li><li><b>Windows:</b> press <b>F11</b>.</li>${canTab ? '<li>Or open the lab in its own tab, then press <b>Full screen</b> there. Your progress comes with you.</li>' : ''}</ul>
+    <div class="row" style="margin-top:12px">${canTab ? '<button class="btn" data-act="newtab">Open in a new tab</button>' : ''}<button class="btn ghost" data-act="closemodal">OK</button></div>`;
+}
+
+/* =================== MODES + EVENTS =================== */
+function setMode(m){
+  S.mode = m; document.body.classList.toggle('quizmode', m === 'quiz'); $$('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.mode === m));
+  $('#controls').style.opacity = m === 'quiz' ? .45 : 1;
+  if(m === 'quiz' && S.quiz.i < PARTS.length) toast('Parts quiz: click the parts on the microscope picture.', 'info');
+  lastStepId = null; renderPanel(); changed();
+}
+function startApp(){
+  $('#startScreen').classList.add('hidden'); $('#labScreen').classList.remove('hidden'); $('#tabs').classList.remove('hidden'); $('#topt').classList.remove('hidden');
+  $('#who').textContent = '\u00b7 ' + S.name;
+  updateFit(); sizeCanvas(); markRaw(); setMode(S.mode || 'guided');
+}
+function init(){
+  const old = load();
+  if(old && old.name){ $('#nameIn').value = old.name; $('#resumeNote').textContent = 'Welcome back! Your progress is saved in this browser. Press Start to keep going.'; }
+  $('#startBtn').addEventListener('click', () => {
+    const n = $('#nameIn').value.trim().replace(/\s+/g, ' ');
+    if(n.length < 2){ $('#nameIn').focus(); $('#resumeNote').textContent = 'Type your first name and last initial.'; return; }
+    if(old && old.name && old.name.toLowerCase() === n.toLowerCase()) S = old; else { S = freshState(); }
+    S.name = n; for(const k in CACHE) delete CACHE[k]; save(); startApp();
+  });
+  $('#nameIn').addEventListener('keydown', e => { if(e.key === 'Enter') $('#startBtn').click(); });
+  $$('.tab').forEach(t => t.addEventListener('click', () => setMode(t.dataset.mode)));
+  $('#tHints').addEventListener('click', () => { S.hints = !S.hints; renderPanel(); changed(); });
+  $('#tLabels').addEventListener('click', () => { S.labels = !S.labels; changed(); });
+  $('#tFull').addEventListener('click', toggleFull);
+  if(window.ResizeObserver){ let lastWH = ''; new ResizeObserver(() => { if(!fitOn()) return; const vt = $('.viewtop'), k = vt.clientWidth + 'x' + vt.clientHeight; if(k !== lastWH){ lastWH = k; sizeCanvas(); } }).observe($('.viewtop')); }
+  document.addEventListener('fullscreenchange', updateFit); document.addEventListener('webkitfullscreenchange', updateFit);
+  $$('[data-hold]').forEach(bindHold);
+  $('#bLight').addEventListener('click', () => setLight(!S.light));
+  $('#rBright').addEventListener('input', e => setBright(+e.target.value));
+  $$('#segObj .cbtn').forEach(b => b.addEventListener('click', () => setObj(+b.dataset.obj)));
+  $$('#segEye .cbtn').forEach(b => b.addEventListener('click', () => setEye(+b.dataset.eye)));
+  $('#bClip').addEventListener('click', toggleClip);
+  const sc = $('#scope'); sc.addEventListener('pointerdown', onScopeDown); sc.addEventListener('pointermove', onScopeMove); sc.addEventListener('pointerup', onScopeUp); sc.addEventListener('pointercancel', onScopeUp);
+  eye.addEventListener('click', onEyeClick);
+  document.addEventListener('click', e => {
+    const t = e.target.closest('button'); if(!t) return;
+    if(t.dataset.say){ speak(t.dataset.say); return; }
+    if(t.dataset.slide){ if(t.closest('#modal')) closeModal(); placeSlide(t.dataset.slide); renderPanel(); return; }
+    if(t.dataset.chal){ if(t.closest('#modal')) closeModal(); startChal(t.dataset.chal); return; }
+    if(t.dataset.goto){ setMode(t.dataset.goto); return; }
+    if(t.dataset.gbtn){ const s = curStep(); if(s.btn) s.btn[1](); renderPanel(); return; }
+    if(t.dataset.prep !== undefined){ prepPick(+t.dataset.prep); return; }
+    if(t.dataset.opt !== undefined){ const qd = t.closest('[data-qid]'); const id = qd.dataset.qid; let q;
+      if(id.startsWith('g_')) q = GSTEPS.find(s => 'g_' + s.id === id).q; else if(id.startsWith('c_')) q = chalQ(CHALL.find(c => 'c_' + c.id === id)); else q = JOBS[+id.slice(2)];
+      answerMC(id, q, +t.dataset.opt); return; }
+    if(t.dataset.numcheck){ const id = t.dataset.numcheck; const val = $('#num_' + id).value;
+      if(id === 'g_qmag') answerNum(id, 'Total magnification with ' + S.eye + 'x eyepiece and ' + S.obj + 'x objective', S.eye*S.obj, val, `${S.eye} ${X} ${S.obj} = ${S.eye*S.obj}.`);
+      else { const n = chalNum(); answerNum(id, n.prompt, n.ans, val, 'Total = eyepiece ' + X + ' objective.'); }
+      return; }
+    const a = t.dataset.act; if(!a) return;
+    if(a === 'closemodal'){ closeModal(); return; }
+    if(a === 'pick-slides'){ openPicker('slides'); return; }
+    if(a === 'pick-chal'){ openPicker('chal'); return; }
+    if(a === 'preview'){ $('#modalbg').classList.remove('hidden'); $('#modal').classList.add('wide'); $('#modal').innerHTML = `<h2>Your report</h2><pre style="white-space:pre-wrap;background:#f4f7fa;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:13px;max-height:62vh;overflow:auto">${esc(buildReport())}</pre>${REPORT_BTNS()}<div class="row" style="margin-top:8px"><button class="btn ghost" data-act="closemodal">Close</button></div>`; return; }
+    if(a === 'newtab'){ save(); window.open(location.href, '_blank'); $('#modalbg').classList.add('hidden'); return; }
+    if(a === 'newslide') newSlide(); else if(a === 'stain') stain(); else if(a === 'gmail') sendGmail(); else if(a === 'outlook') sendOutlook(); else if(a === 'mailto') sendMailto(); else if(a === 'copy') copyReport();
+    else if(a === 'quizagain'){ S.quiz.i = 0; S.quiz.order = shuffled(PARTS.length, 'parts' + Date.now()); }
+    else if(a === 'restart'){ if(confirm('Erase all of your progress and start over?')){ try{ localStorage.removeItem(STORE_KEY); }catch(err){} location.reload(); return; } }
+    renderPanel();
+  });
+  document.addEventListener('keydown', e => {
+    if($('#labScreen').classList.contains('hidden') || e.target.tagName === 'INPUT' || e.ctrlKey || e.metaKey || e.altKey) return;
+    const k = e.key; const map = {ArrowLeft:'left', ArrowRight:'right', ArrowUp:'away', ArrowDown:'toward', q:'coarse+', a:'coarse-', w:'fine+', s:'fine-', Q:'coarse+', A:'coarse-', W:'fine+', S:'fine-'};
+    if(map[k]){ e.preventDefault(); HOLD[map[k]](); return; }
+    if(k === '1') setObj(4); else if(k === '2') setObj(10); else if(k === '3') setObj(40); else if(k === 'e' || k === 'E') setEye(S.eye === 10 ? 15 : 10); else if(k === 'l' || k === 'L') setLight(!S.light);
+  });
+  document.addEventListener('input', e => { if(e.target.classList && e.target.classList.contains('acTo')) $$('.acTo').forEach(x => { if(x !== e.target) x.value = e.target.value; }); });
+  $('#modalbg').addEventListener('click', e => { if(e.target.id === 'modalbg') closeModal(); });
+  let rt = 0; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { updateFit(); if(!$('#labScreen').classList.contains('hidden')) sizeCanvas(); }, 150); });
+  setInterval(() => { if(document.visibilityState === 'visible' && !$('#labScreen').classList.contains('hidden')){ S.activeSec += 5; if(S.activeSec % 30 === 0) saveSoon(); } }, 5000);
+}
+init();
+window.ML = {SLIDES, get S(){ return S; }, set S(v){ S = v; }, setObj, setEye, setLight, setBright, setDiaph, focusMove, moveSlide, placeSlide, toggleClip, stain, setMode, startChal, newSlide, buildReport,
+  isSharp, centered, specInView, brightness, lightOK, focusPoint, curStep, layerDelta, getThreads, getOnion, onionNucleusAt, FOV, center, changed, prepPick, openPrep, CACHE, onEyeClick, quizPick, PARTS, getPond};
+</script>
+<p style="text-align:center;font:12px system-ui,sans-serif;color:#6b7785;margin:18px 0">Demo · © The Alchemist Classroom</p></body>
+</html>

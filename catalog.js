@@ -118,15 +118,26 @@ var APPS = [
     id: "microscope-simulator",
     section: "in-class-apps",
     name: "Microscope Simulator",
-    price: "$4",                      // PLACEHOLDER price — Riley to confirm
+    price: "$4",
     icon: "images/app-microscope.png",
-    short: "A virtual microscope for exploring slides in class.",   // PLACEHOLDER
-    description: "Full description coming soon.",                   // PLACEHOLDER
-    features: [],
-    screens: [],                      // add screenshots here, e.g. ["images/micro-1.jpg", "Caption"]
-    includes: ["The app file (opens in Chrome or Edge)", "A one-page how-to guide"],
-    requirements: "Windows, Mac or Chromebook with Chrome or Edge. Works offline.",
-    buyUrl: ""                        // paste the checkout link when the store is live
+    short: "A compound microscope on the computer: slides, light, diaphragm, three powers and real focusing.",
+    description: "Students learn to use a compound microscope the right way before they touch the real one. They clip a slide, set the light and diaphragm, start at low power and focus with the coarse and fine knobs, and the sim catches the classic mistakes, like cracking a slide or using coarse focus at 40\u00d7. A guided onion lab, 14 slides, 14 challenges and a parts quiz, then a report to your email.",
+    features: [
+      ["Real microscope skills", "Light, diaphragm, 4\u00d7/10\u00d7/40\u00d7 objectives, 10\u00d7/15\u00d7 eyepieces, coarse and fine focus, stage clips and moving the slide."],
+      ["Guided onion lab", "Make a wet mount, stain it with iodine, find a nucleus and work out total magnification."],
+      ["14 slides + 14 challenges", "Cheek cells, elodea, blood, pond water, cork, the letter e and more, with challenges from field of view to a mystery slide."],
+      ["Parts quiz", "Find all 11 parts of the microscope, then match each part to its job."],
+      ["A report for you", "Steps done, answers, quiz results and the mistakes the sim caught, sent through Gmail or Outlook."]
+    ],
+    demoUrl: "demos/microscope-simulator/",
+    screens: [
+      ["images/micro-1.jpg", "Cheek cells in focus at 400\u00d7."],
+      ["images/micro-2.jpg", "Onion skin at 100\u00d7, with hint chips for light, focus and contrast."],
+      ["images/micro-3.jpg", "Parts quiz: find each part on the microscope."]
+    ],
+    includes: ["Microscope Lab app file (one offline file)", "Quick Start guide", "Free updates to version 1"],
+    requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grades 6\u20138 life science.",
+    buyUrl: ""
   },
   {
     id: "essay-reviewer",
