@@ -40,6 +40,31 @@ var SECTIONS = [
 
 var APPS = [
   {
+    id: "cell-lab",
+    section: "in-class-apps",
+    name: "Cell Lab",
+    price: "$4",
+    icon: "images/app-cell-lab.png",
+    short: "Students explore, build and compare plant and animal cells, then send you a report.",
+    description: "A Grade 7 cell lab students can do on their own. They explore each organelle's job, build an animal cell and a plant cell by dragging parts onto a detailed picture, compare the two, and take a quick check. When they finish, one click emails you their report.",
+    features: [
+      ["Explore", "10 animal and 12 plant cell parts, each with its job, a real-world connection and read-aloud."],
+      ["Build a cell", "Drag each part onto its spot. Wrong drops just say try again, and a clue is there when students need one."],
+      ["Compare + Quick check", "What plant and animal cells share and how they differ, then a short quiz."],
+      ["A report for you", "Students send you their work through Gmail or Outlook: parts placed, clues used, quiz answers and time spent."],
+      ["Works offline", "One file. No accounts, no internet, and nothing is sent until the student presses Send."]
+    ],
+    demoUrl: "demos/cell-lab/",
+    screens: [
+      ["images/cell-1.jpg", "Explore: pick a part to learn its job."],
+      ["images/cell-2.jpg", "Build: drag each part onto the plant or animal cell."],
+      ["images/cell-3.jpg", "Compare: what the two cells share and how they differ."]
+    ],
+    includes: ["Cell Lab app file (one offline file)", "Quick Start guide", "Free updates to version 1"],
+    requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grade 7, NGSS MS-LS1-2.",
+    buyUrl: ""
+  },
+  {
     id: "microscope-simulator",
     section: "in-class-apps",
     name: "Microscope Simulator",

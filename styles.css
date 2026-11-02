@@ -211,3 +211,7 @@ p{margin:0 0 1em;max-width:var(--measure)}
 .shot-dialog img{width:100%;height:auto;display:block}
 .shot-dialog p{margin:0;padding:.8rem 1rem;color:var(--muted)}
 .dlg-close{position:absolute;top:.5rem;right:.6rem;width:40px;height:40px;border-radius:50%;border:0;background:rgba(11,18,32,.85);color:#fff;font-size:1.5rem;cursor:pointer}
+
+/* demo button on app pages */
+.btn-demo{display:flex;margin-top:.6rem;background:transparent;border:1px solid rgba(45,212,191,.55);color:#2DD4BF}
+.btn-demo:hover{background:rgba(45,212,191,.12)}

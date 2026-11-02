@@ -77,6 +77,7 @@
       '<div class="app"><aside class="buybox"><span class="icon">' + slot("", a.icon, "flask", s.color, a.name + " app icon") + '</span>' +
       '<div class="price">' + esc(a.price) + "<small>one-time purchase</small></div>" +
       '<a class="btn btn-glow" href="' + esc(b.href) + '">' + esc(b.text) + "</a>" +
+      (a.demoUrl ? '<a class="btn btn-demo" href="' + esc(a.demoUrl) + '" target="_blank" rel="noopener">Try the free demo</a>' : "") +
       (b.live ? "" : '<p class="soon">The store opens soon. This button asks to be emailed when it does.</p>') +
       '<p class="soon">Download link and instructions arrive by email right after you buy.</p></aside>' +
       '<div class="app-body"><h1>' + esc(a.name) + '</h1><p class="lead">' + esc(a.description || a.short) + "</p>" + windowHTML(a) + feats + install +
