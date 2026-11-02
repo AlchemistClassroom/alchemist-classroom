@@ -79,6 +79,31 @@ var APPS = [
     buyUrl: ""                        // paste the checkout link when the store is live
   },
   {
+    id: "essay-reviewer",
+    section: "pro-apps",
+    name: "Essay Reviewer",
+    price: "$12",
+    icon: "images/app-essay-reviewer.png",
+    short: "Checks essays against your rubric, highlights what it finds, and gives a letter grade.",
+    description: "A first-pass essay checker that looks for exactly what you tell it to: length, paragraphs, a thesis, transitions, citations, informal words, run-ons and spelling. Drop in a student's Word or PDF essay and get highlights, a letter grade from your rubric, and a printable report. No AI, and essays never leave your computer.",
+    features: [
+      ["Your rubric, your rules", "Build checks with points and pass/miss comments, or scan your existing rubric (.docx or .pdf) to start the list for you."],
+      ["Reads Word and PDF", "Drop in the student's file or paste the text. Everything is read on your computer."],
+      ["Highlights + grade", "Each check is color-coded in the essay, and the points become a letter grade using your cutoffs."],
+      ["Your notes too", "Select any text to add your own comment, then print or save a PDF report for the student."],
+      ["Private by design", "Rule-based, no AI and no internet. Essays are never uploaded or saved; only your rubric is remembered."]
+    ],
+    demoUrl: "demos/essay-reviewer/",
+    screens: [
+      ["images/essay-1.jpg", "Highlights: every check is color-coded in the student's essay."],
+      ["images/essay-2.jpg", "Results: points per check, comments, and the letter grade."],
+      ["images/essay-3.jpg", "Rubric setup: grade cutoffs and your IF-THEN checks."]
+    ],
+    includes: ["Essay Reviewer app file (one offline file)", "Quick Start guide", "Free updates to version 1"],
+    requirements: "Windows, Mac or Chromebook with Chrome or Edge. Works offline. Reads .docx and .pdf essays.",
+    buyUrl: ""
+  },
+  {
     id: "behavior-system-pro",
     section: "pro-apps",
     name: "Behavior System Pro",
