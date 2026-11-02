@@ -65,6 +65,30 @@ var APPS = [
     buyUrl: ""
   },
   {
+    id: "lab-builder",
+    section: "in-class-apps",
+    name: "Lab Builder + 3 Solo Labs",
+    price: "$10",
+    icon: "images/app-lab-builder.png",
+    short: "Students who work alone still get a lab group: three scripted teammates guide them through a full lab.",
+    description: "For the student who's absent, on a different schedule, or just works better alone. Three friendly scripted teammates talk them through predicting, variables, a fair test, data, a claim-evidence-reasoning conclusion and reflection, then the student emails you a full lab report. Comes with three ready-made Grade 6 labs, and Lab Builder lets you make your own.",
+    features: [
+      ["3 ready-made labs", "Paper Towel (absorbency), Water's Bond (surface tension) and Lava Lamp (density). Share and go."],
+      ["A real lab group", "Maya, Deshawn and Leo disagree, ask for evidence, and help the student fix an unfair test, just like a good group."],
+      ["Real or on-screen", "Students use real materials or a built-in simulation, so the lab works even without supplies."],
+      ["Build your own", "Fill in Lab Builder's sections, preview as a student, and export one file or a Google Sites embed."],
+      ["A report for you", "Students send predictions, data, averages, their CER conclusion, group decisions and reflection through Gmail or Outlook."]
+    ],
+    demoUrl: "demos/lab-builder/",
+    screens: [
+      ["images/labs-1.jpg", "A solo lab: the student's teammates talk them through it, with a lab sheet that fills in as they go."],
+      ["images/labs-2.jpg", "Lab Builder: fill in each section, preview as a student, then export."]
+    ],
+    includes: ["Lab Builder (one offline file)", "3 ready-made student labs", "Quick Start guide", "Free updates to version 1"],
+    requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grade 6 science labs; build your own for any grade.",
+    buyUrl: ""
+  },
+  {
     id: "microscope-simulator",
     section: "in-class-apps",
     name: "Microscope Simulator",
