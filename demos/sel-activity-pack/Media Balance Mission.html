@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Media Balance Mission Demo | The Alchemist Classroom</title>
+<style>
+  :root{
+    --purple:#4b1f6f;
+    --purple2:#6f3b96;
+    --gold:#f4c542;
+    --cream:#fffaf0;
+    --ink:#222;
+    --card:#ffffff;
+    --soft:#f2edf7;
+    --good:#dff4e5;
+    --mid:#fff2c9;
+    --alert:#fde1df;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:linear-gradient(180deg,var(--soft),#ffffff);
+    color:var(--ink);
+  }
+
+  .app{
+    max-width:900px;
+    margin:0 auto;
+    padding:18px;
+  }
+
+  .hero{
+    background:linear-gradient(135deg,var(--purple),var(--purple2));
+    color:white;
+    border-radius:22px;
+    padding:24px 22px;
+    box-shadow:0 8px 22px rgba(0,0,0,.12);
+    text-align:center;
+  }
+
+  .hero h1{
+    margin:0 0 8px;
+    font-size:clamp(28px,5vw,44px);
+  }
+
+  .hero p{
+    margin:6px 0;
+    font-size:18px;
+  }
+
+  .target{
+    margin-top:14px;
+    background:rgba(255,255,255,.14);
+    border:2px solid rgba(255,255,255,.25);
+    padding:12px;
+    border-radius:14px;
+    font-weight:700;
+  }
+
+  .progress-wrap{
+    margin:18px 0;
+    background:#e6e6e6;
+    border-radius:999px;
+    overflow:hidden;
+    height:18px;
+  }
+
+  .progress{
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg,var(--gold),#ffd968);
+    transition:.3s ease;
+  }
+
+  .level{
+    display:none;
+    background:var(--card);
+    border-radius:22px;
+    padding:24px;
+    margin:18px 0;
+    box-shadow:0 6px 18px rgba(0,0,0,.09);
+    border:2px solid #eee;
+  }
+
+  .level.active{display:block}
+
+  .level h2{
+    margin-top:0;
+    color:var(--purple);
+    font-size:28px;
+  }
+
+  .sub{
+    font-size:18px;
+    margin-bottom:18px;
+  }
+
+  .choice-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+    gap:12px;
+  }
+
+  .choice{
+    position:relative;
+  }
+
+  .choice input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .choice label{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:76px;
+    padding:12px;
+    background:#fafafa;
+    border:3px solid #e1e1e1;
+    border-radius:16px;
+    font-size:17px;
+    font-weight:700;
+    cursor:pointer;
+    text-align:center;
+    transition:.15s ease;
+  }
+
+  .choice input:checked + label{
+    border-color:var(--gold);
+    background:#fff8d9;
+    transform:translateY(-2px);
+    box-shadow:0 5px 10px rgba(0,0,0,.08);
+  }
+
+  .emoji{
+    font-size:28px;
+    display:block;
+    margin-right:7px;
+  }
+
+  .rank-box{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  input[type="text"], input[type="number"]{
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:2px solid #cfcfcf;
+    font-size:18px;
+  }
+
+  .question{
+    margin:18px 0 8px;
+    font-size:20px;
+    font-weight:700;
+  }
+
+  .three{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+  }
+
+  .three .choice label{
+    min-height:68px;
+  }
+
+  .challenge{
+    display:grid;
+    gap:10px;
+  }
+
+  .challenge label{
+    justify-content:flex-start;
+    text-align:left;
+  }
+
+  .nav{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:22px;
+    flex-wrap:wrap;
+  }
+
+  button{
+    border:none;
+    border-radius:14px;
+    padding:13px 20px;
+    font-size:17px;
+    font-weight:700;
+    cursor:pointer;
+  }
+
+  .back{
+    background:#e8e8e8;
+    color:#333;
+  }
+
+  .next{
+    background:var(--purple);
+    color:white;
+  }
+
+  .finish{
+    background:var(--gold);
+    color:#24162e;
+  }
+
+  button:hover{filter:brightness(.98)}
+  button:active{transform:translateY(1px)}
+
+  .note{
+    background:#f8f6fb;
+    border-left:5px solid var(--purple);
+    padding:12px 14px;
+    border-radius:10px;
+    margin:14px 0;
+  }
+
+  .result{
+    background:linear-gradient(135deg,#fff7cf,#fff);
+    border:3px solid var(--gold);
+    border-radius:22px;
+    padding:22px;
+    margin-top:18px;
+  }
+
+  .result h2{
+    color:var(--purple);
+    margin-top:0;
+  }
+
+  .big-goal{
+    font-size:23px;
+    font-weight:800;
+    line-height:1.35;
+    background:white;
+    padding:18px;
+    border-radius:14px;
+    border:2px dashed var(--purple);
+  }
+
+  .tiny{
+    font-size:13px;
+    color:#666;
+    margin-top:10px;
+  }
+
+  .reset{
+    background:#444;
+    color:white;
+  }
+
+  .email{
+    background:#1f6f4a;
+    color:white;
+  }
+
+  @media (max-width:620px){
+    .three{grid-template-columns:1fr}
+    .level{padding:18px}
+  }
+
+  @media print{
+    body{background:white}
+    .hero,.progress-wrap,.nav,.reset{display:none!important}
+    .level{display:block!important;box-shadow:none;border:1px solid #ccc}
+  }
+</style>
+<style>
+.ac-send{margin-top:14px;padding:14px;border-radius:14px;border:1px solid rgba(127,127,127,.35)}
+.ac-send label{display:block;font-weight:700;margin:0 0 6px}
+.ac-send input{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:10px;border:1px solid rgba(127,127,127,.5);font:inherit;margin:0 0 10px}
+.ac-row{display:flex;flex-wrap:wrap;gap:8px}
+.ac-row button{font:inherit;font-weight:700;cursor:pointer;border-radius:10px;padding:10px 14px;border:1px solid rgba(127,127,127,.5)}
+.ac-row .ac-main{background:#2DD4BF;color:#06241f;border-color:#2DD4BF}
+.ac-msg{min-height:1.2em;margin:8px 0 0;font-size:14px}
+.ac-copy{width:100%;min-height:160px;margin-top:8px;box-sizing:border-box}
+</style></head>
+<body><div style="background:#2DD4BF;color:#06241f;text-align:center;padding:8px 14px;font:14px system-ui,sans-serif;position:relative;z-index:50" role="note"><b>Demo</b> · Media Balance Mission works fully. Nothing is saved or sent. <a style="color:#06241f;font-weight:800" href="../../#sel-activity-pack" target="_top">Get the SEL Activity Pack →</a></div>
+<div class="app">
+  <section class="hero">
+    <h1>📱 Media Balance Mission</h1>
+    <p><strong>Can you control the screen… or does the screen control you?</strong></p>
+    <div class="target">🎯 I can notice how media makes me feel and choose one way to keep it balanced.</div>
+  </section>
+
+  <div class="progress-wrap" aria-label="Progress">
+    <div class="progress" id="progress"></div>
+  </div>
+
+  <section class="level active" data-level="0">
+    <h2>👤 Start Here</h2>
+    <p class="sub">Type your first name or initials.</p>
+    <input id="studentName" type="text" placeholder="First name or initials" maxlength="30" />
+    <div class="nav">
+      <span></span>
+      <button class="next" onclick="goNext()">Start Mission →</button>
+    </div>
+  </section>
+
+  <section class="level" data-level="1">
+    <h2>🎮 Level 1: What’s on Your Screen?</h2>
+    <p class="sub">Tap everything you use on a normal day.</p>
+
+    <div class="choice-grid" id="mediaChoices">
+      <div class="choice"><input type="checkbox" id="m1" value="Phone"><label for="m1"><span class="emoji">📱</span>Phone</label></div>
+      <div class="choice"><input type="checkbox" id="m2" value="Video Games"><label for="m2"><span class="emoji">🎮</span>Video Games</label></div>
+      <div class="choice"><input type="checkbox" id="m3" value="TV or Streaming"><label for="m3"><span class="emoji">📺</span>TV / Streaming</label></div>
+      <div class="choice"><input type="checkbox" id="m4" value="Computer or Chromebook"><label for="m4"><span class="emoji">💻</span>Computer</label></div>
+      <div class="choice"><input type="checkbox" id="m5" value="YouTube"><label for="m5"><span class="emoji">▶️</span>YouTube</label></div>
+      <div class="choice"><input type="checkbox" id="m6" value="Texting or Messaging"><label for="m6"><span class="emoji">💬</span>Messaging</label></div>
+      <div class="choice"><input type="checkbox" id="m7" value="Music"><label for="m7"><span class="emoji">🎵</span>Music</label></div>
+      <div class="choice"><input type="checkbox" id="m8" value="Social Media"><label for="m8"><span class="emoji">📸</span>Social Media</label></div>
+    </div>
+
+    <div class="nav">
+      <button class="back" onclick="goBack()">← Back</button>
+      <button class="next" onclick="goNext()">Next Level →</button>
+    </div>
+  </section>
+
+  <section class="level" data-level="2">
+    <h2>🏆 Level 2: Your Top 3</h2>
+    <p class="sub">Type the three media things you use the most.</p>
+    <div class="rank-box">
+      <input id="top1" type="text" placeholder="🥇 #1 — I use this the most" />
+      <input id="top2" type="text" placeholder="🥈 #2" />
+      <input id="top3" type="text" placeholder="🥉 #3" />
+    </div>
+
+    <div class="nav">
+      <button class="back" onclick="goBack()">← Back</button>
+      <button class="next" onclick="goNext()">Next Level →</button>
+    </div>
+  </section>
+
+  <section class="level" data-level="3">
+    <h2>⚡ Level 3: Energy Check</h2>
+    <p class="sub">Think about the media you use the most. How does it usually leave you feeling?</p>
+
+    <div class="choice-grid">
+      <div class="choice"><input type="checkbox" id="f1" value="Happy"><label for="f1">😀 Happy</label></div>
+      <div class="choice"><input type="checkbox" id="f2" value="Relaxed"><label for="f2">😌 Relaxed</label></div>
+      <div class="choice"><input type="checkbox" id="f3" value="Entertained"><label for="f3">😂 Entertained</label></div>
+      <div class="choice"><input type="checkbox" id="f4" value="Excited"><label for="f4">🤩 Excited</label></div>
+      <div class="choice"><input type="checkbox" id="f5" value="Tired"><label for="f5">😴 Tired</label></div>
+      <div class="choice"><input type="checkbox" id="f6" value="Angry"><label for="f6">😡 Angry</label></div>
+      <div class="choice"><input type="checkbox" id="f7" value="Stressed"><label for="f7">😟 Stressed</label></div>
+      <div class="choice"><input type="checkbox" id="f8" value="Distracted"><label for="f8">😵 Distracted</label></div>
+    </div>
+
+    <div class="question">Most of the time, media...</div>
+    <div class="three">
+      <div class="choice"><input type="radio" name="energy" id="e1" value="gives me energy"><label for="e1">⚡ Gives me energy</label></div>
+      <div class="choice"><input type="radio" name="energy" id="e2" value="doesn't change much"><label for="e2">😐 Doesn't change much</label></div>
+      <div class="choice"><input type="radio" name="energy" id="e3" value="drains my energy"><label for="e3">🪫 Drains my energy</label></div>
+    </div>
+
+    <div class="nav">
+      <button class="back" onclick="goBack()">← Back</button>
+      <button class="next" onclick="goNext()">Next Level →</button>
+    </div>
+  </section>
+
+  <section class="level" data-level="4">
+    <h2>⏰ Level 4: The “5 More Minutes” Test</h2>
+    <p class="sub">No right or wrong answers. Just pick what is true for you.</p>
+
+    <div class="question">You planned to stop in 5 minutes... but kept going.</div>
+    <div class="three">
+      <div class="choice"><input type="radio" name="q1" id="q1a" value="Yes"><label for="q1a">😂 Yes</label></div>
+      <div class="choice"><input type="radio" name="q1" id="q1b" value="Sometimes"><label for="q1b">🤔 Sometimes</label></div>
+      <div class="choice"><input type="radio" name="q1" id="q1c" value="No"><label for="q1c">😎 No</label></div>
+    </div>
+
+    <div class="question">A screen has kept you up later than you planned.</div>
+    <div class="three">
+      <div class="choice"><input type="radio" name="q2" id="q2a" value="Yes"><label for="q2a">Yes</label></div>
+      <div class="choice"><input type="radio" name="q2" id="q2b" value="Sometimes"><label for="q2b">Sometimes</label></div>
+      <div class="choice"><input type="radio" name="q2" id="q2c" value="No"><label for="q2c">No</label></div>
+    </div>
+
+    <div class="question">You ignored homework, chores, food, or a person because of media.</div>
+    <div class="three">
+      <div class="choice"><input type="radio" name="q3" id="q3a" value="Yes"><label for="q3a">Yes</label></div>
+      <div class="choice"><input type="radio" name="q3" id="q3b" value="Sometimes"><label for="q3b">Sometimes</label></div>
+      <div class="choice"><input type="radio" name="q3" id="q3c" value="No"><label for="q3c">No</label></div>
+    </div>
+
+    <div class="question">Stopping can be hard.</div>
+    <div class="three">
+      <div class="choice"><input type="radio" name="q4" id="q4a" value="Yes"><label for="q4a">Yes</label></div>
+      <div class="choice"><input type="radio" name="q4" id="q4b" value="Sometimes"><label for="q4b">Sometimes</label></div>
+      <div class="choice"><input type="radio" name="q4" id="q4c" value="No"><label for="q4c">No</label></div>
+    </div>
+
+    <div class="nav">
+      <button class="back" onclick="goBack()">← Back</button>
+      <button class="next" onclick="goNext()">Next Level →</button>
+    </div>
+  </section>
+
+  <section class="level" data-level="5">
+    <h2>⚖️ Level 5: Check Your Balance</h2>
+    <div class="note"><strong>Balance does not mean quitting technology.</strong> It means making sure screens leave room for other important parts of your life.</div>
+    <p class="sub">Tap what you want enough time for.</p>
+
+    <div class="choice-grid">
+      <div class="choice"><input type="checkbox" id="b1" value="Gaming"><label for="b1">🎮 Gaming</label></div>
+      <div class="choice"><input type="checkbox" id="b2" value="Family"><label for="b2">👨‍👩‍👧 Family</label></div>
+      <div class="choice"><input type="checkbox" id="b3" value="Sleep"><label for="b3">😴 Sleep</label></div>
+      <div class="choice"><input type="checkbox" id="b4" value="Sports or exercise"><label for="b4">🏀 Sports / Exercise</label></div>
+      <div class="choice"><input type="checkbox" id="b5" value="Friends"><label for="b5">🧑‍🤝‍🧑 Friends</label></div>
+      <div class="choice"><input type="checkbox" id="b6" value="School"><label for="b6">📚 School</label></div>
+      <div class="choice"><input type="checkbox" id="b7" value="Hobbies"><label for="b7">🎨 Hobbies</label></div>
+      <div class="choice"><input type="checkbox" id="b8" value="Outside time"><label for="b8">🌳 Outside</label></div>
+      <div class="choice"><input type="checkbox" id="b9" value="Relaxing"><label for="b9">😌 Relaxing</label></div>
+    </div>
+
+    <div class="nav">
+      <button class="back" onclick="goBack()">← Back</button>
+      <button class="next" onclick="goNext()">Final Boss →</button>
+    </div>
+  </section>
+
+  <section class="level" data-level="6">
+    <h2>👾 Final Boss: Choose Your Challenge</h2>
+    <p class="sub">Pick ONE thing you could actually try.</p>
+
+    <div class="challenge">
+      <div class="choice"><input type="radio" name="goal" id="g1" value="put my phone away while doing homework"><label for="g1">📵 Put my phone away during homework.</label></div>
+      <div class="choice"><input type="radio" name="goal" id="g2" value="stop using screens before bed"><label for="g2">🌙 Stop screens before bed.</label></div>
+      <div class="choice"><input type="radio" name="goal" id="g3" value="set a timer while gaming"><label for="g3">⏰ Set a timer while gaming.</label></div>
+      <div class="choice"><input type="radio" name="goal" id="g4" value="do something active before getting online"><label for="g4">🏃 Do something active before getting online.</label></div>
+      <div class="choice"><input type="radio" name="goal" id="g5" value="put my phone away while eating"><label for="g5">🍕 Put my phone away while eating.</label></div>
+      <div class="choice"><input type="radio" name="goal" id="g6" value="finish responsibilities before gaming"><label for="g6">✅ Finish responsibilities before gaming.</label></div>
+      <div class="choice"><input type="radio" name="goal" id="g7" value="turn off notifications when I need to focus"><label for="g7">🔕 Turn off notifications when I need to focus.</label></div>
+      <div class="choice"><input type="radio" name="goal" id="g8" value="my own goal"><label for="g8">✏️ Make my own goal.</label></div>
+    </div>
+
+    <div style="margin-top:14px">
+      <input id="ownGoal" type="text" placeholder="Optional: type your own goal here" />
+    </div>
+
+    <div class="question">How hard will your challenge be?</div>
+    <div class="choice-grid">
+      <div class="choice"><input type="radio" name="hard" id="h1" value="Easy"><label for="h1">😎 Easy</label></div>
+      <div class="choice"><input type="radio" name="hard" id="h2" value="I can probably do it"><label for="h2">🙂 I can probably do it</label></div>
+      <div class="choice"><input type="radio" name="hard" id="h3" value="This might be tough"><label for="h3">😬 Might be tough</label></div>
+      <div class="choice"><input type="radio" name="hard" id="h4" value="Good luck to me"><label for="h4">💀 Good luck to me</label></div>
+    </div>
+
+    <div class="nav">
+      <button class="back" onclick="goBack()">← Back</button>
+      <button class="finish" onclick="finishMission()">🏆 Finish Mission</button>
+    </div>
+  </section>
+
+  <section class="level" data-level="7" id="finalScreen">
+    <h2>🏆 Mission Complete!</h2>
+    <div class="result">
+      <p id="resultName"></p>
+      <p>Your Media Balance Challenge is:</p>
+      <div class="big-goal" id="goalText">Choose a goal.</div>
+      <p id="difficultyText"></p>
+    </div>
+
+    <div class="question">Quick Exit Ticket</div>
+    <p class="sub">How balanced does your media use feel right now?</p>
+    <div class="choice-grid">
+      <div class="choice"><input type="radio" name="exit" id="x1" value="Pretty balanced"><label for="x1">🟢 Pretty balanced</label></div>
+      <div class="choice"><input type="radio" name="exit" id="x2" value="Could use a little work"><label for="x2">🟡 Could use a little work</label></div>
+      <div class="choice"><input type="radio" name="exit" id="x3" value="Probably taking over"><label for="x3">🔴 Probably taking over</label></div>
+      <div class="choice"><input type="radio" name="exit" id="x4" value="Still figuring it out"><label for="x4">🤷 Still figuring it out</label></div>
+    </div>
+
+    <p class="tiny">Your answers stay on this device. Nothing is sent until you press Send in your own email.</p>
+<div class="ac-send" id="acSend">
+  <label for="acTeacher">Your teacher's email</label>
+  <input id="acTeacher" type="email" autocomplete="off" placeholder="teacher@yourschool.org">
+  <div class="ac-row">
+    <button type="button" class="ac-main" data-ac="gmail">✉️ Send with Gmail</button>
+    <button type="button" class="ac-main" data-ac="outlook">✉️ Send with Outlook</button>
+    <button type="button" data-ac="app">Use my email app</button>
+    <button type="button" data-ac="copy">Copy my results</button>
+  </div>
+  <p class="ac-msg" id="acMsg" role="status" aria-live="polite"></p>
+</div>
+
+    <div class="nav">
+      <button class="back" onclick="goBack()">← Back</button>
+      
+      <button class="reset" onclick="resetMission()">↻ Start Over</button>
+    </div>
+  </section>
+</div>
+
+<script>
+let current = 0;
+const levels = Array.from(document.querySelectorAll('.level'));
+const progress = document.getElementById('progress');
+
+function showLevel(index){
+  levels.forEach((el,i)=>el.classList.toggle('active',i===index));
+  current = index;
+  const pct = (index/(levels.length-1))*100;
+  progress.style.width = pct + '%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goNext(){
+  if(current < levels.length-1) showLevel(current+1);
+}
+
+function goBack(){
+  if(current > 0) showLevel(current-1);
+}
+
+function selectedValue(name){
+  const item = document.querySelector('input[name="'+name+'"]:checked');
+  return item ? item.value : '';
+}
+
+function finishMission(){
+  const name = document.getElementById('studentName').value.trim();
+  let goal = selectedValue('goal');
+  const ownGoal = document.getElementById('ownGoal').value.trim();
+  if(ownGoal) goal = ownGoal;
+  if(!goal) goal = 'choose one small change that helps me keep media balanced';
+
+  const hard = selectedValue('hard') || 'Not rated';
+
+  document.getElementById('resultName').textContent =
+    name ? 'Nice work, ' + name + '.' : 'Nice work.';
+  document.getElementById('goalText').textContent =
+    'I will try to ' + goal + '.';
+  document.getElementById('difficultyText').textContent =
+    'Challenge level: ' + hard;
+
+  showLevel(7);
+}
+
+
+function checkedValues(selector){
+  return Array.from(document.querySelectorAll(selector + ':checked')).map(x=>x.value);
+}
+
+function acResults(){
+  const name = document.getElementById('studentName').value.trim() || "Student";
+  const media = checkedValues('#mediaChoices input[type="checkbox"]').join(', ') || "Not selected";
+  const top1 = document.getElementById('top1').value.trim() || "Not entered";
+  const top2 = document.getElementById('top2').value.trim() || "Not entered";
+  const top3 = document.getElementById('top3').value.trim() || "Not entered";
+
+  const feelings = checkedValues('input[id^="f"]').join(', ') || "Not selected";
+  const energy = selectedValue('energy') || "Not selected";
+  const q1 = selectedValue('q1') || "Not selected";
+  const q2 = selectedValue('q2') || "Not selected";
+  const q3 = selectedValue('q3') || "Not selected";
+  const q4 = selectedValue('q4') || "Not selected";
+
+  const balance = checkedValues('input[id^="b"]').join(', ') || "Not selected";
+
+  let goal = selectedValue('goal');
+  const ownGoal = document.getElementById('ownGoal').value.trim();
+  if(ownGoal) goal = ownGoal;
+  if(!goal) goal = "Not selected";
+
+  const hard = selectedValue('hard') || "Not selected";
+  const exit = selectedValue('exit') || "Not selected";
+
+  const subject = "Media Balance Mission - " + name;
+  const body =
+`MEDIA BALANCE MISSION RESULTS
+
+Student: ${name}
+
+MEDIA I USE
+Selected media: ${media}
+
+TOP 3
+1. ${top1}
+2. ${top2}
+3. ${top3}
+
+ENERGY CHECK
+Feelings: ${feelings}
+Overall effect: ${energy}
+
+5 MORE MINUTES TEST
+Kept going longer than planned: ${q1}
+Screen kept me up late: ${q2}
+Ignored homework/chores/food/person: ${q3}
+Stopping can be hard: ${q4}
+
+BALANCE
+Things I want enough time for: ${balance}
+
+MY BALANCE CHALLENGE
+Goal: ${goal}
+How hard it may be: ${hard}
+
+EXIT TICKET
+My media use feels: ${exit}`;
+
+  return {subject, body};
+}
+
+function resetMission(){
+  document.querySelectorAll('input').forEach(input=>{
+    if(input.type === 'checkbox' || input.type === 'radio') input.checked = false;
+    if(input.type === 'text' || input.type === 'number') input.value = '';
+  });
+  showLevel(0);
+}
+
+showLevel(0);
+
+/* ---- demo: sending is in the full version ---- */
+document.querySelectorAll('[data-ac]').forEach(b=>b.addEventListener('click',()=>{
+  const r=acResults(); if(!r) return;
+  const m=document.getElementById('acMsg'); m.innerHTML='In the full version this sends your teacher an email like this one. Nothing is sent from the demo.<pre style="white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;background:rgba(127,127,127,.12);padding:10px;border-radius:10px;margin-top:8px"></pre>';
+  m.querySelector('pre').textContent='Subject: '+r.subject+'\n\n'+r.body;
+}));
+</script>
+<p style="text-align:center;font:12px system-ui,sans-serif;opacity:.7;margin:22px 0">Demo · © The Alchemist Classroom</p></body>
+</html>

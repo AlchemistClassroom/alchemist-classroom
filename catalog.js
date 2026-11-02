@@ -89,6 +89,32 @@ var APPS = [
     buyUrl: ""
   },
   {
+    id: "sel-activity-pack",
+    section: "in-class-apps",
+    name: "SEL Activity Pack",
+    price: "$5",
+    icon: "images/app-sel-pack.png",
+    short: "Four interactive middle school SEL activities: digital citizenship, digital footprint, media balance and gratitude.",
+    description: "Four short activities students can do on a Chromebook or you can project for the class. Two of them end with an exit ticket that students send to your email.",
+    features: [
+      ["Digital Citizenship Sort", "Students sort 16 online choices into Safe, Responsible, Respectful, or Not a Good Digital Citizen, then check their answers."],
+      ["Digital Footprint Adventure", "A scored mission on what adds to a footprint, why it lasts, and the STOP check before posting, with a 4-question exit ticket."],
+      ["Media Balance Mission", "Students notice how media makes them feel, take the \u201c5 more minutes\u201d test, and set one balance challenge."],
+      ["Thank You, Out Loud", "A 30-minute social-awareness lesson: spot specific kindness, make a thank-you card, and practice saying it out loud."],
+      ["Results in your inbox", "Students type your email once and send their exit ticket with Gmail, Outlook or their email app."]
+    ],
+    demoUrl: "demos/sel-activity-pack/",
+    screens: [
+      ["images/sel-1.jpg", "Digital Citizenship Sort"],
+      ["images/sel-2.jpg", "Digital Footprint Adventure"],
+      ["images/sel-3.jpg", "Media Balance Mission"],
+      ["images/sel-4.jpg", "Thank You, Out Loud: teacher view with a built-in lesson clock"]
+    ],
+    includes: ["4 activity files (each one offline file)", "Quick Start guide", "Free updates to version 1"],
+    requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grades 6\u20138.",
+    buyUrl: ""
+  },
+  {
     id: "microscope-simulator",
     section: "in-class-apps",
     name: "Microscope Simulator",

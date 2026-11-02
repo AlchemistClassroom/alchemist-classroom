@@ -1,0 +1,336 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body><div style="background:#2DD4BF;color:#06241f;text-align:center;padding:8px 14px;font:14px system-ui,sans-serif;position:relative;z-index:50" role="note"><b>Demo</b> · Digital Citizenship Sort works fully. Nothing is saved or sent. <a style="color:#06241f;font-weight:800" href="../../#sel-activity-pack" target="_top">Get the SEL Activity Pack →</a></div>
+<title>Digital Citizenship Sort Demo | The Alchemist Classroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;0,800;1,600&display=swap">
+<style>
+  :root{
+    --ground:#F1F4FB; --surface:#FFFFFF; --surface-2:#F7F9FE;
+    --ink:#1E2533; --muted:#5C6675; --line:#DBE2EE; --line-strong:#C4CDDC;
+    --accent:#4338CA; --accent-soft:#E7E5FB;
+    --safe:#0E9A90; --safe-bg:#E1F4F2;
+    --resp:#C67A0C; --resp-bg:#FBEED6;
+    --respect:#D64C77; --respect-bg:#FBE6ED;
+    --flag:#D8503F; --flag-bg:#FBE3DE;
+    --good:#12855A; --close:#B9720F; --bad:#CB4433;
+    --shadow:0 1px 2px rgba(20,30,55,.06), 0 6px 20px rgba(20,30,55,.07);
+    --radius:16px;
+  }
+  :root:not([data-theme="light"]){}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#12161F; --surface:#1B2130; --surface-2:#222A3B;
+      --ink:#EAEFF8; --muted:#9AA6B8; --line:#2C3547; --line-strong:#3A445A;
+      --accent:#A9A2F5; --accent-soft:#2A2A47;
+      --safe:#3FD0C3; --safe-bg:#123634;
+      --resp:#F0B45A; --resp-bg:#3A2E13;
+      --respect:#F2879F; --respect-bg:#3B1F29;
+      --flag:#F08C7B; --flag-bg:#3A211B;
+      --good:#54D19A; --close:#F0B45A; --bad:#F08C7B;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#12161F; --surface:#1B2130; --surface-2:#222A3B;
+    --ink:#EAEFF8; --muted:#9AA6B8; --line:#2C3547; --line-strong:#3A445A;
+    --accent:#A9A2F5; --accent-soft:#2A2A47;
+    --safe:#3FD0C3; --safe-bg:#123634;
+    --resp:#F0B45A; --resp-bg:#3A2E13;
+    --respect:#F2879F; --respect-bg:#3B1F29;
+    --flag:#F08C7B; --flag-bg:#3A211B;
+    --good:#54D19A; --close:#F0B45A; --bad:#F08C7B;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:"Nunito Sans", system-ui, sans-serif; font-size:16px; line-height:1.5;
+    padding-inline:clamp(14px,3vw,32px); padding-block:0;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding-block:clamp(18px,3vw,34px) 60px;}
+  h1{
+    font-family:"Fredoka", system-ui, sans-serif; font-weight:700;
+    font-size:clamp(1.7rem,4vw,2.5rem); line-height:1.05; margin:0; color:var(--ink);
+    text-wrap:balance; letter-spacing:-.5px;
+  }
+  .eyebrow{
+    font-family:"Fredoka",sans-serif; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+    font-size:.72rem; color:var(--accent); margin:0 0 6px;
+  }
+  .lede{color:var(--muted); margin:8px 0 0; max-width:60ch; font-size:1.02rem;}
+  .lede b{color:var(--ink); font-weight:700}
+
+  .toolbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:20px 0 8px;}
+  .btn{
+    font-family:"Fredoka",sans-serif; font-weight:600; font-size:.98rem;
+    border:1.5px solid var(--line-strong); background:var(--surface); color:var(--ink);
+    padding:9px 16px; border-radius:999px; cursor:pointer; box-shadow:var(--shadow);
+    transition:transform .08s ease, background .15s ease, border-color .15s;
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn.primary{background:var(--accent); color:#fff; border-color:transparent}
+  .btn:focus-visible, .card:focus-visible, .bin:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+  .status{margin-left:auto; font-weight:700; color:var(--muted); font-size:.95rem;}
+  .status b{color:var(--ink)}
+
+  /* Tray */
+  .tray{
+    background:var(--surface-2); border:1.5px dashed var(--line-strong); border-radius:var(--radius);
+    padding:14px; margin:8px 0 22px; min-height:96px;
+  }
+  .tray-head{display:flex; align-items:center; gap:8px; margin:0 2px 10px; color:var(--muted);
+    font-family:"Fredoka",sans-serif; font-weight:600; font-size:.9rem; text-transform:uppercase; letter-spacing:.08em}
+  .tray.dragover, .bin.dragover{outline:3px dashed var(--accent); outline-offset:2px}
+  .cards{display:flex; flex-wrap:wrap; gap:10px}
+  .tray .empty{color:var(--muted); font-style:italic; padding:14px 6px;}
+
+  /* Card */
+  .card{
+    font-family:"Nunito Sans",sans-serif; text-align:left; font-size:.98rem; font-weight:600;
+    background:var(--surface); color:var(--ink); border:1.5px solid var(--line);
+    border-radius:12px; padding:11px 13px 11px 15px; cursor:grab; box-shadow:var(--shadow);
+    max-width:270px; position:relative; line-height:1.3;
+    border-left:5px solid var(--line-strong);
+    transition:transform .1s ease, box-shadow .12s, border-color .12s;
+  }
+  .card:hover{transform:translateY(-1px)}
+  .card.selected{border-color:var(--accent); border-left-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft), var(--shadow)}
+  .card .fb{display:block; font-weight:700; font-size:.8rem; margin-top:6px}
+  .card.mark-good{border-left-color:var(--good)} .card.mark-good .fb{color:var(--good)}
+  .card.mark-close{border-left-color:var(--close)} .card.mark-close .fb{color:var(--close)}
+  .card.mark-bad{border-left-color:var(--bad)} .card.mark-bad .fb{color:var(--bad)}
+  .card .badge{position:absolute; top:-9px; right:-9px; width:22px; height:22px; border-radius:50%;
+    display:none; align-items:center; justify-content:center; font-size:13px; color:#fff; font-weight:800}
+  .card.mark-good .badge{display:flex; background:var(--good)}
+  .card.mark-close .badge{display:flex; background:var(--close)}
+  .card.mark-bad .badge{display:flex; background:var(--bad)}
+
+  /* Bins */
+  .bins{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+  @media(max-width:840px){.bins{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:480px){.bins{grid-template-columns:1fr}}
+  .bin{
+    background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); display:flex; flex-direction:column; overflow:hidden; cursor:pointer;
+    --c:var(--muted); --cbg:var(--surface-2);
+  }
+  .bin[data-key="safe"]{--c:var(--safe); --cbg:var(--safe-bg)}
+  .bin[data-key="responsible"]{--c:var(--resp); --cbg:var(--resp-bg)}
+  .bin[data-key="respectful"]{--c:var(--respect); --cbg:var(--respect-bg)}
+  .bin[data-key="notgood"]{--c:var(--flag); --cbg:var(--flag-bg)}
+  .bin-head{background:var(--cbg); padding:12px 14px; border-bottom:1.5px solid var(--line)}
+  .bin-title{display:flex; align-items:center; gap:8px; font-family:"Fredoka",sans-serif; font-weight:700;
+    color:var(--c); font-size:1.05rem}
+  .bin-title .ico{font-size:1.15rem}
+  .bin-hint{color:var(--muted); font-size:.82rem; margin:3px 0 0}
+  .bin-body{padding:12px; display:flex; flex-direction:column; gap:10px; min-height:120px; flex:1}
+  .bin-body .drop-hint{color:var(--muted); font-size:.85rem; font-style:italic; margin:auto; text-align:center; opacity:.8}
+  .bin.armed{box-shadow:0 0 0 3px var(--accent-soft), var(--shadow); border-color:var(--accent)}
+
+  .result{margin:18px 0 0; padding:14px 16px; border-radius:var(--radius); background:var(--surface);
+    border:1.5px solid var(--line); box-shadow:var(--shadow); display:none; font-size:1rem}
+  .result.show{display:block}
+  .result h2{font-family:"Fredoka",sans-serif; margin:0 0 4px; font-size:1.15rem}
+  .result .tally{color:var(--muted)}
+  .result .tally b{color:var(--ink)}
+  .foot{margin-top:26px; color:var(--muted); font-size:.82rem; text-align:center}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Grade 6 · Digital Literacy</p>
+  <h1>Are You a Good Digital Citizen?</h1>
+  <p class="lede">A good digital citizen is <b>Safe</b>, <b>Responsible</b>, and <b>Respectful</b> online.
+    Tap a card, then tap the box where it belongs. Watch out for the choices that are <b>not</b> good digital citizenship!</p>
+
+  <div class="toolbar">
+    <button class="btn primary" id="check">Check my answers</button>
+    <button class="btn" id="shuffle">Shuffle</button>
+    <button class="btn" id="reset">Start over</button>
+    <span class="status" id="status">0 of 16 sorted</span>
+  </div>
+
+  <div class="tray" id="tray" data-key="tray">
+    <div class="tray-head">🗂️ Cards to sort — tap one to pick it up</div>
+    <div class="cards" id="trayCards"></div>
+  </div>
+
+  <div class="bins" id="bins">
+    <section class="bin" data-key="safe" tabindex="0" aria-label="Safe bin">
+      <div class="bin-head"><div class="bin-title"><span class="ico">🛡️</span>Safe</div>
+        <p class="bin-hint">Protects you and others from harm.</p></div>
+      <div class="bin-body" data-key="safe"><span class="drop-hint">Drop safe choices here</span></div>
+    </section>
+    <section class="bin" data-key="responsible" tabindex="0" aria-label="Responsible bin">
+      <div class="bin-head"><div class="bin-title"><span class="ico">✅</span>Responsible</div>
+        <p class="bin-hint">Doing the right thing and owning your actions.</p></div>
+      <div class="bin-body" data-key="responsible"><span class="drop-hint">Drop responsible choices here</span></div>
+    </section>
+    <section class="bin" data-key="respectful" tabindex="0" aria-label="Respectful bin">
+      <div class="bin-head"><div class="bin-title"><span class="ico">💛</span>Respectful</div>
+        <p class="bin-hint">Treating people kindly online.</p></div>
+      <div class="bin-body" data-key="respectful"><span class="drop-hint">Drop respectful choices here</span></div>
+    </section>
+    <section class="bin" data-key="notgood" tabindex="0" aria-label="Not a good digital citizen bin">
+      <div class="bin-head"><div class="bin-title"><span class="ico">⚠️</span>Not a Good<br>Digital Citizen</div>
+        <p class="bin-hint">Unsafe, unfair, or unkind online.</p></div>
+      <div class="bin-body" data-key="notgood"><span class="drop-hint">Flag the bad choices here</span></div>
+    </section>
+  </div>
+
+  <div class="result" id="result" role="status" aria-live="polite"></div>
+
+  <p class="foot">Digital Citizenship = being Safe, Responsible &amp; Respectful online. · Grade 6 SEL + Digital Literacy</p>
+</div>
+
+<script>
+const CARDS = [
+  {id:1,  text:"Keep your passwords private.", cat:"safe"},
+  {id:2,  text:"Tell a trusted adult if a stranger messages you.", cat:"safe"},
+  {id:3,  text:"Never share your home address online.", cat:"safe"},
+  {id:4,  text:"Log out when you use a shared computer.", cat:"safe"},
+  {id:5,  text:"Give credit when you use someone's words or pictures.", cat:"responsible"},
+  {id:6,  text:"Do your own work instead of copying.", cat:"responsible"},
+  {id:7,  text:"Balance your screen time with other things you enjoy.", cat:"responsible"},
+  {id:8,  text:"Use your Chromebook for schoolwork during class.", cat:"responsible"},
+  {id:9,  text:"Write kind comments, even when you disagree.", cat:"respectful"},
+  {id:10, text:"Ask before posting a photo of a friend.", cat:"respectful"},
+  {id:11, text:"Don't spread rumors or mean messages.", cat:"respectful"},
+  {id:12, text:"Include everyone in the group chat.", cat:"respectful"},
+  {id:13, text:"Share a friend's password as a joke.", cat:"notgood", why:"That's not safe — passwords stay private."},
+  {id:14, text:"Post a mean comment on someone's photo.", cat:"notgood", why:"That's unkind — not respectful."},
+  {id:15, text:"Copy an essay from a website and turn it in.", cat:"notgood", why:"That's not honest — not responsible."},
+  {id:16, text:"Send your address to someone you met in a game.", cat:"notgood", why:"That's unsafe — keep private info private."},
+];
+const POS = {safe:"Safe", responsible:"Responsible", respectful:"Respectful", notgood:"Not a Good Digital Citizen"};
+const state = {};       // id -> bin key or null
+let order = CARDS.map(c=>c.id);
+let selected = null;
+let checked = false;
+
+const trayCards = document.getElementById('trayCards');
+const status = document.getElementById('status');
+const result = document.getElementById('result');
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+
+function cardEl(c){
+  const b=document.createElement('button');
+  b.className='card'; b.type='button'; b.dataset.id=c.id; b.draggable=true;
+  b.innerHTML = `<span class="badge"></span>${c.text}<span class="fb"></span>`;
+  if(selected===c.id) b.classList.add('selected');
+  return b;
+}
+function render(){
+  // tray
+  trayCards.innerHTML='';
+  const uns = order.filter(id=>!state[id]);
+  if(uns.length===0){ trayCards.innerHTML='<span class="empty">All cards sorted! Tap “Check my answers”.</span>'; }
+  uns.forEach(id=>trayCards.appendChild(cardEl(CARDS.find(c=>c.id===id))));
+  // bins
+  document.querySelectorAll('.bin-body').forEach(body=>{
+    const key=body.dataset.key;
+    body.innerHTML='';
+    const inb = order.filter(id=>state[id]===key);
+    if(inb.length===0){ const s=document.createElement('span'); s.className='drop-hint';
+      s.textContent = key==='notgood' ? 'Flag the bad choices here' : 'Drop cards here'; body.appendChild(s); }
+    inb.forEach(id=>{
+      const c=CARDS.find(x=>x.id===id); const el=cardEl(c);
+      if(checked) grade(el,c,key);
+      body.appendChild(el);
+    });
+  });
+  const sorted = order.filter(id=>state[id]).length;
+  status.innerHTML = `<b>${sorted}</b> of 16 sorted`;
+  document.querySelectorAll('.bin').forEach(b=>b.classList.toggle('armed', !!selected));
+}
+function grade(el,c,key){
+  el.classList.remove('mark-good','mark-close','mark-bad');
+  const badge=el.querySelector('.badge'); const fb=el.querySelector('.fb');
+  if(c.cat==='notgood'){
+    if(key==='notgood'){ el.classList.add('mark-good'); badge.textContent='✓'; fb.textContent='Good catch — you flagged it!'; }
+    else { el.classList.add('mark-bad'); badge.textContent='✗'; fb.textContent=(c.why||'')+' Move it to “Not a Good Digital Citizen.”'; }
+  } else { // a positive behavior
+    if(key===c.cat){ el.classList.add('mark-good'); badge.textContent='✓'; fb.textContent=`Yes! That's a ${POS[c.cat]} choice.`; }
+    else if(key==='notgood'){ el.classList.add('mark-bad'); badge.textContent='✗'; fb.textContent=`This is a GOOD choice — it belongs under ${POS[c.cat]}.`; }
+    else { el.classList.add('mark-close'); badge.textContent='~'; fb.textContent=`Close! It's a good-citizen choice. Best fit: ${POS[c.cat]}.`; }
+  }
+}
+function place(id, key){
+  state[id] = key;               // key null? we pass 'tray' handled by caller
+  selected=null; checked=false; result.classList.remove('show'); render();
+}
+function toTray(id){ delete state[id]; selected=null; checked=false; result.classList.remove('show'); render(); }
+
+// selection + placement (works with tap/click on any device)
+document.body.addEventListener('click', e=>{
+  const card=e.target.closest('.card');
+  const binBody=e.target.closest('.bin-body') || (e.target.closest('.bin')?.querySelector('.bin-body'));
+  const tray=e.target.closest('#tray');
+  if(card){
+    const id=+card.dataset.id;
+    if(state[id]){ // a placed card: pick it up (select) or if already selected, send to tray
+      if(selected===id){ toTray(id); } else { selected=id; render(); }
+    } else {
+      selected = (selected===id)? null : id; render();
+    }
+    e.stopPropagation(); return;
+  }
+  if(selected!=null){
+    if(binBody){ place(selected, binBody.dataset.key); return; }
+    if(tray){ toTray(selected); return; }
+  }
+});
+// keyboard placement on bins
+document.querySelectorAll('.bin').forEach(bin=>{
+  bin.addEventListener('keydown', e=>{
+    if((e.key==='Enter'||e.key===' ') && selected!=null){ e.preventDefault(); place(selected, bin.querySelector('.bin-body').dataset.key); }
+  });
+});
+// native drag for mouse/trackpad
+let dragId=null;
+document.body.addEventListener('dragstart', e=>{ const c=e.target.closest('.card'); if(c){ dragId=+c.dataset.id; e.dataTransfer.effectAllowed='move'; }});
+document.body.addEventListener('dragover', e=>{ if(dragId!=null && (e.target.closest('.bin')||e.target.closest('#tray'))){ e.preventDefault();
+  const z=e.target.closest('.bin')||e.target.closest('#tray'); document.querySelectorAll('.dragover').forEach(x=>x.classList.remove('dragover')); z.classList.add('dragover'); }});
+document.body.addEventListener('dragleave', e=>{ const z=e.target.closest('.bin')||e.target.closest('#tray'); if(z) z.classList.remove('dragover'); });
+document.body.addEventListener('drop', e=>{
+  if(dragId==null) return; e.preventDefault();
+  document.querySelectorAll('.dragover').forEach(x=>x.classList.remove('dragover'));
+  const bin=e.target.closest('.bin'); const tray=e.target.closest('#tray');
+  if(bin){ place(dragId, bin.querySelector('.bin-body').dataset.key); }
+  else if(tray){ toTray(dragId); }
+  dragId=null;
+});
+document.body.addEventListener('dragend', ()=>{ dragId=null; document.querySelectorAll('.dragover').forEach(x=>x.classList.remove('dragover')); });
+
+// buttons
+document.getElementById('check').addEventListener('click', ()=>{
+  const unsorted = order.filter(id=>!state[id]).length;
+  checked=true; render();
+  let good=0, close=0, bad=0;
+  order.forEach(id=>{ const c=CARDS.find(x=>x.id===id); const k=state[id]; if(!k) return;
+    if(c.cat==='notgood'){ k==='notgood'?good++:bad++; }
+    else { k===c.cat?good++ : (k==='notgood'?bad++:close++); } });
+  let msg;
+  if(unsorted>0){ msg=`You still have <b>${unsorted}</b> card${unsorted>1?'s':''} in the tray. Sort them, then check again.`; }
+  else if(bad===0 && close===0){ msg=`🎉 Perfect! You sorted every card like a great digital citizen.`; }
+  else if(bad===0){ msg=`Nice work! A few are just in a different good-citizen box — check the ~ cards.`; }
+  else { msg=`Good start! Look at the ✗ cards and try again — you've got this.`; }
+  result.className='result show';
+  result.innerHTML = `<h2>Your Sort</h2><p class="tally"><b>${good}</b> spot-on · <b>${close}</b> close · <b>${bad}</b> to rethink</p><p style="margin:.4em 0 0">${msg}</p>`;
+  document.getElementById('check').textContent='Check again';
+  result.scrollIntoView({behavior:'smooth', block:'nearest'});
+});
+document.getElementById('shuffle').addEventListener('click', ()=>{ shuffle(order); selected=null; render(); });
+document.getElementById('reset').addEventListener('click', ()=>{
+  for(const k in state) delete state[k]; selected=null; checked=false;
+  result.classList.remove('show'); document.getElementById('check').textContent='Check my answers';
+  order=CARDS.map(c=>c.id); render();
+});
+
+shuffle(order);
+render();
+</script>
+
+<p style="text-align:center;font:12px system-ui,sans-serif;opacity:.7;margin:22px 0">Demo · © The Alchemist Classroom</p></body></html>

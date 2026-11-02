@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Footprint Adventure Demo | The Alchemist Classroom</title>
+<style>
+:root{--bg:#171325;--panel:#251c3b;--panel2:#30234a;--gold:#f1c84c;--purple2:#9a6ad6;--text:#f7f4fb;--good:#58c78b;--bad:#e96a6a}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:980px;margin:auto;padding:20px}
+header{background:linear-gradient(135deg,var(--panel),#1e1830);border-radius:18px;padding:18px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+h1{color:var(--gold);margin:0} h2{margin-top:0} h3{color:var(--gold)} p{line-height:1.5}
+.pill{background:var(--panel2);padding:10px 14px;border-radius:999px;display:inline-block;margin:4px;font-weight:bold}
+.progress{height:12px;background:#0f0c18;border-radius:999px;margin:15px 0;overflow:hidden}
+#bar{height:100%;width:0;background:linear-gradient(90deg,var(--purple2),var(--gold));transition:.3s}
+.screen{display:none;background:var(--panel);border-radius:20px;padding:28px;margin-top:15px}
+.screen.active{display:block}
+.note{background:#1a1428;border-left:5px solid var(--gold);padding:15px;border-radius:10px;margin:15px 0}
+button{border:none;border-radius:12px;padding:14px 18px;font-weight:bold;font-size:1rem;cursor:pointer;margin:5px}
+button:disabled{opacity:.75;cursor:not-allowed}
+.primary{background:var(--gold);color:#21190d}.secondary{background:var(--purple2);color:white}
+.choice,.source{background:#181221;color:white;border:2px solid rgba(255,255,255,.12);width:100%;text-align:left}
+.choice.correct{border-color:var(--good);background:rgba(88,199,139,.15)}
+.choice.wrong{border-color:var(--bad);background:rgba(233,106,106,.15)}
+.source.selected{border-color:var(--gold);background:var(--panel2)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:15px 0}
+.feedback{background:#181221;padding:14px;border-radius:12px;margin-top:10px}
+.success{border-left:5px solid var(--good)}.error{border-left:5px solid var(--bad)}.hidden{display:none!important}
+label{display:block;margin-top:14px;margin-bottom:5px;font-weight:bold}
+input,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #777;font-size:1rem}
+textarea{min-height:90px;resize:vertical}
+.result{background:#1a1428;border:2px solid var(--gold);border-radius:16px;padding:18px}
+.badge{display:inline-block;padding:7px 10px;border-radius:999px;background:#26364b;margin:4px}
+.big-score{font-size:2rem;font-weight:bold;color:var(--gold)}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.wrap{padding:10px}.screen{padding:18px}}
+</style>
+<style>
+.ac-send{margin-top:14px;padding:14px;border-radius:14px;border:1px solid rgba(127,127,127,.35)}
+.ac-send label{display:block;font-weight:700;margin:0 0 6px}
+.ac-send input{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:10px;border:1px solid rgba(127,127,127,.5);font:inherit;margin:0 0 10px}
+.ac-row{display:flex;flex-wrap:wrap;gap:8px}
+.ac-row button{font:inherit;font-weight:700;cursor:pointer;border-radius:10px;padding:10px 14px;border:1px solid rgba(127,127,127,.5)}
+.ac-row .ac-main{background:#2DD4BF;color:#06241f;border-color:#2DD4BF}
+.ac-msg{min-height:1.2em;margin:8px 0 0;font-size:14px}
+.ac-copy{width:100%;min-height:160px;margin-top:8px;box-sizing:border-box}
+</style></head>
+<body><div style="background:#2DD4BF;color:#06241f;text-align:center;padding:8px 14px;font:14px system-ui,sans-serif;position:relative;z-index:50" role="note"><b>Demo</b> · Digital Footprint Adventure works fully. Nothing is saved or sent. <a style="color:#06241f;font-weight:800" href="../../#sel-activity-pack" target="_top">Get the SEL Activity Pack →</a></div>
+<div class="wrap">
+<header>
+<div><h1>👣 Digital Footprint Adventure</h1><p>What trail are you leaving online?</p></div>
+<div><span class="pill">⭐ Score: <span id="score">0</span></span><span class="pill">🧠 Level: <span id="level">1</span>/5</span></div>
+</header>
+<div class="progress"><div id="bar"></div></div>
+
+<section class="screen active" id="screen1">
+<h2>Every Click Leaves a Clue</h2>
+<p>A <strong>digital footprint</strong> is the trail of information connected to what you do online.</p>
+<div class="note"><strong>Your mission:</strong> Learn what creates a digital footprint, spot risky choices, and make smart online decisions.</div>
+<p>Some parts of your footprint are things you post on purpose. Other parts happen simply because you use websites, games, apps, or online accounts.</p>
+<button class="primary" id="startButton">Start Mission →</button>
+</section>
+
+<section class="screen" id="screen2">
+<h2>Level 1: What Adds to a Digital Footprint?</h2>
+<p>Select <strong>every activity</strong> that can add to your digital footprint.</p>
+<div class="grid" id="sources">
+<button class="source" data-correct="true">📸 Posting a photo</button>
+<button class="source" data-correct="true">💬 Commenting on a video</button>
+<button class="source" data-correct="true">🎮 Using an online game account</button>
+<button class="source" data-correct="true">🔎 Searching online</button>
+<button class="source" data-correct="false">📕 Reading a paper book</button>
+<button class="source" data-correct="true">❤️ Liking a post</button>
+</div>
+<button class="primary" id="checkSources">Check My Choices</button>
+<div class="feedback" id="sourceFeedback">Choose all that apply.</div>
+<button class="secondary hidden" id="sourceNext">Continue →</button>
+</section>
+
+<section class="screen" id="screen3">
+<h2>Level 2: Safe, Risky, or Think First?</h2>
+<p><strong>Scenario <span id="scenarioNumber">1</span> of 4</strong></p>
+<h3 id="scenarioTitle"></h3>
+<div class="grid" id="scenarioChoices"></div>
+<div class="feedback" id="scenarioFeedback">Choose an answer.</div>
+<button class="secondary hidden" id="nextScenario">Next Scenario →</button>
+</section>
+
+<section class="screen" id="screen4">
+<h2>Level 3: Can It Really Disappear?</h2>
+<p>Imagine you post an embarrassing picture and then delete it 10 minutes later.</p>
+<p><strong>Is it guaranteed to be gone forever?</strong></p>
+<div class="grid">
+<button class="choice permanence" data-answer="no">No — someone may have saved, shared, or screenshotted it.</button>
+<button class="choice permanence" data-answer="yes">Yes — deleting it means every copy disappears.</button>
+</div>
+<div class="feedback" id="permFeedback">Choose the best answer.</div>
+<div class="note hidden" id="permExplain"><strong>Remember:</strong><br><br>POST → SHARE → SAVE → SCREENSHOT<br><br>Deleting something from your account does not guarantee that every copy is gone.</div>
+<button class="secondary hidden" id="permNext">Continue →</button>
+</section>
+
+<section class="screen" id="screen5">
+<h2>Level 4: Build Your Digital Footprint</h2>
+<p>Choose <strong>3 things you actually do online.</strong></p>
+<div class="grid" id="footprintChoices">
+<button class="source">🎮 Online games</button>
+<button class="source">▶️ Watch videos</button>
+<button class="source">💬 Messages or chats</button>
+<button class="source">🔎 Search online</button>
+<button class="source">📸 Post pictures or videos</button>
+<button class="source">❤️ Like or react</button>
+<button class="source">🧑‍🤝‍🧑 Social media</button>
+<button class="source">🎵 Music apps</button>
+<button class="source">📚 School websites</button>
+</div>
+<p>Selected: <span id="selectedCount">0</span>/3</p>
+<button class="primary" id="lockFootprint">Lock In My 3</button>
+<div class="feedback" id="footFeedback">Pick exactly three.</div>
+<button class="secondary hidden" id="footNext">Final Challenge →</button>
+</section>
+
+<section class="screen" id="screen6">
+<h2>Level 5: The STOP Check</h2>
+<div class="result">
+<p><strong>S — Should I share this?</strong></p>
+<p><strong>T — True or helpful?</strong></p>
+<p><strong>O — Okay if an adult I respect saw it?</strong></p>
+<p><strong>P — Permanent?</strong></p>
+</div>
+<h3>Final Challenge</h3>
+<p>You are angry at a classmate and start typing a mean comment. What is the strongest digital-footprint choice?</p>
+<div class="grid">
+<button class="choice finalchoice" data-good="false">Post it quickly before you change your mind.</button>
+<button class="choice finalchoice" data-good="false">Post it and delete it later.</button>
+<button class="choice finalchoice" data-good="true">Stop, do not post it, and handle the problem another way.</button>
+<button class="choice finalchoice" data-good="false">Send it only to a group chat.</button>
+</div>
+<div class="feedback" id="finalFeedback">Choose the best answer.</div>
+<button class="primary hidden" id="finishBtn">See My Results →</button>
+</section>
+
+<section class="screen" id="screen7">
+<h2>🎉 Mission Complete</h2>
+<div class="result">
+<p class="big-score"><span id="finalScore">0</span>/100</p>
+<p id="resultMessage"></p>
+<div><span class="badge">👣 Footprint Finder</span><span class="badge">🧠 Think-First Tracker</span><span class="badge">⭐ Digital Citizen</span></div>
+</div>
+<h3>Exit Ticket</h3>
+<label for="studentName">Student Name</label>
+<input type="text" id="studentName" placeholder="Enter your name">
+<label for="oneThing">1. One thing I do that adds to my digital footprint is...</label>
+<input type="text" id="oneThing" placeholder="Type your answer">
+<label for="lasting">2. Something online can last because...</label>
+<input type="text" id="lasting" placeholder="Type your answer">
+<label for="beforePost">3. Before I post something, I should...</label>
+<input type="text" id="beforePost" placeholder="Type your answer">
+<label for="positiveGoal">4. One thing I can do to make my digital footprint more positive is...</label>
+<textarea id="positiveGoal" placeholder="Type your answer"></textarea>
+<h3>📋 My Answer Summary</h3>
+<div class="result"><p><strong>My Digital Footprint Activities:</strong></p><ul id="summaryActivities"></ul><p><strong>Final Score:</strong> <span id="summaryScore">0</span>/100</p></div>
+<br>
+<p class="feedback" id="emailMessage">Finish your exit ticket, then send your results to your teacher.</p>
+<div class="ac-send" id="acSend">
+  <label for="acTeacher">Your teacher's email</label>
+  <input id="acTeacher" type="email" autocomplete="off" placeholder="teacher@yourschool.org">
+  <div class="ac-row">
+    <button type="button" class="ac-main" data-ac="gmail">✉️ Send with Gmail</button>
+    <button type="button" class="ac-main" data-ac="outlook">✉️ Send with Outlook</button>
+    <button type="button" data-ac="app">Use my email app</button>
+    <button type="button" data-ac="copy">Copy my results</button>
+  </div>
+  <p class="ac-msg" id="acMsg" role="status" aria-live="polite"></p>
+</div>
+</section>
+</div>
+
+<script>
+let score=0,scenarioIndex=0,sourceScored=false,permScored=false,finalScored=false,footprintScored=false,scenarioAnswered=false;
+const selectedFoot=new Set();
+const scenarios=[
+{text:"Ari posts a picture of a science project she worked hard on.",answers:["Positive footprint","Risky choice","Does not affect a footprint"],correct:0,explain:"Positive schoolwork can become part of a positive digital footprint."},
+{text:"Noah reposts an embarrassing picture of another student.",answers:["Positive footprint","Think first / risky","Safe because he did not take the picture"],correct:1,explain:"Reposting still becomes part of Noah's digital footprint and can hurt someone."},
+{text:"Mia posts her full name, school, and home address in a public video.",answers:["Safe","Think first / risky","Only risky for adults"],correct:1,explain:"Personal information should be protected online."},
+{text:"Eli writes 'Great job!' on a teammate's game highlight.",answers:["Positive footprint","Risky choice","It does not count"],correct:0,explain:"Kind comments can add to a positive digital footprint."}
+];
+
+function updateScore(points){score+=points;if(score>100)score=100;document.getElementById("score").textContent=score}
+function showScreen(number){
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+document.getElementById("screen"+number).classList.add("active");
+let level=number-1;if(level<1)level=1;if(level>5)level=5;
+document.getElementById("level").textContent=level;
+document.getElementById("bar").style.width=((number-1)/6*100)+"%";
+window.scrollTo(0,0);
+if(number===3)renderScenario();
+if(number===7)renderResults();
+}
+
+document.getElementById("startButton").addEventListener("click",()=>showScreen(2));
+
+document.querySelectorAll("#sources .source").forEach(b=>b.addEventListener("click",()=>b.classList.toggle("selected")));
+document.getElementById("checkSources").addEventListener("click",function(){
+const buttons=[...document.querySelectorAll("#sources .source")];
+const wrong=buttons.filter(b=>b.classList.contains("selected")!==(b.dataset.correct==="true"));
+const feedback=document.getElementById("sourceFeedback");
+if(wrong.length===0){
+feedback.textContent="Correct! Posts, searches, likes, comments, and online accounts can all add to a digital footprint.";
+feedback.classList.add("success");
+if(!sourceScored){updateScore(20);sourceScored=true}
+document.getElementById("sourceNext").classList.remove("hidden");
+buttons.forEach(b=>b.disabled=true);
+document.getElementById("checkSources").disabled=true;
+}else{
+feedback.textContent="Not quite. Think about which activities happen online and create information.";
+}
+});
+document.getElementById("sourceNext").addEventListener("click",()=>showScreen(3));
+
+function renderScenario(){
+scenarioAnswered=false;
+const scenario=scenarios[scenarioIndex];
+document.getElementById("scenarioNumber").textContent=scenarioIndex+1;
+document.getElementById("scenarioTitle").textContent=scenario.text;
+const container=document.getElementById("scenarioChoices");
+container.innerHTML="";
+document.getElementById("scenarioFeedback").textContent="Choose an answer.";
+document.getElementById("nextScenario").classList.add("hidden");
+scenario.answers.forEach((answer,index)=>{
+const button=document.createElement("button");
+button.className="choice";button.textContent=answer;
+button.addEventListener("click",function(){
+if(scenarioAnswered)return;
+scenarioAnswered=true;
+[...container.children].forEach(item=>item.disabled=true);
+if(index===scenario.correct){
+button.classList.add("correct");updateScore(12);
+document.getElementById("scenarioFeedback").textContent="Correct! "+scenario.explain;
+}else{
+button.classList.add("wrong");
+container.children[scenario.correct].classList.add("correct");
+document.getElementById("scenarioFeedback").textContent="Good try. "+scenario.explain;
+}
+document.getElementById("nextScenario").classList.remove("hidden");
+});
+container.appendChild(button);
+});
+}
+document.getElementById("nextScenario").addEventListener("click",function(){scenarioIndex++;scenarioIndex<scenarios.length?renderScenario():showScreen(4)});
+
+document.querySelectorAll(".permanence").forEach(button=>button.addEventListener("click",function(){
+document.querySelectorAll(".permanence").forEach(item=>item.disabled=true);
+const correct=button.dataset.answer==="no";
+if(correct){
+button.classList.add("correct");
+if(!permScored){updateScore(15);permScored=true}
+document.getElementById("permFeedback").textContent="Correct! Deleting something does not guarantee every copy disappears.";
+}else{
+button.classList.add("wrong");
+document.querySelector('.permanence[data-answer="no"]').classList.add("correct");
+document.getElementById("permFeedback").textContent="Someone may already have saved, shared, or screenshotted it.";
+}
+document.getElementById("permExplain").classList.remove("hidden");
+document.getElementById("permNext").classList.remove("hidden");
+}));
+document.getElementById("permNext").addEventListener("click",()=>showScreen(5));
+
+document.querySelectorAll("#footprintChoices .source").forEach(button=>button.addEventListener("click",function(){
+const value=button.textContent.trim();
+if(button.classList.contains("selected")){button.classList.remove("selected");selectedFoot.delete(value)}
+else{
+if(selectedFoot.size>=3){document.getElementById("footFeedback").textContent="You already chose 3. Remove one first.";return}
+button.classList.add("selected");selectedFoot.add(value)
+}
+document.getElementById("selectedCount").textContent=selectedFoot.size;
+}));
+document.getElementById("lockFootprint").addEventListener("click",function(){
+if(selectedFoot.size!==3){document.getElementById("footFeedback").textContent="Pick exactly 3 activities.";return}
+document.getElementById("footFeedback").textContent="Great! These activities all create part of your digital footprint.";
+if(!footprintScored){updateScore(7);footprintScored=true}
+document.querySelectorAll("#footprintChoices .source").forEach(b=>b.disabled=true);
+this.disabled=true;
+document.getElementById("footNext").classList.remove("hidden");
+});
+document.getElementById("footNext").addEventListener("click",()=>showScreen(6));
+
+document.querySelectorAll(".finalchoice").forEach(button=>button.addEventListener("click",function(){
+document.querySelectorAll(".finalchoice").forEach(item=>item.disabled=true);
+const correct=button.dataset.good==="true";
+if(correct){
+button.classList.add("correct");
+if(!finalScored){updateScore(10);finalScored=true}
+document.getElementById("finalFeedback").textContent="Correct! Stopping before posting protects both people and your digital footprint.";
+}else{
+button.classList.add("wrong");
+document.querySelector('.finalchoice[data-good="true"]').classList.add("correct");
+document.getElementById("finalFeedback").textContent="The strongest choice is to stop before posting and handle the problem another way.";
+}
+document.getElementById("finishBtn").classList.remove("hidden");
+}));
+document.getElementById("finishBtn").addEventListener("click",()=>showScreen(7));
+
+function renderResults(){
+document.getElementById("finalScore").textContent=score;
+document.getElementById("summaryScore").textContent=score;
+const message=document.getElementById("resultMessage");
+message.textContent=score>=90?"Excellent work! You showed a strong understanding of digital footprints and smart online choices.":score>=75?"Good work! You understand the main ideas about digital footprints.":"You completed the mission. Remember to use the STOP check before posting, sending, or commenting.";
+const list=document.getElementById("summaryActivities");
+list.innerHTML="";
+selectedFoot.forEach(activity=>{const li=document.createElement("li");li.textContent=activity;list.appendChild(li)});
+}
+
+function acResults(){
+const message=document.getElementById("emailMessage");
+message.classList.remove("success","error");
+const v=id=>document.getElementById(id).value.trim();
+const studentName=v("studentName"),oneThing=v("oneThing"),lasting=v("lasting"),beforePost=v("beforePost"),positiveGoal=v("positiveGoal");
+const need=[[studentName,"Please enter your name."],[oneThing,"Please answer question 1."],[lasting,"Please answer question 2."],[beforePost,"Please answer question 3."],[positiveGoal,"Please answer question 4."]];
+for(const [val,txt] of need){ if(!val){ message.textContent="⚠️ "+txt; message.classList.add("error"); return null; } }
+message.textContent="";
+const body=`DIGITAL FOOTPRINT ADVENTURE
+
+Student: ${studentName}
+
+Final Score: ${score}/100
+
+MY DIGITAL FOOTPRINT ACTIVITIES:
+${[...selectedFoot].join(", ")}
+
+EXIT TICKET
+
+1. One thing I do that adds to my digital footprint:
+${oneThing}
+
+2. Something online can last because:
+${lasting}
+
+3. Before I post something, I should:
+${beforePost}
+
+4. One thing I can do to make my digital footprint more positive:
+${positiveGoal}`;
+return {subject:"Digital Footprint Lesson - "+studentName, body};
+}
+
+/* ---- demo: sending is in the full version ---- */
+document.querySelectorAll('[data-ac]').forEach(b=>b.addEventListener('click',()=>{
+  const r=acResults(); if(!r) return;
+  const m=document.getElementById('acMsg'); m.innerHTML='In the full version this sends your teacher an email like this one. Nothing is sent from the demo.<pre style="white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;background:rgba(127,127,127,.12);padding:10px;border-radius:10px;margin-top:8px"></pre>';
+  m.querySelector('pre').textContent='Subject: '+r.subject+'\n\n'+r.body;
+}));
+</script>
+<p style="text-align:center;font:12px system-ui,sans-serif;opacity:.7;margin:22px 0">Demo · © The Alchemist Classroom</p></body>
+</html>
