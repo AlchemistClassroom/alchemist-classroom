@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Alchemist Classroom — The Teacher Toolbox</title>
+<meta name="description" content="Digital classroom tools made by a special education teacher. Low-cost In-Class Apps and complete Pro Apps like Behavior System Pro. Offline, and your students' data stays at your school.">
+<meta property="og:title" content="The Alchemist Classroom — The Teacher Toolbox">
+<meta property="og:description" content="Digital classroom tools made by a teacher. Offline, private, built for real classrooms.">
+<meta property="og:image" content="https://alchemistclassroom.com/images/share.png">
+<link rel="icon" href="images/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="bar">
+  <div class="wrap bar-in">
+    <a class="brand" href="#index">
+      <span class="slot logo" data-img="images/logo.png" data-fallback="flask" data-color="#2DD4BF"></span>
+      <span><span class="brand-name">The Alchemist Classroom</span><span class="brand-sub">The Teacher Toolbox</span></span>
+    </a>
+    <nav class="bar-nav" aria-label="Main" id="bar-nav"></nav>
+  </div>
+</header>
+
+<main id="main">
+  <!-- HOME / INDEX VIEW -->
+  <div id="view-home">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-art slot" data-img="images/hero.jpg" data-alt="A teacher using a large glass touchscreen surrounded by floating app cards" data-fallback="none"></div>
+      <div class="wrap hero-in">
+        <div class="hero-copy">
+          <h1 id="hero-title">Classroom tools, turned into apps.</h1>
+          <p class="lede">Digital tools made by a special education teacher, for real classrooms. They run offline, and your students' data never leaves your school.</p>
+          <a class="btn btn-glow" href="#index-screen">Open the index</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="index" id="index-screen" aria-labelledby="index-title">
+      <div class="wrap">
+        <h2 id="index-title" class="index-title">Browse the toolbox</h2>
+        <p class="index-sub">Choose a section to see its apps.</p>
+        <div class="monitor" id="monitor">
+          <div class="screen">
+            <div class="circle" id="circle">
+              <svg class="sigil" viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+                <defs>
+                  <radialGradient id="core" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#2DD4BF" stop-opacity=".28"/><stop offset=".6" stop-color="#8B5CF6" stop-opacity=".10"/><stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/></radialGradient>
+                  <linearGradient id="orb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2DD4BF"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient>
+                </defs>
+                <circle cx="300" cy="300" r="190" fill="url(#core)"/>
+                <circle class="orbit o1" cx="300" cy="300" r="250" fill="none" stroke="url(#orb)" stroke-width="2" opacity=".7"/>
+                <circle class="orbit o2" cx="300" cy="300" r="190" fill="none" stroke="#94A3B8" stroke-width="1" stroke-dasharray="3 9" opacity=".6"/>
+                <g class="spin">
+                  <ellipse cx="300" cy="300" rx="250" ry="92" fill="none" stroke="#2DD4BF" stroke-width="1.2" opacity=".35" transform="rotate(30 300 300)"/>
+                  <ellipse cx="300" cy="300" rx="250" ry="92" fill="none" stroke="#8B5CF6" stroke-width="1.2" opacity=".35" transform="rotate(-30 300 300)"/>
+                  <circle cx="516" cy="175" r="4" fill="#2DD4BF"/><circle cx="84" cy="425" r="4" fill="#8B5CF6"/>
+                </g>
+              </svg>
+              <div class="core">
+                <span class="slot core-mark" data-img="images/logo.png" data-fallback="flask" data-color="#2DD4BF"></span>
+                <span class="core-text">Choose a section</span>
+              </div>
+              <ul class="nodes" id="nodes" aria-label="Sections"></ul>
+            </div>
+          </div>
+          <div class="stand" aria-hidden="true"><span class="neck"></span><span class="base"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about" id="about" aria-labelledby="about-title">
+      <div class="wrap about-in">
+        <span class="slot portrait" data-img="images/about.jpg" data-alt="Portrait of the teacher holding a tablet" data-fallback="flask" data-color="#8B5CF6"></span>
+        <div>
+          <h2 id="about-title">Made by a teacher</h2>
+          <p>The Alchemist Classroom is run by a middle school special education teacher who builds the tools his own students and team needed and couldn't find. Every app here was used in a real classroom before it went on the shelf.</p>
+          <p>Questions? Email <a data-email href="mailto:help@alchemistclassroom.com">help@alchemistclassroom.com</a></p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- SECTION + APP VIEWS are drawn here from catalog.js -->
+  <div id="view-page" hidden></div>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>© <span data-year>2026</span> The Alchemist Classroom</span>
+    <nav aria-label="Legal">
+      <a href="license.html">License</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="refunds.html">Refunds</a>
+      <a data-email href="mailto:help@alchemistclassroom.com">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="catalog.js"></script>
+<script src="site.js"></script>
+</body>
+</html>
