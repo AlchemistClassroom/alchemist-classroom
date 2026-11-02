@@ -79,12 +79,42 @@
       '<a class="btn btn-glow" href="' + esc(b.href) + '">' + esc(b.text) + "</a>" +
       (b.live ? "" : '<p class="soon">The store opens soon. This button asks to be emailed when it does.</p>') +
       '<p class="soon">Download link and instructions arrive by email right after you buy.</p></aside>' +
-      '<div class="app-body"><h1>' + esc(a.name) + '</h1><p class="lead">' + esc(a.description || a.short) + "</p>" + feats + install +
+      '<div class="app-body"><h1>' + esc(a.name) + '</h1><p class="lead">' + esc(a.description || a.short) + "</p>" + windowHTML(a) + feats + install +
       "<h2>What you get</h2><ul class=\"ticks\">" + (a.includes || []).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>" +
       "<h2>Works on</h2><p>" + esc(a.requirements) + "</p>" +
       '<h2>Your students\' data</h2><p>Everything you enter stays on your computer or your school\'s network drive. The app doesn\'t send data anywhere, and we never see it.</p>' +
       "</div></div></div>";
   }
+
+  /* ---- app window: screenshot viewer ---- */
+  function windowHTML(a) {
+    var sc = a.screens || [];
+    if (!sc.length) return "";
+    return '<figure class="appwin" data-i="0"><div class="appwin-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="appwin-title">' + esc(a.name) + "</span></div>" +
+      '<button class="appwin-view" type="button" aria-label="Open larger screenshot"><img src="' + esc(sc[0][0]) + '" alt="' + esc(sc[0][1]) + '"></button>' +
+      '<figcaption><span class="appwin-cap">' + esc(sc[0][1]) + "</span>" + (sc.length > 1 ? '<span class="appwin-tabs" role="group" aria-label="Screenshots">' +
+      sc.map(function (x, i) { return '<button type="button" data-shot="' + i + '" aria-pressed="' + (i === 0) + '" aria-label="Screenshot ' + (i + 1) + '"><img src="' + esc(x[0]) + '" alt=""></button>'; }).join("") + "</span>" : "") +
+      '</figcaption><p class="appwin-note">Shown with sample students.</p></figure>';
+  }
+  document.addEventListener("click", function (e) {
+    var tab = e.target.closest("[data-shot]");
+    var win = e.target.closest(".appwin");
+    if (tab && win) {
+      var a = app((location.hash || "").slice(1)); if (!a) return;
+      var i = +tab.getAttribute("data-shot"), sc = a.screens[i];
+      var img = win.querySelector(".appwin-view img"); img.src = sc[0]; img.alt = sc[1];
+      win.querySelector(".appwin-cap").textContent = sc[1];
+      win.querySelectorAll("[data-shot]").forEach(function (b) { b.setAttribute("aria-pressed", b === tab); });
+      return;
+    }
+    if (e.target.closest(".appwin-view")) {
+      var big = win.querySelector(".appwin-view img"), dlg = $("#shot-dialog");
+      dlg.querySelector("img").src = big.src; dlg.querySelector("img").alt = big.alt;
+      dlg.querySelector("p").textContent = big.alt;
+      if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
+    }
+    if (e.target.closest("#shot-dialog") && (e.target.id === "shot-dialog" || e.target.closest(".dlg-close"))) $("#shot-dialog").close();
+  });
 
   /* ---- router: #index, #<section-id>, #<app-id>, #about ---- */
   function route() {

@@ -8,6 +8,7 @@
                        It appears as a new glowing node on the index screen.
    "Coming soon" sections: set soon: true — they show as dim placeholder nodes.
    Art: put the image file in /images with the file name used below.
+   Screenshots: list them in an app's "screens" — they show in a small app window.
    ========================================================================= */
 
 var STORE = {
@@ -47,6 +48,7 @@ var APPS = [
     short: "A virtual microscope for exploring slides in class.",   // PLACEHOLDER
     description: "Full description coming soon.",                   // PLACEHOLDER
     features: [],
+    screens: [],                      // add screenshots here, e.g. ["images/micro-1.jpg", "Caption"]
     includes: ["The app file (opens in Chrome or Edge)", "A one-page how-to guide"],
     requirements: "Windows, Mac or Chromebook with Chrome or Edge. Works offline.",
     buyUrl: ""                        // paste the checkout link when the store is live
@@ -67,6 +69,11 @@ var APPS = [
       ["Works offline", "One file that opens in Chrome or Edge. No accounts, no subscription, no internet needed."]
     ],
     install: true,                    // shows the "one computer / district server" options
+    screens: [                        // screenshots shown in the app window (sample students only)
+      ["images/bsp-1-entry.jpg", "Data entry: tap 0, ½ or 1 for each goal, every period."],
+      ["images/bsp-2-weekly.jpg", "Weekly report: the whole class's week at a glance."],
+      ["images/bsp-3-tabulate.jpg", "Tabulate: one student's week, period by period."]
+    ],
     includes: ["Behavior System Pro app file", "Quick Start guide", "IT Setup Guide", "Sample roster", "Free updates to version 1"],
     requirements: "Windows, Mac or Chromebook with Chrome or Edge. Runs on one computer or from a shared network drive.",
     buyUrl: ""

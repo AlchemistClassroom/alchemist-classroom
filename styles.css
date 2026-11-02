@@ -188,3 +188,26 @@ p{margin:0 0 1em;max-width:var(--measure)}
   .hero-in{padding:1rem 0 3rem}
 }
 @media (max-width:640px){.bar-nav{display:none}}
+
+/* app window: screenshot viewer */
+.appwin{margin:1.8rem 0 0;border-radius:16px;overflow:hidden;background:#0E1628;box-shadow:0 0 0 1px var(--line),0 24px 60px rgba(0,0,0,.5),0 0 60px rgba(45,212,191,.08)}
+.appwin-bar{display:flex;align-items:center;gap:.8rem;padding:.6rem .9rem;background:#16213A;border-bottom:1px solid var(--line)}
+.appwin-bar .dots{display:flex;gap:.4rem}
+.appwin-bar .dots i{width:11px;height:11px;border-radius:50%;background:#334155}
+.appwin-bar .dots i:first-child{background:#F87171}.appwin-bar .dots i:nth-child(2){background:#FBBF24}.appwin-bar .dots i:nth-child(3){background:#34D399}
+.appwin-title{font-size:.85rem;color:var(--muted)}
+.appwin-view{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in}
+.appwin-view img{width:100%;height:auto}
+.appwin figcaption{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border-top:1px solid var(--line)}
+.appwin-cap{color:var(--text);font-size:.98rem}
+.appwin-tabs{display:flex;gap:.5rem}
+.appwin-tabs button{width:76px;padding:0;border:0;border-radius:8px;overflow:hidden;cursor:pointer;opacity:.55;box-shadow:0 0 0 1.5px var(--line);background:none}
+.appwin-tabs button[aria-pressed="true"]{opacity:1;box-shadow:0 0 0 2px var(--teal)}
+.appwin-tabs button:hover{opacity:.9}
+.appwin-tabs img{width:100%;height:auto}
+.appwin-note{margin:0;padding:0 1rem .8rem;font-size:.85rem;color:var(--muted)}
+.shot-dialog{max-width:min(1400px,96vw);width:100%;padding:0;border:0;border-radius:14px;background:#0E1628;color:var(--text);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.shot-dialog::backdrop{background:rgba(5,9,18,.8)}
+.shot-dialog img{width:100%;height:auto;display:block}
+.shot-dialog p{margin:0;padding:.8rem 1rem;color:var(--muted)}
+.dlg-close{position:absolute;top:.5rem;right:.6rem;width:40px;height:40px;border-radius:50%;border:0;background:rgba(11,18,32,.85);color:#fff;font-size:1.5rem;cursor:pointer}
