@@ -1,0 +1,2954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#1a3a6b"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Behavior Pro"/>
+<meta name="author" content="The Alchemist Classroom"/>
+<meta name="robots" content="noindex"/>
+<meta name="description" content="Free demo of Behavior System Pro by The Alchemist Classroom."/>
+<!--
+  Behavior System Pro
+  FREE DEMO — sample data only, nothing is saved.
+  © 2026 The Alchemist Classroom. All rights reserved. alchemistclassroom.com
+-->
+<title>Behavior System Pro — Free Demo</title>
+<style>
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#eef2f8;color:#0d1f3c;}
+input,select,textarea,button{font-family:inherit;font-size:inherit;}
+button{cursor:pointer;}
+a{color:inherit;text-decoration:none;}
+
+/* ═══════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════ */
+#login-screen,#kiosk-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0d1f3c 0%,#1a3a6b 60%,#1e4d8c 100%);}
+#app-screen{display:none;height:100vh;overflow:hidden;flex-direction:column;}
+#app-screen.visible{display:flex;}
+.app-layout{display:flex;flex:1;min-height:0;}
+.sidebar{width:220px;min-width:220px;background:#0d1f3c;display:flex;flex-direction:column;overflow-y:auto;}
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:#fff;border-bottom:2px solid #dce8f7;padding:0 20px;height:54px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+#content-area{flex:1;overflow-y:auto;padding:22px;}
+
+/* ═══════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════ */
+.sidebar-header{padding:18px 16px 12px;border-bottom:1px solid rgba(255,255,255,.1);}
+.sidebar-logo{font-size:13px;font-weight:800;color:#d4a017;letter-spacing:.5px;line-height:1.3;}
+.sidebar-sub{font-size:10px;color:rgba(212,160,23,.6);margin-top:2px;}
+.sidebar-user{padding:10px 16px 6px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sidebar-user-name{font-size:12px;font-weight:700;color:#fff;}
+.sidebar-user-role{font-size:10px;color:rgba(255,255,255,.5);text-transform:capitalize;}
+.sidebar-section{padding:10px 0 4px 14px;font-size:9px;font-weight:700;color:rgba(212,160,23,.5);text-transform:uppercase;letter-spacing:1px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;font-size:12px;font-weight:600;color:rgba(255,255,255,.65);cursor:pointer;border-left:3px solid transparent;transition:all .15s;}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff;}
+.nav-item.active{background:rgba(212,160,23,.13);color:#d4a017;border-left-color:#d4a017;}
+.nav-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.sidebar-footer{margin-top:auto;padding:12px 16px;border-top:1px solid rgba(255,255,255,.08);}
+.btn-signout{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);border-radius:6px;padding:7px;font-size:11px;font-weight:600;}
+.btn-signout:hover{background:rgba(255,255,255,.12);color:#fff;}
+
+/* ═══════════════════════════════════════════════
+   LOGIN SCREEN
+═══════════════════════════════════════════════ */
+.login-box{background:#fff;border-radius:16px;padding:40px 36px 32px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.login-title{font-size:22px;font-weight:900;color:#0d1f3c;text-align:center;letter-spacing:-.5px;}
+.login-subtitle{font-size:12px;color:#5a80b8;text-align:center;margin-top:4px;margin-bottom:28px;}
+.login-field{margin-bottom:14px;}
+.login-field label{display:block;font-size:11px;font-weight:700;color:#1e4d8c;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.login-field input{width:100%;border:1.5px solid #b0c8e8;border-radius:8px;padding:10px 12px;font-size:14px;outline:none;transition:border-color .15s;}
+.login-field input:focus{border-color:#1a3a6b;}
+.btn-signin{width:100%;background:#1a3a6b;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:700;margin-top:4px;transition:background .15s;}
+.btn-signin:hover{background:#0d1f3c;}
+.login-divider{display:flex;align-items:center;gap:10px;margin:16px 0 14px;}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:#dce8f7;}
+.login-divider span{font-size:10px;color:#9ab0cc;font-weight:600;}
+.btn-demo{width:100%;background:#d4a017;color:#0d1f3c;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;margin-bottom:8px;transition:background .15s;}
+.btn-demo:hover{background:#b8880f;}
+.btn-store-browse{width:100%;background:#eef2f8;border:1.5px solid #b0c8e8;color:#1e4d8c;border-radius:8px;padding:10px;font-size:13px;font-weight:600;transition:all .15s;}
+.btn-store-browse:hover{background:#dce8f7;}
+.demo-accounts{margin-top:16px;border-top:1px solid #eef2f8;padding-top:14px;}
+.demo-accounts-label{font-size:10px;color:#9ab0cc;font-weight:700;text-align:center;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+.demo-accounts-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.demo-acct-btn{background:#f4f7fb;border:1.5px solid #dce8f7;border-radius:7px;padding:7px 8px;font-size:11px;font-weight:600;color:#1e4d8c;text-align:center;transition:all .15s;}
+.demo-acct-btn:hover{background:#dce8f7;border-color:#b0c8e8;}
+.login-error{background:#fde8e8;border:1px solid #e5a0a0;color:#8a1c1c;padding:8px 12px;border-radius:7px;font-size:12px;font-weight:600;margin-bottom:12px;display:none;}
+
+/* ═══════════════════════════════════════════════
+   DEMO BANNER
+═══════════════════════════════════════════════ */
+#demo-banner{display:none;background:#d4a017;color:#0d1f3c;padding:8px 16px;font-size:12px;font-weight:700;text-align:center;flex-shrink:0;}
+#demo-banner .btn-exit-demo{background:#0d1f3c;color:#d4a017;border:none;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:700;margin-left:12px;cursor:pointer;}
+
+/* ═══════════════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════════════ */
+.topbar-title{font-size:16px;font-weight:800;color:#0d1f3c;}
+.topbar-sub{font-size:11px;color:#5a80b8;margin-left:4px;}
+.topbar-actions{margin-left:auto;display:flex;gap:8px;align-items:center;}
+
+/* ═══════════════════════════════════════════════
+   CARDS & CONTAINERS
+═══════════════════════════════════════════════ */
+.card{background:#fff;border-radius:10px;padding:18px;border:1.5px solid #dce8f7;margin-bottom:16px;}
+.card-title{font-size:14px;font-weight:800;color:#0d1f3c;margin-bottom:12px;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.section-title{font-size:18px;font-weight:800;color:#1a3a6b;}
+
+/* ═══════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;}
+.btn-primary{background:#1a3a6b;color:#fff;}
+.btn-primary:hover{background:#0d1f3c;}
+.btn-secondary{background:#eef2f8;border:1.5px solid #b0c8e8;color:#1e4d8c;}
+.btn-secondary:hover{background:#dce8f7;}
+.btn-danger{background:#9a1c1c;color:#fff;}
+.btn-danger:hover{background:#7a1515;}
+.btn-gold{background:#d4a017;color:#0d1f3c;}
+.btn-gold:hover{background:#b8880f;}
+.btn-sm{padding:5px 10px;font-size:11px;}
+.btn-icon{background:none;border:none;padding:4px;border-radius:5px;color:#5a80b8;font-size:16px;}
+.btn-icon:hover{background:#eef2f8;}
+
+/* ═══════════════════════════════════════════════
+   TRACKER TABLE
+═══════════════════════════════════════════════ */
+.tracker-table{width:100%;border-collapse:collapse;font-size:12px;}
+.tracker-table th{background:#1a3a6b;color:#fff;padding:7px 10px;text-align:left;font-weight:700;white-space:nowrap;}
+.tracker-table th:first-child{border-radius:6px 0 0 0;}
+.tracker-table th:last-child{border-radius:0 6px 0 0;}
+.tracker-table td{padding:6px 8px;border-bottom:1px solid #eef2f8;vertical-align:middle;}
+.tracker-table tr:hover td{background:#f4f7fb;}
+.tracker-table tr.summary-row td{background:#f0f5fc;font-weight:700;border-top:2px solid #b0c8e8;}
+.score-btn{width:30px;height:26px;border-radius:5px;border:1.5px solid #b0c8e8;background:#f4f7fb;font-size:13px;font-weight:700;color:#1e4d8c;cursor:pointer;transition:all .15s;}
+.score-btn.active{border-color:transparent;}
+.score-0{background:#fde8e8 !important;color:#8a1c1c !important;border-color:#e5a0a0 !important;}
+.score-h{background:#fff3cd !important;color:#7a5c00 !important;border-color:#e8cc70 !important;}
+.score-1{background:#d4f4e2 !important;color:#1a5c3a !important;border-color:#7ecfa0 !important;}
+
+/* ═══════════════════════════════════════════════
+   PERIOD SECTION
+═══════════════════════════════════════════════ */
+.period-header{background:#eef2f8;border-radius:8px 8px 0 0;padding:8px 12px;font-size:12px;font-weight:700;color:#1a3a6b;border:1.5px solid #dce8f7;border-bottom:none;display:flex;align-items:center;gap:10px;}
+.period-pct{font-size:11px;background:#1a3a6b;color:#fff;padding:2px 8px;border-radius:10px;}
+
+/* ═══════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════ */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:center;justify-content:center;}
+#modal-overlay.open{display:flex;}
+.modal-box{background:#fff;border-radius:12px;padding:28px;max-width:480px;width:90%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.modal-title{font-size:16px;font-weight:800;color:#0d1f3c;margin-bottom:16px;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+.modal-field{margin-bottom:14px;}
+.modal-field label{display:block;font-size:11px;font-weight:700;color:#1e4d8c;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.modal-field input,.modal-field select,.modal-field textarea{width:100%;border:1.5px solid #b0c8e8;border-radius:7px;padding:8px 10px;font-size:13px;outline:none;}
+.modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{border-color:#1a3a6b;}
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0d1f3c;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;pointer-events:none;z-index:9999;opacity:0;transition:all .25s;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.error{background:#8a1c1c;}
+#toast.ok{background:#1a5c3a;}
+
+/* ═══════════════════════════════════════════════
+   BADGES & CHIPS
+═══════════════════════════════════════════════ */
+.badge{display:inline-block;border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;}
+.badge-green{background:#d4f4e2;color:#1a5c3a;}
+.badge-red{background:#fde8e8;color:#8a1c1c;}
+.badge-gold{background:#fff3cd;color:#7a5c00;}
+.badge-blue{background:#dce8f7;color:#1e4d8c;}
+.chip{display:inline-flex;align-items:center;gap:4px;background:#eef2f8;border:1.5px solid #b0c8e8;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#1e4d8c;cursor:pointer;}
+.chip.active{background:#1a3a6b;color:#d4a017;border-color:#1a3a6b;}
+
+/* ═══════════════════════════════════════════════
+   SUMMARY / WEEKLY VIEWS
+═══════════════════════════════════════════════ */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.student-card{background:#fff;border-radius:10px;border:1.5px solid #dce8f7;padding:14px;}
+.student-card-name{font-size:13px;font-weight:800;color:#0d1f3c;margin-bottom:6px;}
+.progress-bar-wrap{height:8px;background:#eef2f8;border-radius:4px;overflow:hidden;}
+.progress-bar{height:100%;border-radius:4px;background:#1a3a6b;transition:width .3s;}
+.week-nav{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.week-label{font-size:13px;font-weight:700;color:#1a3a6b;}
+
+/* ═══════════════════════════════════════════════
+   TABULATE
+═══════════════════════════════════════════════ */
+.tab-table{width:100%;border-collapse:collapse;font-size:12px;}
+.tab-table th{background:#1a3a6b;color:#fff;padding:7px 10px;text-align:left;}
+.tab-table td{padding:6px 10px;border-bottom:1px solid #eef2f8;}
+.tab-table tr:hover td{background:#f4f7fb;}
+.tab-table tr.total-row td{font-weight:700;background:#f0f5fc;border-top:2px solid #b0c8e8;}
+
+/* ═══════════════════════════════════════════════
+   ADMIN / USERS TABLE
+═══════════════════════════════════════════════ */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table th{background:#eef2f8;color:#1a3a6b;padding:9px 12px;text-align:left;font-weight:700;border-bottom:2px solid #dce8f7;}
+.data-table td{padding:9px 12px;border-bottom:1px solid #eef2f8;}
+.data-table tr:hover td{background:#f8fafd;}
+
+/* ═══════════════════════════════════════════════
+   STORE VIEWS
+═══════════════════════════════════════════════ */
+.store-item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;}
+.store-item-card{background:#fff;border-radius:10px;border:1.5px solid #dce8f7;padding:14px;text-align:center;position:relative;}
+.store-item-emoji{font-size:36px;margin-bottom:8px;}
+.store-item-name{font-size:13px;font-weight:700;color:#0d1f3c;margin-bottom:4px;}
+.store-item-price{font-size:14px;font-weight:800;color:#1a3a6b;}
+.store-item-stock{font-size:10px;color:#9ab0cc;margin-top:2px;}
+.cart-panel{background:#fff;border:1.5px solid #dce8f7;border-radius:10px;padding:16px;min-width:240px;}
+.cart-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eef2f8;font-size:12px;}
+.pos-layout{display:flex;gap:16px;align-items:flex-start;}
+.pos-items{flex:1;}
+
+/* ═══════════════════════════════════════════════
+   KIOSK SCREEN
+═══════════════════════════════════════════════ */
+#kiosk-screen .kiosk-box{max-width:640px;width:90%;background:#fff;border-radius:16px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.kiosk-student-btn{width:100%;background:#f4f7fb;border:1.5px solid #dce8f7;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;color:#0d1f3c;margin-bottom:8px;text-align:left;transition:all .15s;}
+.kiosk-student-btn:hover{background:#dce8f7;border-color:#b0c8e8;}
+.kiosk-items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:16px;}
+.kiosk-item{background:#f4f7fb;border:1.5px solid #dce8f7;border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:all .15s;}
+.kiosk-item:hover{background:#dce8f7;border-color:#b0c8e8;}
+.kiosk-item-emoji{font-size:28px;margin-bottom:6px;}
+.kiosk-item-name{font-size:12px;font-weight:700;color:#0d1f3c;}
+.kiosk-item-price{font-size:11px;color:#5a80b8;font-weight:600;}
+
+/* ═══════════════════════════════════════════════
+   SYNC BANNER
+═══════════════════════════════════════════════ */
+#sync-banner{display:none;align-items:center;gap:10px;background:#1a3a6b;color:#fff;padding:8px 16px;font-size:12px;font-weight:600;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#sync-icon{display:inline-block;}
+
+/* ═══════════════════════════════════════════════
+   PRINT
+═══════════════════════════════════════════════ */
+#print-overlay{display:none;position:fixed;inset:0;background:#fff;z-index:2000;overflow:auto;padding:24px;}
+.print-close-btn{position:fixed;top:16px;right:16px;background:#8a1c1c;color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;}
+@media print{
+  body > *:not(#print-overlay){display:none !important;}
+  #print-overlay{display:block !important;position:static !important;padding:0 !important;}
+  .print-close-btn{display:none !important;}
+}
+
+/* ═══════════════════════════════════════════════
+   MISC UTILITIES
+═══════════════════════════════════════════════ */
+.flex{display:flex;} .flex-col{flex-direction:column;} .items-center{align-items:center;} .gap-8{gap:8px;} .gap-12{gap:12px;} .mt-12{margin-top:12px;} .mb-12{margin-bottom:12px;}
+.text-muted{color:#9ab0cc;font-size:12px;}
+.text-sm{font-size:12px;} .text-xs{font-size:11px;}
+.font-bold{font-weight:700;} .font-800{font-weight:800;}
+input[type=date],input[type=text],input[type=password],input[type=email],input[type=number],select{border:1.5px solid #b0c8e8;border-radius:7px;padding:7px 10px;font-size:13px;outline:none;background:#fff;}
+input:focus,select:focus{border-color:#1a3a6b;}
+.form-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.empty-state{text-align:center;padding:40px 20px;color:#9ab0cc;}
+.empty-state-icon{font-size:40px;margin-bottom:12px;}
+.iep-alert{background:#fff3cd;border:1.5px solid #e8cc70;border-radius:8px;padding:10px 14px;font-size:12px;color:#7a5c00;margin-bottom:10px;}
+
+/* dashboard stat cards */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+.stat-card{background:#fff;border-radius:10px;border:1.5px solid #dce8f7;padding:16px;}
+.stat-value{font-size:28px;font-weight:900;color:#1a3a6b;}
+.stat-label{font-size:11px;color:#9ab0cc;margin-top:4px;font-weight:600;}
+/* Designer signature mark */
+.sig-wrap{text-align:center;}
+.sig-credit{font-size:9px;letter-spacing:1.6px;text-transform:uppercase;font-weight:600;}
+.sig-name{font-family:'Segoe Script','Brush Script MT','Snell Roundhand','Apple Chancery',cursive;line-height:1;}
+.sig-login .sig-name{font-size:26px;color:#1a3a6b;}
+.sig-login .sig-credit{color:#9ab0cc;margin-bottom:2px;}
+.sig-side{margin-top:12px;}
+.sig-side .sig-name{font-size:22px;color:#d4a017;}
+.sig-side .sig-credit{color:rgba(255,255,255,.45);margin-bottom:1px;}
+#demo-banner{display:block!important}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     LOGIN SCREEN
+═══════════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-title">BEHAVIOR SYSTEM PRO</div>
+    <div class="login-subtitle">Behavior points, goals &amp; reports</div>
+    <div style="text-align:center;margin:-14px 0 18px;"><span style="display:inline-block;background:#d4a017;color:#0d1f3c;font-size:10px;font-weight:800;letter-spacing:1.2px;padding:3px 11px;border-radius:10px;">DEMO VERSION &mdash; SAMPLE DATA</span></div>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-field"><label>Username</label><input type="text" id="login-user" autocomplete="username" autocapitalize="none"/></div>
+    <div class="login-field"><label>Password</label><input type="password" id="login-pw" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="btn-signin" onclick="doLogin()">Sign In →</button>
+    <div class="login-divider"><span>OR</span></div>
+    <button class="btn-demo" onclick="startDemo()">🎮 Restart the demo</button>
+    <div class="demo-accounts">
+      <div class="demo-accounts-label">── See it as a different role ──</div>
+      <div class="demo-accounts-grid" id="demo-acct-grid">
+        <button class="demo-acct-btn" onclick="fillLogin('administrator','demo1234')">🔐 Admin panel</button>
+        <button class="demo-acct-btn" onclick="fillLogin('casemanager','demo1234')">📋 Case Manager</button>
+        <button class="demo-acct-btn" onclick="fillLogin('teacher','demo1234')">📝 Teacher 1</button>
+        <button class="demo-acct-btn" onclick="fillLogin('teacher2','demo1234')">📝 Teacher 2</button>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:#8aa0bc;margin-top:18px;">by The Alchemist Classroom · <a href="https://alchemistclassroom.com/#behavior-system-pro" target="_blank" rel="noopener" style="color:#1a3a6b;">Get the full version</a></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     KIOSK SCREEN (Student-facing store browser)
+═══════════════════════════════════════════════ -->
+<div id="kiosk-screen" style="display:none;">
+  <div class="kiosk-box">
+    <div id="kiosk-content"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     APP SCREEN
+═══════════════════════════════════════════════ -->
+<div id="app-screen">
+  <div id="demo-banner">
+    ⚠️ Demo mode — Exploring sample data
+    <button class="btn-exit-demo" onclick="endDemo()">Exit Demo</button>
+  </div>
+  <div id="sync-banner">
+    <span id="sync-icon">↻</span>
+    <span id="sync-msg">Syncing…</span>
+  </div>
+  <div class="app-layout">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="main-area">
+      <div class="topbar" id="topbar">
+        <span class="topbar-title" id="topbar-title">Behavior System Pro</span>
+      </div>
+      <div id="content-area"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL
+═══════════════════════════════════════════════ -->
+<div id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PRINT OVERLAY
+═══════════════════════════════════════════════ -->
+<div id="print-overlay">
+  <button class="print-close-btn" onclick="closePrint()">✕ Close</button>
+  <div id="print-content"></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════════════ */
+// Periods are admin-configurable: a Home Base toggle + a period count.
+// Labels are auto-generated ("HB (Home Base)", "Period 1" … "Period N") so
+// changing the count never orphans existing score data for lower periods.
+function computePeriods(cfg) {
+  cfg = cfg || { homeBase: true, count: 8 };
+  const arr = [];
+  if (cfg.homeBase) arr.push("HB (Home Base)");
+  const n = Math.max(0, Math.min(20, parseInt(cfg.count, 10) || 0));
+  for (let i = 1; i <= n; i++) arr.push("Period " + i);
+  return arr;
+}
+let PERIODS = computePeriods();
+function buildPeriods() { PERIODS = computePeriods(STATE.periodConfig); }
+
+// App identity / credits
+const APP_VERSION = "1.0.0";
+const APP_AUTHOR  = "The Alchemist Classroom";
+
+const GRADES = ["6","7","8"];
+
+const DEFAULT_GOALS = [
+  {id:"on_task",     label:"On Task"},
+  {id:"follow_dir",  label:"Follow Directions"},
+  {id:"respect",     label:"Respectful"},
+  {id:"prepared",    label:"Prepared"},
+];
+
+// Seed students for fresh installs (real names set in buildDemoData for demo mode)
+const SEED_STUDENTS = [
+  "Alex M.","Jordan T.","Casey R.","Sam L.","Riley B.",
+  "Morgan D.","Taylor K.","Jamie W.","Drew C.","Avery H."
+];
+
+const SEED_STUDENT_INFO = {};
+SEED_STUDENTS.forEach(function(n){ SEED_STUDENT_INFO[n] = {firstName:"",lastName:"",grade:"",teacher:"",iepDate:"",email:""}; });
+
+// Store starter inventory — 8 items for demo
+const STARTER_INVENTORY = [
+  {id:"itm_pencil",   name:"Cool Pencil",         emoji:"✏️",  category:"Supplies",    price:3,  stock:25,  active:true},
+  {id:"itm_sticker",  name:"Sticker Pack",         emoji:"🌟",  category:"Fun",         price:2,  stock:40,  active:true},
+  {id:"itm_snack",    name:"Snack Choice",         emoji:"🍪",  category:"Treats",      price:5,  stock:30,  active:true},
+  {id:"itm_bookmark", name:"Fancy Bookmark",       emoji:"📌",  category:"Supplies",    price:4,  stock:20,  active:true},
+  {id:"itm_lunch",    name:"Lunch with Teacher",   emoji:"🍽️",  category:"Experiences", price:20, stock:-1,  active:true},
+  {id:"itm_homework", name:"Homework Pass",        emoji:"📝",  category:"Privileges",  price:15, stock:-1,  active:true},
+  {id:"itm_seat",     name:"Choose Your Seat",     emoji:"🪑",  category:"Privileges",  price:8,  stock:-1,  active:true},
+  {id:"itm_free",     name:"Free Period Activity", emoji:"🎮",  category:"Experiences", price:25, stock:-1,  active:true},
+];
+
+/* ═══════════════════════════════════════════════
+   STORAGE KEYS
+═══════════════════════════════════════════════ */
+const SK = {
+  accounts:    "psp-accounts",
+  students:    "psp-students",
+  assignments: "psp-assign",
+  data:        "psp-data",
+  goals:       "psp-goals",
+  studentInfo: "psp-studentinfo",
+  periodConfig:"psp-periodconfig",
+  currentUser: "psp-currentuser",
+};
+const SP = {
+  inventory: "sp-inventory",
+  purchases: "sp-purchases",
+  config:    "sp-config",
+  emails:    "sp-emails",
+  adjust:    "sp-adjust",
+  status:    "sp-status",
+};
+const SYNC_KEYS = {
+  url:        "psp-sync-url",
+  enabled:    "psp-sync-enabled",
+  lastSync:   "psp-sync-last",
+  lastStatus: "psp-sync-status",
+};
+
+/* ═══════════════════════════════════════════════
+   DEMO MODE
+═══════════════════════════════════════════════ */
+let DEMO_MODE = true;   // PUBLIC DEMO: nothing is ever saved
+const DEMO_MEM = {};
+
+function lsGet(k) {
+  if (DEMO_MODE) return (DEMO_MEM[k] !== undefined) ? DEMO_MEM[k] : null;
+  try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e) { return null; }
+}
+function lsSet(k, v) {
+  if (DEMO_MODE) { DEMO_MEM[k] = v; return; }
+  try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {}
+}
+
+/* ═══════════════════════════════════════════════
+   HELPERS — FIXED
+═══════════════════════════════════════════════ */
+
+// BUG 2 FIX: escape single-quotes too
+function esc(s) {
+  return String(s)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
+
+// BUG 1 FIX: deterministic slug, counter dedup only on collision
+const _slugCounters = {};
+function slugify(s, existingSet) {
+  const base = s.toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"").slice(0,40);
+  if (!existingSet) return base;
+  if (!existingSet.has(base)) return base;
+  // collision — find next available counter
+  let i = 2;
+  while (existingSet.has(base + "_" + i)) i++;
+  return base + "_" + i;
+}
+
+// BUG 5/11/12 FIX: SHA-256 password hashing
+async function hashPassword(pw) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function isHashed(pw) { return /^[a-f0-9]{64}$/.test(pw); }
+
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+function fmtDate(k) {
+  if (!k) return "—";
+  const [y,m,d] = k.split("-");
+  return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][parseInt(m)-1]+" "+parseInt(d)+", "+y;
+}
+
+function getMondayOfWeek(dateKey) {
+  const d = new Date(dateKey+"T12:00:00");
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate()+diff);
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+function addDays(dateKey, n) {
+  const d = new Date(dateKey+"T12:00:00");
+  d.setDate(d.getDate()+n);
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+function pct(sum, count) {
+  if (!count) return 0;
+  return Math.round(sum / count * 100);
+}
+
+function scoreColor(p) {
+  if (p >= 80) return "#1a5c3a";
+  if (p >= 60) return "#7a5c00";
+  return "#8a1c1c";
+}
+
+function scoreBg(p) {
+  if (p >= 80) return "#d4f4e2";
+  if (p >= 60) return "#fff3cd";
+  return "#fde8e8";
+}
+
+function calcTotal(dayData, goals) {
+  let sum = 0, count = 0;
+  PERIODS.forEach(function(period) {
+    const ps = (dayData && dayData[period]) || {};
+    goals.forEach(function(g) {
+      const v = ps[g.id];
+      if (v != null) { sum += v; count++; }
+    });
+  });
+  return { sum, count };
+}
+
+function getStudentGoals(name) {
+  const g = STATE.goals[name];
+  return (g && g.length) ? g : DEFAULT_GOALS;
+}
+
+/* ═══════════════════════════════════════════════
+   EARNED POINTS — MEMOIZED (BUG 7 FIX)
+═══════════════════════════════════════════════ */
+let _earnedCache = {};
+function invalidateEarnedCache() { _earnedCache = {}; }
+
+function earnedPoints(name) {
+  if (_earnedCache[name] !== undefined) return _earnedCache[name];
+  // Read from merged PSP data
+  const allData = STATE.data[name];
+  if (!allData) { _earnedCache[name] = 0; return 0; }
+  let sum = 0;
+  Object.keys(allData).forEach(function(date) {
+    const day = allData[date];
+    if (!day || typeof day !== "object") return;
+    Object.keys(day).forEach(function(period) {
+      const ps = day[period];
+      if (!ps || typeof ps !== "object") return;
+      Object.keys(ps).forEach(function(goal) {
+        const v = ps[goal];
+        if (typeof v === "number") sum += v;
+      });
+    });
+  });
+  // Add manual adjustments
+  const adj = STATE.store.adjust[name];
+  if (adj && typeof adj === "number") sum += adj;
+  _earnedCache[name] = sum;
+  return sum;
+}
+
+function spentPoints(name) {
+  let spent = 0;
+  STATE.store.purchases.forEach(function(p) {
+    if (p.student === name && !p.refunded) {
+      p.items.forEach(function(li) { spent += li.price * li.qty; });
+    }
+  });
+  return spent;
+}
+
+function balanceOf(name) {
+  return Math.max(0, earnedPoints(name) - spentPoints(name));
+}
+
+/* ═══════════════════════════════════════════════
+   UNIFIED STATE
+═══════════════════════════════════════════════ */
+let STATE = {
+  // PointSheet
+  accounts:    lsGet(SK.accounts) || [
+    {id:"admin1",  username:"administrator", password:"demo1234", role:"admin",       displayName:"Site Admin"},
+    {id:"cm1",     username:"casemanager",   password:"demo1234", role:"casemanager", displayName:"Case Manager"},
+    {id:"t1",      username:"teacher",       password:"demo1234", role:"teacher",     displayName:"Teacher 1"},
+    {id:"t2",      username:"teacher2",      password:"demo1234", role:"teacher",     displayName:"Teacher 2"},
+  ],
+  students:    lsGet(SK.students)    || JSON.parse(JSON.stringify(SEED_STUDENTS)),
+  studentInfo: lsGet(SK.studentInfo) || JSON.parse(JSON.stringify(SEED_STUDENT_INFO)),
+  assignments: lsGet(SK.assignments) || {},
+  data:        lsGet(SK.data)        || {},
+  goals:       lsGet(SK.goals)       || {},
+  periodConfig: lsGet(SK.periodConfig) || { homeBase: true, count: 8 },
+  currentUser: null,
+  view:        "tracker",
+  selStudent:  null,
+  selDate:     todayKey(),
+  weekStart:   getMondayOfWeek(todayKey()),
+  tabulateStudent: null,
+  adminTab:    "dashboard",
+
+  // Store sub-namespace
+  store: {
+    inventory: lsGet(SP.inventory) || JSON.parse(JSON.stringify(STARTER_INVENTORY)),
+    purchases: lsGet(SP.purchases) || [],
+    config:    Object.assign({
+      schoolName:  "Our School Store",
+      pointLabel:  "points",
+      emailDay:    "Friday",
+      emailTime:   "08:00",
+      appsScriptUrl: "",
+    }, lsGet(SP.config) || {}),
+    emails:   lsGet(SP.emails)  || {},
+    adjust:   lsGet(SP.adjust)  || {},
+    status:   lsGet(SP.status)  || {},
+    posStudent: "",
+    cart: {},
+    previewStudent: "",
+  },
+};
+
+// Track synced keys for data file auto-save
+const DF_SYNCED_KEYS = {data:1, students:1, goals:1, studentInfo:1, assignments:1};
+
+function save(key) {
+  if (key === "store") {
+    lsSet(SP.inventory, STATE.store.inventory);
+    lsSet(SP.purchases, STATE.store.purchases);
+    lsSet(SP.config,    STATE.store.config);
+    lsSet(SP.emails,    STATE.store.emails);
+    lsSet(SP.adjust,    STATE.store.adjust);
+    lsSet(SP.status,    STATE.store.status);
+    return;
+  }
+  lsSet(SK[key], STATE[key]);
+  if (DF_SYNCED_KEYS[key] && typeof dfScheduleSave === 'function') dfScheduleSave();
+  if (key === "data") invalidateEarnedCache();
+}
+
+function saveStore(subkey) {
+  lsSet(SP[subkey], STATE.store[subkey]);
+  if (subkey === "adjust") invalidateEarnedCache();
+}
+
+/* ═══════════════════════════════════════════════
+   TOAST & MODAL
+═══════════════════════════════════════════════ */
+let _toastTimer;
+function toast(msg, type) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "show" + (type ? " "+type : "");
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){ el.className = ""; }, 3200);
+}
+
+function openModal(html) {
+  document.getElementById("modal-box").innerHTML = html;
+  document.getElementById("modal-overlay").classList.add("open");
+}
+function closeModal() {
+  document.getElementById("modal-overlay").classList.remove("open");
+}
+
+/* ═══════════════════════════════════════════════
+   PRINT HELPERS (BUG 4 FIX — no window.open)
+═══════════════════════════════════════════════ */
+function openPrint(html) {
+  document.getElementById("print-content").innerHTML = html;
+  document.getElementById("print-overlay").style.display = "block";
+}
+function closePrint() {
+  document.getElementById("print-overlay").style.display = "none";
+  document.getElementById("print-content").innerHTML = "";
+}
+function doPrint() { window.print(); }
+
+/* ═══════════════════════════════════════════════
+   ROLE HELPERS
+═══════════════════════════════════════════════ */
+function isAdmin()    { return STATE.currentUser && STATE.currentUser.role === "admin"; }
+function isCM()       { return STATE.currentUser && STATE.currentUser.role === "casemanager"; }
+function isTeacher()  { return STATE.currentUser && STATE.currentUser.role === "teacher"; }
+function canStore()   { return isAdmin() || isCM(); }
+function canDataFile(){ return isAdmin() || isCM(); }
+function canAdmin()   { return isAdmin(); }
+function canEditGoals(){ return isAdmin() || isCM(); }
+function canRosters()  { return isAdmin() || isCM(); }
+
+function visibleStudents() {
+  if (!STATE.currentUser) return [];
+  if (isAdmin() || isCM()) return STATE.students;
+  // Teacher — show only students they teach at least one period for
+  const tid = STATE.currentUser.id;
+  return STATE.students.filter(function(n){ return teacherTeaches(tid, n); });
+}
+
+/* ── Per-period assignments: STATE.assignments = { studentName: { period: teacherId } } ── */
+function periodTeacherId(student, period){ return (STATE.assignments[student] || {})[period] || ''; }
+function teacherTeaches(tid, student){
+  const m = STATE.assignments[student] || {};
+  return PERIODS.some(function(p){ return m[p] === tid; });
+}
+function teacherPeriodsFor(tid, student){
+  const m = STATE.assignments[student] || {};
+  return PERIODS.filter(function(p){ return m[p] === tid; });
+}
+function teacherDisplayName(tid){
+  const a = STATE.accounts.find(function(x){ return x.id === tid; });
+  return a ? a.displayName : '';
+}
+function periodTeacherName(student, period){ return teacherDisplayName(periodTeacherId(student, period)); }
+// Periods the current user may see for a student (teachers = only their assigned periods)
+function visiblePeriodsFor(student){
+  if (isAdmin() || isCM()) return PERIODS;
+  const tid = STATE.currentUser ? STATE.currentUser.id : '';
+  return PERIODS.filter(function(p){ return periodTeacherId(student, p) === tid; });
+}
+// Ensure STATE.assignments matches the per-period shape; legacy teacher→[students] data starts blank.
+function normalizeAssignments(){
+  let a = STATE.assignments;
+  if (!a || typeof a !== 'object' || Array.isArray(a)) { STATE.assignments = {}; return; }
+  const keys = Object.keys(a);
+  const looksLegacy = keys.some(function(k){ return Array.isArray(a[k]); });
+  if (looksLegacy) { STATE.assignments = {}; save('assignments'); return; }
+  keys.forEach(function(k){ if (!a[k] || typeof a[k] !== 'object' || Array.isArray(a[k])) a[k] = {}; });
+}
+</script>
+<script>
+/* ═══════════════════════════════════════════════
+   DEMO DATA BUILDER
+═══════════════════════════════════════════════ */
+function buildDemoData() {
+  // 10 students with real names
+  const students = [
+    "Alex Martinez","Jordan Thompson","Casey Rivera","Sam Lee","Riley Brown",
+    "Morgan Davis","Taylor Kim","Jamie Wilson","Drew Chen","Avery Hall"
+  ];
+
+  // Student info
+  const studentInfo = {
+    "Alex Martinez":    {firstName:"Alex",    lastName:"Martinez",  grade:"6", teacher:"Teacher 1", iepDate:"2025-09-15", email:"parent1@demo.com"},
+    "Jordan Thompson":  {firstName:"Jordan",  lastName:"Thompson",  grade:"6", teacher:"Teacher 1", iepDate:"2025-10-01", email:"parent2@demo.com"},
+    "Casey Rivera":     {firstName:"Casey",   lastName:"Rivera",    grade:"6", teacher:"Teacher 1", iepDate:"2025-11-12", email:"parent3@demo.com"},
+    "Sam Lee":          {firstName:"Sam",     lastName:"Lee",       grade:"6", teacher:"Teacher 1", iepDate:"2026-01-20", email:"parent4@demo.com"},
+    "Riley Brown":      {firstName:"Riley",   lastName:"Brown",     grade:"7", teacher:"Teacher 1", iepDate:"2025-12-05", email:"parent5@demo.com"},
+    "Morgan Davis":     {firstName:"Morgan",  lastName:"Davis",     grade:"7", teacher:"Teacher 2", iepDate:"2026-02-14", email:"parent6@demo.com"},
+    "Taylor Kim":       {firstName:"Taylor",  lastName:"Kim",       grade:"7", teacher:"Teacher 2", iepDate:"2025-09-30", email:"parent7@demo.com"},
+    "Jamie Wilson":     {firstName:"Jamie",   lastName:"Wilson",    grade:"8", teacher:"Teacher 2", iepDate:"2026-03-22", email:"parent8@demo.com"},
+    "Drew Chen":        {firstName:"Drew",    lastName:"Chen",      grade:"8", teacher:"Teacher 2", iepDate:"2025-10-18", email:"parent9@demo.com"},
+    "Avery Hall":       {firstName:"Avery",   lastName:"Hall",      grade:"8", teacher:"Teacher 2", iepDate:"2026-04-10", email:"parent10@demo.com"},
+  };
+
+  // Assignments — per-period schedule, built by the case manager (starts blank)
+  const assignments = {};
+
+  // Goals per student (using DEFAULT_GOALS for all in demo)
+  const goals = {};
+
+  // Build 2 weeks of score data
+  const data = {};
+  const today = todayKey();
+  const weekStart = getMondayOfWeek(today);
+  const prevWeekStart = addDays(weekStart, -7);
+
+  // Score patterns: [0=bad, 0.5=half, 1=good]
+  const patterns = {
+    "Alex Martinez":   [1,1,0.5,1,1,0.5,1,1],
+    "Jordan Thompson": [1,1,1,1,1,1,1,1],
+    "Casey Rivera":    [0.5,1,0.5,0.5,1,1,0.5,0.5],
+    "Sam Lee":         [1,0.5,1,1,0.5,1,1,1],
+    "Riley Brown":     [0,0.5,0,1,0,0.5,0,0.5],
+    "Morgan Davis":    [1,1,1,0.5,1,1,1,1],
+    "Taylor Kim":      [0.5,0.5,1,0.5,0.5,1,0.5,1],
+    "Jamie Wilson":    [1,1,1,1,1,1,1,1],
+    "Drew Chen":       [0.5,1,0.5,1,0.5,1,0.5,1],
+    "Avery Hall":      [1,0.5,1,0.5,1,0.5,1,0.5],
+  };
+
+  const weekDays = [0,1,2,3,4]; // Mon-Fri
+  [prevWeekStart, weekStart].forEach(function(ws) {
+    weekDays.forEach(function(d) {
+      const dateKey = addDays(ws, d);
+      students.forEach(function(name) {
+        const pat = patterns[name] || [1,1,1,1,1,1,1,1];
+        const dayData = {};
+        PERIODS.forEach(function(period, pi) {
+          const score = pat[pi % pat.length];
+          const ps = {};
+          DEFAULT_GOALS.forEach(function(g) { ps[g.id] = score; });
+          dayData[period] = ps;
+        });
+        if (!data[name]) data[name] = {};
+        data[name][dateKey] = dayData;
+      });
+    });
+  });
+
+  // Store data
+  const inventory = JSON.parse(JSON.stringify(STARTER_INVENTORY));
+  const purchases = [
+    {id:"pur_1", student:"Jordan Thompson", date: addDays(weekStart,-2), items:[{id:"itm_sticker",name:"Sticker Pack",emoji:"🌟",qty:2,price:2}], total:4, refunded:false},
+    {id:"pur_2", student:"Jamie Wilson",    date: addDays(weekStart,-4), items:[{id:"itm_homework",name:"Homework Pass",emoji:"📝",qty:1,price:15}], total:15, refunded:false},
+    {id:"pur_3", student:"Morgan Davis",    date: addDays(weekStart,-1), items:[{id:"itm_seat",name:"Choose Your Seat",emoji:"🪑",qty:1,price:8}], total:8, refunded:false},
+  ];
+
+  // 1 student store-paused, 1 email-paused
+  const storeStatus = {"Riley Brown": "paused"};
+  const emailStatus = {"Casey Rivera": "paused"};
+
+  return {
+    students, studentInfo, assignments, goals, data,
+    inventory, purchases,
+    storeStatus, emailStatus,
+  };
+}
+
+function startDemo() {
+  DEMO_MODE = true;
+  const d = buildDemoData();
+  DEMO_MEM[SK.accounts] = [
+    {id:"admin1",  username:"administrator", password:"demo1234", role:"admin",       displayName:"Site Admin"},
+    {id:"cm1",     username:"casemanager",   password:"demo1234", role:"casemanager", displayName:"Case Manager"},
+    {id:"t1",      username:"teacher",       password:"demo1234", role:"teacher",     displayName:"Teacher 1"},
+    {id:"t2",      username:"teacher2",      password:"demo1234", role:"teacher",     displayName:"Teacher 2"},
+  ];
+  DEMO_MEM[SK.students]    = d.students;
+  DEMO_MEM[SK.studentInfo] = d.studentInfo;
+  DEMO_MEM[SK.assignments] = d.assignments;
+  DEMO_MEM[SK.data]        = d.data;
+  DEMO_MEM[SK.goals]       = d.goals;
+  DEMO_MEM[SP.inventory]   = d.inventory;
+  DEMO_MEM[SP.purchases]   = d.purchases;
+  DEMO_MEM[SP.status]      = Object.assign({}, d.storeStatus, d.emailStatus);
+  DEMO_MEM[SP.adjust]      = {};
+  DEMO_MEM[SP.config]      = {schoolName:"Demo School Store",pointLabel:"points",emailDay:"Friday",emailTime:"08:00",appsScriptUrl:""};
+  DEMO_MEM[SP.emails]      = {};
+
+  // Re-init STATE from DEMO_MEM
+  STATE.accounts    = lsGet(SK.accounts);
+  STATE.students    = lsGet(SK.students);
+  STATE.studentInfo = lsGet(SK.studentInfo);
+  STATE.assignments = lsGet(SK.assignments);
+  STATE.data        = lsGet(SK.data);
+  STATE.goals       = lsGet(SK.goals);
+  STATE.store.inventory = lsGet(SP.inventory);
+  STATE.store.purchases = lsGet(SP.purchases);
+  STATE.store.config    = Object.assign({schoolName:"Demo School Store",pointLabel:"points",emailDay:"Friday",emailTime:"08:00",appsScriptUrl:""}, lsGet(SP.config)||{});
+  STATE.store.emails    = lsGet(SP.emails) || {};
+  STATE.store.adjust    = lsGet(SP.adjust) || {};
+  STATE.store.status    = lsGet(SP.status) || {};
+  invalidateEarnedCache();
+
+  // Auto-login as casemanager for best demo experience
+  const acct = STATE.accounts.find(a => a.username === "casemanager");
+  finishLogin(acct);
+  document.getElementById("demo-banner").style.display = "block";
+}
+
+function endDemo() {
+  DEMO_MODE = false;
+  signOut();
+}
+
+/* ═══════════════════════════════════════════════
+   LOGIN
+═══════════════════════════════════════════════ */
+function fillLogin(user, pw) {
+  document.getElementById("login-user").value = user;
+  document.getElementById("login-pw").value = pw;
+  document.getElementById("login-user").focus();
+}
+
+async function doLogin() {
+  const u = (document.getElementById("login-user").value || "").trim();
+  const p = (document.getElementById("login-pw").value || "").trim();
+  const errEl = document.getElementById("login-error");
+  errEl.style.display = "none";
+
+  if (!u || !p) { errEl.textContent = "Please enter username and password."; errEl.style.display = "block"; return; }
+
+  const accounts = lsGet(SK.accounts) || STATE.accounts;
+  let acct = null;
+
+  for (let i = 0; i < accounts.length; i++) {
+    const a = accounts[i];
+    if (a.username.toLowerCase() !== u.toLowerCase()) continue;
+    if (isHashed(a.password)) {
+      const h = await hashPassword(p);
+      if (h === a.password) { acct = a; break; }
+    } else {
+      // Plaintext — auto-migrate on successful match (BUG 5 FIX)
+      if (a.password === p) {
+        const h = await hashPassword(p);
+        a.password = h;
+        STATE.accounts = accounts;
+        save("accounts");
+        acct = a;
+        break;
+      }
+    }
+  }
+
+  if (!acct) { errEl.textContent = "Invalid username or password."; errEl.style.display = "block"; return; }
+  finishLogin(acct);
+}
+
+function finishLogin(acct) {
+  STATE.currentUser = acct;
+  STATE.view = "tracker";
+  STATE.selDate = todayKey();
+  STATE.weekStart = getMondayOfWeek(todayKey());
+  STATE.selStudent = null;
+  invalidateEarnedCache();
+  // Persist session across page reloads (not in demo mode)
+  if (!DEMO_MODE) lsSet(SK.currentUser, {id: acct.id});
+
+  document.getElementById("login-screen").style.display = "none";
+  const appEl = document.getElementById("app-screen");
+  appEl.style.display = "";
+  appEl.classList.add("visible");
+  renderApp();
+}
+
+function restoreSession() {
+  const saved = lsGet(SK.currentUser);
+  if (!saved) return;
+  const acct = (lsGet(SK.accounts) || STATE.accounts).find(a => a.id === saved.id);
+  if (acct) {
+    STATE.accounts    = lsGet(SK.accounts) || STATE.accounts;
+    STATE.students    = lsGet(SK.students) || STATE.students;
+    STATE.studentInfo = lsGet(SK.studentInfo) || STATE.studentInfo;
+    STATE.assignments = lsGet(SK.assignments) || STATE.assignments;
+    STATE.data        = lsGet(SK.data) || STATE.data;
+    STATE.goals       = lsGet(SK.goals) || STATE.goals;
+    STATE.store.inventory = lsGet(SP.inventory) || STATE.store.inventory;
+    STATE.store.purchases = lsGet(SP.purchases) || STATE.store.purchases;
+    STATE.store.config    = Object.assign({schoolName:"Our School Store",pointLabel:"points",emailDay:"Friday",emailTime:"08:00",appsScriptUrl:""}, lsGet(SP.config)||{});
+    STATE.store.emails    = lsGet(SP.emails) || STATE.store.emails;
+    STATE.store.adjust    = lsGet(SP.adjust) || STATE.store.adjust;
+    STATE.store.status    = lsGet(SP.status) || STATE.store.status;
+    finishLogin(acct);
+  }
+}
+
+function signOut() {
+  if (!DEMO_MODE) lsSet(SK.currentUser, null);
+  STATE.currentUser = null;
+  STATE.view = "tracker";
+  const appEl2 = document.getElementById("app-screen");
+  appEl2.classList.remove("visible");
+  appEl2.style.display = "";
+  document.getElementById("demo-banner").style.display = "none";
+  document.getElementById("login-screen").style.display = "flex";
+  document.getElementById("login-user").value = "";
+  document.getElementById("login-pw").value = "";
+}
+
+/* ═══════════════════════════════════════════════
+   APP SHELL & NAVIGATION
+═══════════════════════════════════════════════ */
+function setView(v) {
+  STATE.view = v;
+  renderApp();
+}
+
+function renderApp() {
+  renderSidebar();
+  renderTopbar();
+  renderContent();
+}
+
+function renderSidebar() {
+  const u = STATE.currentUser;
+  if (!u) return;
+  const v = STATE.view;
+
+  let nav = "";
+
+  // Behavior section — all roles
+  nav += '<div class="sidebar-section">Behavior</div>';
+  nav += navItem("tracker",  "📝", "Data Entry", v);
+  if (!isTeacher()) {
+    nav += navItem("summary",  "📊", "Class Summary", v);
+    nav += navItem("weekly",   "📅", "Weekly Report", v);
+    nav += navItem("tabulate", "🔢", "Tabulate", v);
+    nav += navItem("students", "👥", "Student Info", v);
+  }
+
+  // Store section — CM + Admin only
+  if (canStore()) {
+    nav += '<div class="sidebar-section">Store</div>';
+    nav += navItem("store-pos",       "🛒", "Checkout", v);
+    nav += navItem("store-inventory", "📦", "Inventory", v);
+    nav += navItem("store-balances",  "💰", "Balances", v);
+    nav += navItem("store-purchases", "🧾", "Purchases", v);
+  }
+
+  // Roster section — CM + Admin
+  if (canRosters()) {
+    nav += '<div class="sidebar-section">Roster</div>';
+    nav += navItem("admin-rosters",   "📋", "Assign Rosters", v);
+  }
+
+  // Admin section
+  if (canAdmin()) {
+    nav += '<div class="sidebar-section">Admin</div>';
+    nav += navItem("admin-dashboard", "🏠", "Dashboard", v);
+    nav += navItem("admin-users",     "👤", "Manage Users", v);
+    nav += navItem("admin-periods",   "🗓", "Periods", v);
+    nav += navItem("admin-rollover",  "🎓", "End of Year", v);
+  }
+
+  // Data file — CM + Admin
+  if (canDataFile()) {
+    nav += '<div class="sidebar-section">Data</div>';
+    nav += navItem("data-file", "💾", "Data File", v);
+  }
+
+  // Settings (admin only)
+  if (canAdmin()) {
+    nav += navItem("store-settings", "⚙️", "Settings", v);
+    nav += navItem("store-setup",    "📖", "Setup Guide", v);
+  }
+
+  document.getElementById("sidebar").innerHTML =
+    '<div class="sidebar-header">' +
+      '<div class="sidebar-logo">BEHAVIOR<br>SYSTEM PRO</div>' +
+    '</div>' +
+    '<div class="sidebar-user">' +
+      '<div class="sidebar-user-name">' + esc(u.displayName) + '</div>' +
+      '<div class="sidebar-user-role">' + esc(u.role) + (DEMO_MODE ? ' · demo' : '') + '</div>' +
+    '</div>' +
+    nav +
+    '<div class="sidebar-footer">' +
+      '<button class="btn-signout" onclick="signOut()">Sign Out</button>' +
+      '<div style="text-align:center;margin-top:8px;">' +
+        '<span onclick="openAbout()" style="cursor:pointer;font-size:10px;color:rgba(255,255,255,.55);text-decoration:underline;">About</span>' +
+        '<div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:3px;">© ' + (new Date().getFullYear()) + ' by ' + APP_AUTHOR + ' · demo</div>' +
+      '</div>' +
+    '</div>';
+}
+
+function openAbout() {
+  openModal(
+    '<div class="modal-title">About Behavior System Pro</div>' +
+    '<div style="font-size:13px;line-height:1.65;color:#0d1f3c;">' +
+      '<p style="margin-bottom:10px;"><strong>Behavior System Pro</strong> — daily behavior points, goals and reports for school teams. This is a free demo with a made-up class.</p>' +
+      '<p style="margin-bottom:4px;"><strong>Version:</strong> ' + APP_VERSION + '</p>' +
+      '<p style="margin-bottom:4px;"><strong>Made by:</strong> ' + esc(APP_AUTHOR) + '</p>' +
+      '<p style="margin-top:10px;color:#5a80b8;font-size:12px;">© ' + (new Date().getFullYear()) + ' ' + esc(APP_AUTHOR) + '. All rights reserved.</p>' +
+    '</div>' +
+    '<div class="modal-actions"><button class="btn btn-primary" onclick="closeModal()">Close</button></div>'
+  );
+}
+
+function navItem(view, icon, label, current) {
+  return '<div class="nav-item' + (current === view ? ' active' : '') + '" onclick="setView(\'' + view + '\')">' +
+    '<span class="nav-icon">' + icon + '</span>' + esc(label) + '</div>';
+}
+
+function renderTopbar() {
+  const titles = {
+    tracker:          "Data Entry",
+    summary:          "Class Summary",
+    weekly:           "Weekly Report",
+    tabulate:         "Tabulate",
+    students:         "Student Info",
+    "store-pos":      "Checkout",
+    "store-inventory":"Inventory",
+    "store-balances": "Balances",
+    "store-purchases":"Purchases",
+    "store-email":    "Weekly Email",
+    "admin-dashboard":"Dashboard",
+    "admin-users":    "Manage Users",
+    "admin-rosters":  "Assign Rosters",
+    "admin-periods":  "Periods",
+    "admin-rollover": "End of Year",
+    "admin-sync":     "Excel Sync",
+    "data-file":      "Data File",
+    "store-settings": "Settings",
+    "store-setup":    "Setup Guide",
+  };
+  const title = titles[STATE.view] || "Behavior System Pro";
+  document.getElementById("topbar-title").textContent = title;
+}
+
+function renderContent() {
+  const el = document.getElementById("content-area");
+  switch(STATE.view) {
+    case "tracker":          el.innerHTML = renderTracker(); break;
+    case "summary":          el.innerHTML = renderSummary(); break;
+    case "weekly":           el.innerHTML = renderWeekly(); break;
+    case "tabulate":         el.innerHTML = renderTabulate(); break;
+    case "students":         el.innerHTML = renderStudents(); break;
+    case "store-pos":        el.innerHTML = renderPOS(); break;
+    case "store-inventory":  el.innerHTML = renderInventory(); break;
+    case "store-balances":   el.innerHTML = renderBalances(); break;
+    case "store-purchases":  el.innerHTML = renderPurchasesView(); break;
+    case "admin-dashboard":  el.innerHTML = renderDashboard(); break;
+    case "admin-users":      el.innerHTML = renderUsers(); break;
+    case "admin-rosters":    el.innerHTML = renderRosters(); break;
+    case "admin-periods":    el.innerHTML = renderPeriodsConfig(); break;
+    case "admin-rollover":   el.innerHTML = renderYearRollover(); break;
+    case "data-file":        el.innerHTML = renderDataFile(); break;
+    case "store-settings":   el.innerHTML = renderSettings(); break;
+    case "store-setup":      el.innerHTML = renderSetupGuide(); break;
+    default:                 el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🚧</div><div>View not found</div></div>';
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   TRACKER VIEW
+═══════════════════════════════════════════════ */
+function renderTracker() {
+  const students = visibleStudents();
+  if (!students.length) return '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="font-bold">No students assigned</div><div class="text-muted mt-12">Contact your administrator to assign students to your roster.</div></div>';
+
+  const selStudent = (STATE.selStudent && students.includes(STATE.selStudent)) ? STATE.selStudent : students[0];
+  const goals = getStudentGoals(selStudent);
+  const dayData = (STATE.data[selStudent] || {})[STATE.selDate] || {};
+
+  // Student tabs
+  let studentTabs = '<div class="form-row mb-12" style="flex-wrap:wrap;">';
+  students.forEach(function(n) {
+    const active = n === selStudent;
+    studentTabs += '<div class="chip' + (active ? ' active' : '') + '" onclick="selectTrackerStudent(\'' + esc(n) + '\')">' + esc(n) + '</div>';
+  });
+  studentTabs += '</div>';
+
+  // Date picker + nav
+  const dateRow = '<div class="form-row mb-12">' +
+    '<button class="btn btn-secondary btn-sm" onclick="shiftDate(-1)">◀</button>' +
+    '<input type="date" value="' + STATE.selDate + '" onchange="STATE.selDate=this.value;renderContent()"/>' +
+    '<button class="btn btn-secondary btn-sm" onclick="shiftDate(1)">▶</button>' +
+    '<span class="text-muted">' + fmtDate(STATE.selDate) + '</span>' +
+    '<div style="margin-left:auto;display:flex;gap:8px;">' +
+      '<button class="btn btn-secondary btn-sm" onclick="exportDayCSV()">⬇ CSV</button>' +
+      '<button class="btn btn-secondary btn-sm" onclick="printTracker()">🖨 Print</button>' +
+    '</div>' +
+  '</div>';
+
+  // Which periods this user may see: teachers only see periods they teach for this student
+  const visiblePeriods = (isAdmin() || isCM())
+    ? PERIODS
+    : PERIODS.filter(function(p){ return periodTeacherId(selStudent, p) === STATE.currentUser.id; });
+
+  // Build period tables
+  let tables = '';
+  visiblePeriods.forEach(function(period) {
+    const ps = dayData[period] || {};
+    let pSum = 0, pCount = 0;
+    goals.forEach(function(g) { const v = ps[g.id]; if (v != null) { pSum += v; pCount++; } });
+    const p = pCount ? pct(pSum, pCount) : null;
+
+    tables += '<div style="margin-bottom:14px;">' +
+      '<div class="period-header">' + esc(period) +
+        (p !== null ? '<span class="period-pct" style="background:' + scoreColor(p) + '">' + p + '%</span>' : '') +
+      '</div>' +
+      '<table class="tracker-table" style="border:1.5px solid #dce8f7;border-top:none;border-radius:0 0 8px 8px;">' +
+        '<thead><tr>' +
+          '<th>Goal</th>' +
+          '<th style="text-align:center;width:80px;">0</th>' +
+          '<th style="text-align:center;width:80px;">½</th>' +
+          '<th style="text-align:center;width:80px;">1</th>' +
+          '<th style="text-align:center;width:60px;">Score</th>' +
+        '</tr></thead>' +
+        '<tbody>' + goals.map(function(g) {
+          const v = ps[g.id];
+          const s0 = v === 0   ? ' active score-0' : '';
+          const sh = v === 0.5 ? ' active score-h' : '';
+          const s1 = v === 1   ? ' active score-1' : '';
+          return '<tr>' +
+            '<td>' + esc(g.label) + '</td>' +
+            '<td style="text-align:center;"><button class="score-btn' + s0 + '" onclick="setScore(\'' + esc(selStudent) + '\',\'' + esc(period) + '\',\'' + g.id + '\',0)">0</button></td>' +
+            '<td style="text-align:center;"><button class="score-btn' + sh + '" onclick="setScore(\'' + esc(selStudent) + '\',\'' + esc(period) + '\',\'' + g.id + '\',0.5)">½</button></td>' +
+            '<td style="text-align:center;"><button class="score-btn' + s1 + '" onclick="setScore(\'' + esc(selStudent) + '\',\'' + esc(period) + '\',\'' + g.id + '\',1)">1</button></td>' +
+            '<td style="text-align:center;font-weight:700;color:' + (v===1?'#1a5c3a':v===0.5?'#7a5c00':v===0?'#8a1c1c':'#9ab0cc') + '">' + (v!=null ? (v===0.5?'½':v) : '—') + '</td>' +
+          '</tr>';
+        }).join("") + '</tbody>' +
+      '</table></div>';
+  });
+
+  // Daily total — summed only over the periods this user can see
+  let tSum = 0, tCount = 0;
+  visiblePeriods.forEach(function(period) {
+    const ps = dayData[period] || {};
+    goals.forEach(function(g) { const v = ps[g.id]; if (v != null) { tSum += v; tCount++; } });
+  });
+  const totalPct = tCount ? pct(tSum, tCount) : null;
+  const totalBadge = totalPct !== null
+    ? '<span class="badge" style="background:' + scoreBg(totalPct) + ';color:' + scoreColor(totalPct) + ';font-size:13px;padding:4px 12px;">' + totalPct + '% today</span>'
+    : '<span class="text-muted">No scores yet</span>';
+
+  return '<div>' +
+    studentTabs +
+    dateRow +
+    '<div class="card" style="margin-bottom:14px;">' +
+      '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">' +
+        '<span style="font-size:15px;font-weight:800;color:#0d1f3c;">' + esc(selStudent) + '</span>' +
+        totalBadge +
+        '<div style="margin-left:auto;display:flex;gap:8px;">' +
+          (canEditGoals() ? '<button class="btn btn-secondary btn-sm" onclick="openGoalEditor(\'' + esc(selStudent) + '\')">⚙ Goals</button>' : '') +
+          (canStore() ? '<button class="btn btn-secondary btn-sm" onclick="openAdjust(\'' + esc(selStudent) + '\')">± Adjust</button>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    tables +
+  '</div>';
+}
+
+function selectTrackerStudent(name) {
+  STATE.selStudent = name;
+  renderContent();
+}
+
+function shiftDate(n) {
+  STATE.selDate = addDays(STATE.selDate, n);
+  renderContent();
+}
+
+function setScore(student, period, goalId, value) {
+  if (!STATE.data[student]) STATE.data[student] = {};
+  if (!STATE.data[student][STATE.selDate]) STATE.data[student][STATE.selDate] = {};
+  if (!STATE.data[student][STATE.selDate][period]) STATE.data[student][STATE.selDate][period] = {};
+  const cur = STATE.data[student][STATE.selDate][period][goalId];
+  // Toggle off if same score clicked
+  if (cur === value) {
+    delete STATE.data[student][STATE.selDate][period][goalId];
+  } else {
+    STATE.data[student][STATE.selDate][period][goalId] = value;
+  }
+  save("data");
+  renderContent();
+}
+
+function openGoalEditor(name) {
+  if (!canEditGoals()) { toast("You don't have permission to edit goals.", "error"); return; }
+  const goals = getStudentGoals(name);
+  let rows = goals.map(function(g, i) {
+    return '<div class="form-row" style="margin-bottom:8px;">' +
+      '<input type="text" value="' + esc(g.label) + '" id="glab_' + i + '" style="flex:1;"/>' +
+      '<button class="btn btn-danger btn-sm" onclick="removeGoalRow(' + i + ')">✕</button>' +
+    '</div>';
+  }).join("");
+
+  openModal(
+    '<div class="modal-title">⚙ Goals for ' + esc(name) + '</div>' +
+    '<div id="goal-rows">' + rows + '</div>' +
+    '<button class="btn btn-secondary btn-sm mt-12" onclick="addGoalRow()">+ Add Goal</button>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-primary" onclick="saveGoals(\'' + esc(name) + '\')">Save</button>' +
+    '</div>'
+  );
+}
+
+function addGoalRow() {
+  const container = document.getElementById("goal-rows");
+  const i = container.children.length;
+  const div = document.createElement("div");
+  div.className = "form-row";
+  div.style.marginBottom = "8px";
+  div.innerHTML = '<input type="text" id="glab_' + i + '" placeholder="Goal label" style="flex:1;"/>' +
+    '<button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">✕</button>';
+  container.appendChild(div);
+}
+
+function removeGoalRow(i) {
+  const el = document.getElementById("glab_" + i);
+  if (el) el.parentElement.remove();
+}
+
+function saveGoals(name) {
+  if (!canEditGoals()) { toast("You don't have permission to edit goals.", "error"); return; }
+  const inputs = document.querySelectorAll("#goal-rows input[type=text]");
+  const newGoals = [];
+  const seen = new Set();
+  inputs.forEach(function(inp) {
+    const label = inp.value.trim();
+    if (!label) return;
+    const id = slugify(label, seen);
+    seen.add(id);
+    newGoals.push({id, label});
+  });
+  if (!newGoals.length) { toast("Add at least one goal.", "error"); return; }
+  STATE.goals[name] = newGoals;
+  save("goals");
+  closeModal();
+  toast("Goals saved.");
+  renderContent();
+}
+
+function openAdjust(name) {
+  const cur = STATE.store.adjust[name] || 0;
+  openModal(
+    '<div class="modal-title">± Point Adjustment for ' + esc(name) + '</div>' +
+    '<div class="text-muted mb-12">Current balance: <strong>' + balanceOf(name) + ' ' + esc(STATE.store.config.pointLabel) + '</strong></div>' +
+    '<div class="modal-field"><label>Adjustment (+ or −)</label><input type="number" id="adj-val" value="' + cur + '" step="0.5"/></div>' +
+    '<div class="modal-field"><label>Reason (optional)</label><input type="text" id="adj-note" placeholder="e.g. Bonus for great week"/></div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-primary" onclick="saveAdjust(\'' + esc(name) + '\')">Save</button>' +
+    '</div>'
+  );
+}
+
+function saveAdjust(name) {
+  const v = parseFloat(document.getElementById("adj-val").value) || 0;
+  STATE.store.adjust[name] = v;
+  saveStore("adjust");
+  closeModal();
+  toast("Adjustment saved.");
+}
+
+/* ═══════════════════════════════════════════════
+   CLASS SUMMARY VIEW
+═══════════════════════════════════════════════ */
+function renderSummary() {
+  const students = visibleStudents();
+  const dateRow = '<div class="form-row mb-12">' +
+    '<button class="btn btn-secondary btn-sm" onclick="shiftDate(-1)">◀</button>' +
+    '<input type="date" value="' + STATE.selDate + '" onchange="STATE.selDate=this.value;renderContent()"/>' +
+    '<button class="btn btn-secondary btn-sm" onclick="shiftDate(1)">▶</button>' +
+    '<span class="text-muted">' + fmtDate(STATE.selDate) + '</span>' +
+  '</div>';
+
+  if (!students.length) return '<div class="section-header"><div class="section-title">Class Summary</div></div>' + dateRow + '<div class="empty-state"><div class="empty-state-icon">📊</div><div>No students found</div></div>';
+
+  const cards = students.map(function(name) {
+    const goals = getStudentGoals(name);
+    const dayData = (STATE.data[name] || {})[STATE.selDate] || {};
+    const tot = calcTotal(dayData, goals);
+    const p = tot.count ? pct(tot.sum, tot.count) : null;
+
+    let periodBars = PERIODS.map(function(period) {
+      const ps = dayData[period] || {};
+      let pSum = 0, pCount = 0;
+      goals.forEach(function(g){ const v = ps[g.id]; if(v!=null){pSum+=v;pCount++;} });
+      const pp = pCount ? pct(pSum, pCount) : null;
+      return '<div style="display:flex;align-items:center;gap:6px;font-size:10px;margin-bottom:3px;">' +
+        '<span style="width:80px;color:#9ab0cc;flex-shrink:0;">' + esc(period.split(" ")[0]) + '</span>' +
+        '<div class="progress-bar-wrap" style="flex:1;">' +
+          (pp !== null ? '<div class="progress-bar" style="width:' + pp + '%;background:' + scoreColor(pp) + ';"></div>' : '') +
+        '</div>' +
+        '<span style="width:28px;text-align:right;font-weight:700;color:' + (pp!==null?scoreColor(pp):'#9ab0cc') + ';">' + (pp!==null?pp+'%':'—') + '</span>' +
+      '</div>';
+    }).join("");
+
+    return '<div class="student-card">' +
+      '<div class="student-card-name">' + esc(name) + '</div>' +
+      (p !== null
+        ? '<div class="badge mb-12" style="background:' + scoreBg(p) + ';color:' + scoreColor(p) + ';">' + p + '% daily avg</div>'
+        : '<div class="text-muted mb-12" style="font-size:11px;">No data</div>') +
+      periodBars +
+    '</div>';
+  }).join("");
+
+  return '<div class="section-header"><div class="section-title">Class Summary</div></div>' +
+    dateRow +
+    '<div class="summary-grid">' + cards + '</div>';
+}
+
+/* ═══════════════════════════════════════════════
+   WEEKLY REPORT VIEW
+═══════════════════════════════════════════════ */
+function renderWeekly() {
+  const students = visibleStudents();
+  const ws = STATE.weekStart;
+  const weekDates = [0,1,2,3,4].map(d => addDays(ws, d));
+  const dayLabels = ["Mon","Tue","Wed","Thu","Fri"];
+
+  const weekNav = '<div class="week-nav">' +
+    '<button class="btn btn-secondary btn-sm" onclick="shiftWeek(-1)">◀ Prev</button>' +
+    '<span class="week-label">' + fmtDate(ws) + ' – ' + fmtDate(addDays(ws,4)) + '</span>' +
+    '<button class="btn btn-secondary btn-sm" onclick="shiftWeek(1)">Next ▶</button>' +
+    '<div style="margin-left:auto;">' +
+      '<button class="btn btn-secondary btn-sm" onclick="printWeekly()">🖨 Print</button>' +
+    '</div>' +
+  '</div>';
+
+  if (!students.length) return '<div class="section-header"><div class="section-title">Weekly Report</div></div>' + weekNav + '<div class="empty-state"><div class="empty-state-icon">📅</div><div>No students found</div></div>';
+
+  let rows = students.map(function(name) {
+    const goals = getStudentGoals(name);
+    let cells = weekDates.map(function(dateKey) {
+      const dayData = (STATE.data[name] || {})[dateKey] || {};
+      const tot = calcTotal(dayData, goals);
+      const p = tot.count ? pct(tot.sum, tot.count) : null;
+      return '<td style="text-align:center;font-weight:700;color:' + (p!==null?scoreColor(p):'#9ab0cc') + ';background:' + (p!==null?scoreBg(p):'transparent') + ';border-radius:4px;">' + (p!==null?p+'%':'—') + '</td>';
+    }).join("");
+
+    // Week average
+    let wSum = 0, wCount = 0;
+    weekDates.forEach(function(dateKey) {
+      const dayData = (STATE.data[name] || {})[dateKey] || {};
+      const tot = calcTotal(dayData, goals);
+      if (tot.count) { wSum += tot.sum; wCount += tot.count; }
+    });
+    const wPct = wCount ? pct(wSum, wCount) : null;
+
+    return '<tr>' +
+      '<td style="font-weight:700;">' + esc(name) + '</td>' +
+      cells +
+      '<td style="text-align:center;font-weight:800;color:' + (wPct!==null?scoreColor(wPct):'#9ab0cc') + ';font-size:14px;">' + (wPct!==null?wPct+'%':'—') + '</td>' +
+    '</tr>';
+  }).join("");
+
+  const table = '<table class="tracker-table" style="border:1.5px solid #dce8f7;border-radius:8px;overflow:hidden;">' +
+    '<thead><tr>' +
+      '<th>Student</th>' +
+      dayLabels.map((l,i) => '<th style="text-align:center;">' + l + '<br><span style="font-size:10px;font-weight:400;opacity:.7;">' + weekDates[i].slice(5) + '</span></th>').join("") +
+      '<th style="text-align:center;">Week Avg</th>' +
+    '</tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+  '</table>';
+
+  return '<div class="section-header"><div class="section-title">Weekly Report</div></div>' +
+    weekNav + table;
+}
+
+function shiftWeek(n) {
+  STATE.weekStart = addDays(STATE.weekStart, n * 7);
+  renderContent();
+}
+
+function printWeekly() {
+  const content = document.getElementById("content-area").innerHTML;
+  openPrint('<style>body{font-family:sans-serif;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ccc;padding:6px 10px;font-size:12px;}</style><h2>Weekly Report</h2>' + content);
+}
+
+/* ═══════════════════════════════════════════════
+   TABULATE VIEW
+═══════════════════════════════════════════════ */
+function renderTabulate() {
+  const students = visibleStudents();
+  const ws = STATE.weekStart;
+  const weekDates = [0,1,2,3,4].map(d => addDays(ws, d));
+  const sel = STATE.tabulateStudent || (students[0] || null);
+
+  const weekNav = '<div class="week-nav">' +
+    '<button class="btn btn-secondary btn-sm" onclick="shiftWeek(-1)">◀ Prev</button>' +
+    '<span class="week-label">' + fmtDate(ws) + ' – ' + fmtDate(addDays(ws,4)) + '</span>' +
+    '<button class="btn btn-secondary btn-sm" onclick="shiftWeek(1)">Next ▶</button>' +
+  '</div>';
+
+  let studentSelect = '<div class="form-row mb-12">' +
+    '<select onchange="STATE.tabulateStudent=this.value;renderContent()">' +
+    students.map(n => '<option value="' + esc(n) + '"' + (n===sel?' selected':'') + '>' + esc(n) + '</option>').join("") +
+    '</select></div>';
+
+  if (!sel) return '<div class="section-header"><div class="section-title">Tabulate</div></div>' + weekNav + '<div class="empty-state"><div class="empty-state-icon">🔢</div><div>No students</div></div>';
+
+  const goals = getStudentGoals(sel);
+
+  // Period × day table
+  let rows = '';
+  let grandSum = 0, grandCount = 0;
+  PERIODS.forEach(function(period) {
+    let pGrand = 0, pGrandCount = 0;
+    let cells = weekDates.map(function(dateKey) {
+      const ps = ((STATE.data[sel]||{})[dateKey]||{})[period]||{};
+      let pSum=0, pCount=0;
+      goals.forEach(function(g){ const v=ps[g.id]; if(v!=null){pSum+=v;pCount++;} });
+      if(pCount){pGrand+=pSum;pGrandCount+=pCount;grandSum+=pSum;grandCount+=pCount;}
+      const p = pCount ? pct(pSum,pCount) : null;
+      return '<td style="text-align:center;color:' + (p!==null?scoreColor(p):'#9ab0cc') + ';font-weight:600;">' + (p!==null?p+'%':'—') + '</td>';
+    }).join("");
+    const avgPct = pGrandCount ? pct(pGrand,pGrandCount) : null;
+    rows += '<tr>' +
+      '<td style="font-weight:700;">' + esc(period) + '</td>' +
+      cells +
+      '<td style="text-align:center;font-weight:800;color:' + (avgPct!==null?scoreColor(avgPct):'#9ab0cc') + ';">' + (avgPct!==null?avgPct+'%':'—') + '</td>' +
+    '</tr>';
+  });
+  const wkPct = grandCount ? pct(grandSum,grandCount) : null;
+  rows += '<tr class="total-row">' +
+    '<td>Week Total</td>' +
+    '<td colspan="5" style="text-align:center;">—</td>' +
+    '<td style="text-align:center;font-size:15px;color:' + (wkPct!==null?scoreColor(wkPct):'#9ab0cc') + ';">' + (wkPct!==null?wkPct+'%':'—') + '</td>' +
+  '</tr>';
+
+  const table = '<table class="tab-table" style="border:1.5px solid #dce8f7;border-radius:8px;overflow:hidden;">' +
+    '<thead><tr>' +
+      '<th>Period</th>' +
+      [0,1,2,3,4].map(function(d){ const dk=weekDates[d]; return '<th style="text-align:center;">'+["Mon","Tue","Wed","Thu","Fri"][d]+'<br><span style="font-size:10px;font-weight:400;opacity:.7;">'+dk.slice(5)+'</span></th>'; }).join("") +
+      '<th style="text-align:center;">Avg</th>' +
+    '</tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+  '</table>';
+
+  return '<div class="section-header"><div class="section-title">Tabulate</div></div>' +
+    weekNav + studentSelect + table;
+}
+</script>
+<script>
+/* ═══════════════════════════════════════════════
+   STUDENT INFO VIEW (CM + Admin)
+═══════════════════════════════════════════════ */
+function renderStudents() {
+  const students = STATE.students;
+
+  // IEP alerts (within 30 days)
+  const today = new Date();
+  const alerts = students.filter(function(name) {
+    const inf = STATE.studentInfo[name] || {};
+    if (!inf.iepDate) return false;
+    const diff = (new Date(inf.iepDate) - today) / 86400000;
+    return diff >= 0 && diff <= 30;
+  });
+
+  let alertHtml = '';
+  if (alerts.length) {
+    alertHtml = '<div class="iep-alert" style="margin-bottom:16px;">' +
+      '<strong>📅 Upcoming IEP Dates (next 30 days):</strong><br>' +
+      alerts.map(function(n) {
+        const inf = STATE.studentInfo[n] || {};
+        return '<span style="margin-right:14px;">' + esc(n) + ' — ' + fmtDate(inf.iepDate) + '</span>';
+      }).join("") +
+    '</div>';
+  }
+
+  // Student table
+  let rows = students.map(function(name) {
+    const inf = STATE.studentInfo[name] || {};
+    return '<tr>' +
+      '<td style="font-weight:700;">' + esc(name) + '</td>' +
+      '<td>' + esc(inf.firstName||'') + '</td>' +
+      '<td>' + esc(inf.lastName||'') + '</td>' +
+      '<td>' + esc(inf.grade||'—') + '</td>' +
+      '<td>' + (inf.iepDate ? fmtDate(inf.iepDate) : '—') + '</td>' +
+      '<td>' + esc(inf.email||'') + '</td>' +
+      '<td>' +
+        '<button class="btn btn-secondary btn-sm" onclick="openEditStudent(\'' + esc(name) + '\')">Edit</button> ' +
+        (canAdmin() ? '<button class="btn btn-danger btn-sm" onclick="confirmRemoveStudent(\'' + esc(name) + '\')">Remove</button>' : '') +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  return '<div class="section-header">' +
+    '<div class="section-title">Student Info</div>' +
+    (canAdmin() ? '<button class="btn btn-primary" onclick="openAddStudent()">+ Add Student</button>' : '') +
+  '</div>' +
+  alertHtml +
+  '<div class="card" style="overflow-x:auto;">' +
+    '<table class="data-table">' +
+      '<thead><tr><th>Name</th><th>First</th><th>Last</th><th>Grade</th><th>IEP Date</th><th>Parent Email</th><th>Actions</th></tr></thead>' +
+      '<tbody>' + (rows || '<tr><td colspan="7" style="text-align:center;color:#9ab0cc;">No students yet</td></tr>') + '</tbody>' +
+    '</table>' +
+  '</div>' +
+  '<div style="margin-top:12px;display:flex;gap:8px;">' +
+    '<button class="btn btn-secondary btn-sm" onclick="importStudentXLSX()">⬆ Import Excel</button>' +
+    '<button class="btn btn-secondary btn-sm" onclick="exportStudentCSV()">⬇ Export CSV</button>' +
+  '</div>';
+}
+
+function openAddStudent() {
+  openModal(
+    '<div class="modal-title">+ Add Student</div>' +
+    '<div class="modal-field"><label>Display Name (e.g. Alex M.)</label><input type="text" id="st-name"/></div>' +
+    '<div class="modal-field"><label>First Name</label><input type="text" id="st-first"/></div>' +
+    '<div class="modal-field"><label>Last Name</label><input type="text" id="st-last"/></div>' +
+    '<div class="modal-field"><label>Grade</label><select id="st-grade"><option value="">—</option>' + GRADES.map(g=>'<option>'+g+'</option>').join('') + '</select></div>' +
+    '<div class="modal-field"><label>IEP Date</label><input type="date" id="st-iep"/></div>' +
+    '<div class="modal-field"><label>Parent Email</label><input type="email" id="st-email"/></div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-primary" onclick="doAddStudent()">Add Student</button>' +
+    '</div>'
+  );
+}
+
+function doAddStudent() {
+  const name = (document.getElementById('st-name').value||'').trim();
+  if (!name) { toast('Display name required.','error'); return; }
+  if (STATE.students.includes(name)) { toast('Student already exists.','error'); return; }
+  STATE.students.push(name);
+  STATE.studentInfo[name] = {
+    firstName: (document.getElementById('st-first').value||'').trim(),
+    lastName:  (document.getElementById('st-last').value||'').trim(),
+    grade:     document.getElementById('st-grade').value,
+    iepDate:   document.getElementById('st-iep').value,
+    email:     document.getElementById('st-email').value,
+  };
+  save('students'); save('studentInfo');
+  closeModal();
+  toast('Student added.');
+  renderContent();
+}
+
+function openEditStudent(name) {
+  const inf = STATE.studentInfo[name] || {};
+  openModal(
+    '<div class="modal-title">Edit: ' + esc(name) + '</div>' +
+    '<div class="modal-field"><label>First Name</label><input type="text" id="st-first" value="' + esc(inf.firstName||'') + '"/></div>' +
+    '<div class="modal-field"><label>Last Name</label><input type="text" id="st-last" value="' + esc(inf.lastName||'') + '"/></div>' +
+    '<div class="modal-field"><label>Grade</label><select id="st-grade"><option value="">—</option>' + GRADES.map(g=>'<option'+(g===inf.grade?' selected':'')+'>'+g+'</option>').join('') + '</select></div>' +
+    '<div class="modal-field"><label>IEP Date</label><input type="date" id="st-iep" value="' + esc(inf.iepDate||'') + '"/></div>' +
+    '<div class="modal-field"><label>Parent Email</label><input type="email" id="st-email" value="' + esc(inf.email||'') + '"/></div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-primary" onclick="doEditStudent(\'' + esc(name) + '\')">Save</button>' +
+    '</div>'
+  );
+}
+
+function doEditStudent(name) {
+  if (!STATE.studentInfo[name]) STATE.studentInfo[name] = {};
+  Object.assign(STATE.studentInfo[name], {
+    firstName: (document.getElementById('st-first').value||'').trim(),
+    lastName:  (document.getElementById('st-last').value||'').trim(),
+    grade:     document.getElementById('st-grade').value,
+    iepDate:   document.getElementById('st-iep').value,
+    email:     document.getElementById('st-email').value,
+  });
+  save('studentInfo');
+  closeModal();
+  toast('Student updated.');
+  renderContent();
+}
+
+// BUG 3 FIX: use modal, not confirm()
+function confirmRemoveStudent(name) {
+  openModal(
+    '<div class="modal-title">Remove Student?</div>' +
+    '<div style="margin-bottom:16px;font-size:14px;">Remove <strong>' + esc(name) + '</strong>? All score data will be permanently deleted. This cannot be undone.</div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-danger" onclick="doRemoveStudent(\'' + esc(name) + '\')">Remove</button>' +
+    '</div>'
+  );
+}
+
+function doRemoveStudent(name) {
+  STATE.students = STATE.students.filter(n => n !== name);
+  delete STATE.studentInfo[name];
+  delete STATE.data[name];
+  delete STATE.goals[name];
+  // Remove this student's period schedule
+  delete STATE.assignments[name];
+  save('students'); save('studentInfo'); save('data'); save('goals'); save('assignments');
+  closeModal();
+  toast(name + ' removed.');
+  renderContent();
+}
+
+/* ═══════════════════════════════════════════════
+   ADMIN VIEWS
+═══════════════════════════════════════════════ */
+function renderDashboard() {
+  const students = STATE.students;
+  const teachers = STATE.accounts.filter(a => a.role === 'teacher');
+  const today = todayKey();
+
+  // Students with data today
+  const withDataToday = students.filter(function(n) {
+    const d = STATE.data[n];
+    return d && d[today] && Object.keys(d[today]).length > 0;
+  }).length;
+
+  // IEP alerts next 30 days
+  const now = new Date();
+  const iepAlerts = students.filter(function(n) {
+    const inf = STATE.studentInfo[n]||{};
+    if (!inf.iepDate) return false;
+    const diff = (new Date(inf.iepDate) - now) / 86400000;
+    return diff >= 0 && diff <= 30;
+  });
+
+  // Weekly avg across all students
+  const ws = getMondayOfWeek(today);
+  const weekDates = [0,1,2,3,4].map(d => addDays(ws,d));
+  let wSum=0,wCount=0;
+  students.forEach(function(n) {
+    const goals = getStudentGoals(n);
+    weekDates.forEach(function(dk) {
+      const dd = (STATE.data[n]||{})[dk]||{};
+      const tot = calcTotal(dd,goals);
+      wSum+=tot.sum; wCount+=tot.count;
+    });
+  });
+  const wPct = wCount ? pct(wSum,wCount) : null;
+
+  return '<div class="section-title" style="margin-bottom:18px;">Dashboard</div>' +
+    '<div class="stat-grid">' +
+      statCard(students.length,'Students') +
+      statCard(teachers.length,'Teachers') +
+      statCard(withDataToday+'/'+students.length,'Scored Today') +
+      statCard(wPct!==null?wPct+'%':'—','Week Avg') +
+    '</div>' +
+    (iepAlerts.length ? '<div class="iep-alert"><strong>📅 IEP dates in next 30 days:</strong><br>' +
+      iepAlerts.map(function(n){ const inf=STATE.studentInfo[n]||{}; return '<span style="margin-right:14px;">'+esc(n)+' — '+fmtDate(inf.iepDate)+'</span>'; }).join('') +
+    '</div>' : '') +
+    '<div class="card">' +
+      '<div class="card-title">Teacher Rosters</div>' +
+      teachers.map(function(t) {
+        let periodCount = 0; const studs = [];
+        STATE.students.forEach(function(n) {
+          const ps = teacherPeriodsFor(t.id, n);
+          if (ps.length) { periodCount += ps.length; studs.push(esc(n)+' ('+ps.length+')'); }
+        });
+        return '<div style="margin-bottom:10px;"><strong>'+esc(t.displayName)+'</strong> ('+periodCount+' period'+(periodCount!==1?'s':'')+' across '+studs.length+' student'+(studs.length!==1?'s':'')+')<br>' +
+          '<span style="font-size:12px;color:#5a80b8;">'+(studs.join(', ')||'—')+'</span></div>';
+      }).join('') +
+    '</div>';
+}
+
+function statCard(val, label) {
+  return '<div class="stat-card"><div class="stat-value">'+val+'</div><div class="stat-label">'+label+'</div></div>';
+}
+
+function renderUsers() {
+  const accts = STATE.accounts;
+  const rows = accts.map(function(a) {
+    return '<tr>' +
+      '<td style="font-weight:700;">'+esc(a.displayName)+'</td>' +
+      '<td>'+esc(a.username)+'</td>' +
+      '<td><span class="badge badge-blue">'+esc(a.role)+'</span></td>' +
+      '<td>'+esc(a.subject||'—')+'</td>' +
+      '<td>' +
+        '<button class="btn btn-secondary btn-sm" onclick="openEditUser(\''+esc(a.id)+'\')">Edit</button> ' +
+        (a.id !== STATE.currentUser.id ? '<button class="btn btn-danger btn-sm" onclick="confirmRemoveUser(\''+esc(a.id)+'\')">Remove</button>' : '') +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  return '<div class="section-header">' +
+    '<div class="section-title">Manage Users</div>' +
+    '<button class="btn btn-primary" onclick="openAddUser()">+ Add User</button>' +
+  '</div>' +
+  '<div class="card" style="overflow-x:auto;">' +
+    '<table class="data-table">' +
+      '<thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Subject</th><th>Actions</th></tr></thead>' +
+      '<tbody>'+rows+'</tbody>' +
+    '</table>' +
+  '</div>';
+}
+
+function openAddUser() {
+  openModal(
+    '<div class="modal-title">+ Add User</div>' +
+    '<div class="modal-field"><label>Display Name</label><input type="text" id="u-name"/></div>' +
+    '<div class="modal-field"><label>Username</label><input type="text" id="u-user" autocapitalize="none"/></div>' +
+    '<div class="modal-field"><label>Password</label><input type="password" id="u-pw"/></div>' +
+    '<div class="modal-field"><label>Role</label><select id="u-role"><option value="teacher">Teacher</option><option value="casemanager">Case Manager</option><option value="admin">Admin</option></select></div>' +
+    '<div class="modal-field"><label>Subject (e.g. Math) — for teachers</label><input type="text" id="u-subject" placeholder="e.g. Math, ELA, Science"/></div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-primary" onclick="doAddUser()">Add User</button>' +
+    '</div>'
+  );
+}
+
+// BUG 12 FIX: hash password on create
+async function doAddUser() {
+  const name = (document.getElementById('u-name').value||'').trim();
+  const user = (document.getElementById('u-user').value||'').trim().toLowerCase();
+  const pw   = (document.getElementById('u-pw').value||'').trim();
+  const role = document.getElementById('u-role').value;
+  const subject = (document.getElementById('u-subject').value||'').trim();
+  if (!name||!user||!pw) { toast('All fields required.','error'); return; }
+  if (STATE.accounts.find(a=>a.username.toLowerCase()===user)) { toast('Username already taken.','error'); return; }
+  const hashed = await hashPassword(pw);
+  const id = 'u_' + Date.now();
+  STATE.accounts.push({id, username:user, password:hashed, role, displayName:name, subject});
+  save('accounts');
+  closeModal();
+  toast('User added.');
+  renderContent();
+}
+
+function openEditUser(id) {
+  const a = STATE.accounts.find(x=>x.id===id);
+  if (!a) return;
+  openModal(
+    '<div class="modal-title">Edit User: ' + esc(a.displayName) + '</div>' +
+    '<div class="modal-field"><label>Display Name</label><input type="text" id="u-name" value="'+esc(a.displayName)+'"/></div>' +
+    '<div class="modal-field"><label>Username</label><input type="text" id="u-user" value="'+esc(a.username)+'" autocapitalize="none"/></div>' +
+    '<div class="modal-field"><label>New Password (leave blank to keep)</label><input type="password" id="u-pw"/></div>' +
+    '<div class="modal-field"><label>Role</label><select id="u-role">' +
+      ['teacher','casemanager','admin'].map(r=>'<option value="'+r+'"'+(r===a.role?' selected':'')+'>'+r+'</option>').join('') +
+    '</select></div>' +
+    '<div class="modal-field"><label>Subject (e.g. Math) — for teachers</label><input type="text" id="u-subject" value="'+esc(a.subject||'')+'" placeholder="e.g. Math, ELA, Science"/></div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-primary" onclick="doEditUser(\''+esc(id)+'\')">Save</button>' +
+    '</div>'
+  );
+}
+
+// BUG 11 FIX: hash on reset
+async function doEditUser(id) {
+  const a = STATE.accounts.find(x=>x.id===id);
+  if (!a) return;
+  const name = (document.getElementById('u-name').value||'').trim();
+  const user = (document.getElementById('u-user').value||'').trim().toLowerCase();
+  const pw   = (document.getElementById('u-pw').value||'').trim();
+  if (!name||!user) { toast('Name and username required.','error'); return; }
+  const dup = STATE.accounts.find(x=>x.username.toLowerCase()===user && x.id!==id);
+  if (dup) { toast('Username already taken.','error'); return; }
+  a.displayName = name;
+  a.username = user;
+  a.subject = (document.getElementById('u-subject').value||'').trim();
+  if (pw) a.password = await hashPassword(pw);
+  save('accounts');
+  closeModal();
+  toast('User updated.');
+  renderContent();
+}
+
+function confirmRemoveUser(id) {
+  const a = STATE.accounts.find(x=>x.id===id);
+  if (!a) return;
+  openModal(
+    '<div class="modal-title">Remove User?</div>' +
+    '<div style="margin-bottom:16px;font-size:14px;">Remove <strong>'+esc(a.displayName)+'</strong>? This cannot be undone.</div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-danger" onclick="doRemoveUser(\''+esc(id)+'\')">Remove</button>' +
+    '</div>'
+  );
+}
+
+function doRemoveUser(id) {
+  STATE.accounts = STATE.accounts.filter(x=>x.id!==id);
+  // Remove this teacher from every student's period schedule
+  Object.keys(STATE.assignments).forEach(function(student) {
+    const m = STATE.assignments[student] || {};
+    PERIODS.forEach(function(p){ if (m[p] === id) delete m[p]; });
+  });
+  save('accounts'); save('assignments');
+  closeModal();
+  toast('User removed.');
+  renderContent();
+}
+
+function renderRosters() {
+  const teachers = STATE.accounts.filter(a=>a.role==='teacher');
+  if (!teachers.length) {
+    return '<div class="section-header"><div class="section-title">Assign Rosters — Period Schedule</div></div>' +
+      '<div class="iep-alert">⚠️ No teacher accounts yet. Add teachers in the <strong>Users</strong> section first, then assign them to periods here.</div>';
+  }
+  if (!STATE.students.length) {
+    return '<div class="section-header"><div class="section-title">Assign Rosters — Period Schedule</div></div>' +
+      '<div class="empty-state"><div class="empty-state-icon">📝</div><div>No students yet.</div></div>';
+  }
+
+  const cards = STATE.students.map(function(name, si) {
+    const m = STATE.assignments[name] || {};
+    const assignedCount = PERIODS.filter(function(p){ return m[p]; }).length;
+    const rows = PERIODS.map(function(period) {
+      const cur = m[period] || '';
+      const opts = '<option value="">— unassigned —</option>' + teachers.map(function(t) {
+        return '<option value="'+esc(t.id)+'"'+(t.id===cur?' selected':'')+'>'+esc(t.displayName)+'</option>';
+      }).join('');
+      return '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid #eef2f8;">' +
+        '<span style="flex:0 0 130px;font-size:13px;color:#1a3a6b;font-weight:600;">'+esc(period)+'</span>' +
+        '<select style="flex:1;" onchange="setPeriodTeacher('+si+',\''+esc(period)+'\',this.value)">'+opts+'</select>' +
+      '</div>';
+    }).join('');
+    return '<div class="card" style="margin-bottom:12px;">' +
+      '<div class="card-title">'+esc(name)+
+        ' <span id="rc-'+si+'" style="font-size:12px;font-weight:500;color:#5a80b8;">('+assignedCount+'/'+PERIODS.length+' periods assigned)</span>' +
+      '</div>' +
+      rows +
+    '</div>';
+  }).join('');
+
+  return '<div class="section-header"><div class="section-title">Assign Rosters — Period Schedule</div></div>' +
+    '<div class="text-muted" style="margin-bottom:14px;font-size:13px;">Assign a teacher to each period for each student. Teachers only see and score the periods assigned to them.</div>' +
+    cards;
+}
+
+function setPeriodTeacher(si, period, teacherId) {
+  const name = STATE.students[si];
+  if (!name) return;
+  if (!STATE.assignments[name]) STATE.assignments[name] = {};
+  if (teacherId) STATE.assignments[name][period] = teacherId;
+  else delete STATE.assignments[name][period];
+  save('assignments');
+  const el = document.getElementById('rc-'+si);
+  if (el) {
+    const m = STATE.assignments[name] || {};
+    const c = PERIODS.filter(function(p){ return m[p]; }).length;
+    el.textContent = '('+c+'/'+PERIODS.length+' periods assigned)';
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   PERIODS CONFIG (admin) — set Home Base + # periods
+═══════════════════════════════════════════════ */
+function renderPeriodsConfig() {
+  const cfg = STATE.periodConfig || { homeBase: true, count: 8 };
+  const preview = PERIODS.map(function(p){ return '<span class="badge badge-blue" style="margin:2px;">'+esc(p)+'</span>'; }).join(' ');
+  return '<div class="section-header"><div class="section-title">Daily Periods</div></div>' +
+    '<div class="text-muted" style="margin-bottom:14px;font-size:13px;">Set how many periods your school day has, and whether there is a Home Base (HB). This controls the rows shown in Data Entry, Assign Rosters, reports, and exports.</div>' +
+    '<div class="card" style="max-width:460px;">' +
+      '<div class="modal-field" style="display:flex;align-items:center;gap:10px;">' +
+        '<input type="checkbox" id="pc-hb" '+(cfg.homeBase?'checked':'')+' style="width:18px;height:18px;"/>' +
+        '<label for="pc-hb" style="margin:0;">Include a <strong>Home Base (HB)</strong> period</label>' +
+      '</div>' +
+      '<div class="modal-field"><label>Number of periods per day (excluding HB)</label>' +
+        '<input type="number" id="pc-count" min="0" max="20" value="'+(parseInt(cfg.count,10)||0)+'"/></div>' +
+      '<div style="font-size:12px;color:#5a80b8;margin:8px 0 4px;">Current schedule:</div>' +
+      '<div id="pc-preview" style="margin-bottom:12px;">'+preview+'</div>' +
+      '<div class="iep-alert" style="font-size:12px;">Reducing the count hides higher periods but does <strong>not</strong> delete any scores already recorded for them.</div>' +
+      '<div class="modal-actions">' +
+        '<button class="btn btn-primary" onclick="savePeriodConfig()">Save Schedule</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function savePeriodConfig() {
+  const homeBase = document.getElementById('pc-hb').checked;
+  let count = parseInt(document.getElementById('pc-count').value, 10);
+  if (isNaN(count) || count < 0) count = 0;
+  if (count > 20) count = 20;
+  if (!homeBase && count === 0) { toast('Add at least one period or Home Base.','error'); return; }
+  STATE.periodConfig = { homeBase: homeBase, count: count };
+  save('periodConfig');
+  buildPeriods();
+  toast('Schedule updated — '+PERIODS.length+' period'+(PERIODS.length!==1?'s':'')+' per day.');
+  renderContent();
+}
+
+/* ═══════════════════════════════════════════════
+   END-OF-YEAR ROLLOVER (admin) — promote grades,
+   graduate the top grade, clear last year's data
+═══════════════════════════════════════════════ */
+// CSV of full score history for the given students (used for backups + graduating export).
+function buildStudentsScoreCSV(names) {
+  const rows = [['Student','First','Last','Grade','IEP Date','Email','Date','Period','Goal','Score']];
+  names.forEach(function(name) {
+    const inf = STATE.studentInfo[name] || {};
+    const goals = getStudentGoals(name);
+    const byDate = STATE.data[name] || {};
+    const dates = Object.keys(byDate).sort();
+    if (!dates.length) {
+      rows.push([name, inf.firstName||'', inf.lastName||'', inf.grade||'', inf.iepDate||'', inf.email||'', '', '', '', '']);
+      return;
+    }
+    dates.forEach(function(d) {
+      const day = byDate[d] || {};
+      Object.keys(day).forEach(function(period) {
+        const ps = day[period] || {};
+        goals.forEach(function(g) {
+          const v = ps[g.id];
+          if (v != null) rows.push([name, inf.firstName||'', inf.lastName||'', inf.grade||'', inf.iepDate||'', inf.email||'', d, period, g.label, v]);
+        });
+      });
+    });
+  });
+  return rows;
+}
+
+function exportFullBackup() {
+  if (!STATE.students.length) { toast('No students to back up.', 'error'); return; }
+  downloadCSV('behavior-full-backup-' + todayKey() + '.csv', buildStudentsScoreCSV(STATE.students));
+  toast('Full backup downloaded.');
+}
+
+function rolloverBuckets() {
+  const top = GRADES[GRADES.length - 1];
+  const grads = [], promote = [], ungraded = [];
+  STATE.students.forEach(function(n) {
+    const g = (STATE.studentInfo[n] || {}).grade;
+    if (GRADES.indexOf(g) === -1) ungraded.push(n);
+    else if (g === top) grads.push(n);
+    else promote.push(n);
+  });
+  return { top: top, grads: grads, promote: promote, ungraded: ungraded };
+}
+
+function renderYearRollover() {
+  const b = rolloverBuckets();
+  const counts = {};
+  GRADES.forEach(function(g){ counts[g] = 0; });
+  STATE.students.forEach(function(n){ const g=(STATE.studentInfo[n]||{}).grade; if(counts[g]!=null) counts[g]++; });
+
+  const map = GRADES.map(function(g, i) {
+    const dest = (i < GRADES.length - 1) ? ('→ Grade ' + GRADES[i+1]) : '→ Graduate / remove';
+    return '<div style="display:flex;gap:10px;padding:4px 0;border-bottom:1px solid #eef2f8;font-size:13px;">' +
+      '<span style="flex:0 0 150px;color:#1a3a6b;font-weight:600;">Grade ' + esc(g) + ' (' + counts[g] + ')</span>' +
+      '<span style="color:#5a80b8;">' + dest + '</span></div>';
+  }).join('');
+
+  return '<div class="section-header"><div class="section-title">End-of-Year Rollover</div></div>' +
+    '<div class="text-muted" style="margin-bottom:12px;font-size:13px;">Promotes every student up one grade, exports and removes the graduating grade, and clears last year\'s scores, period schedules, and store balances for a fresh start. Add incoming students afterward from <strong>Student Info</strong> (Add Student or Import Excel).</div>' +
+    '<div class="card" style="max-width:520px;">' +
+      '<div class="card-title">What will happen</div>' +
+      map +
+      (b.ungraded.length ? '<div class="iep-alert" style="margin-top:10px;font-size:12px;">⚠️ ' + b.ungraded.length + ' student(s) have no grade set and will be <strong>skipped</strong> (not promoted or cleared): ' + b.ungraded.map(esc).join(', ') + '. Set their grade in Student Info first if they should roll over.</div>' : '') +
+      '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">' +
+        '<button class="btn btn-secondary" onclick="exportFullBackup()">⬇ Download Full Backup</button>' +
+        '<button class="btn btn-danger" onclick="confirmRollover()">🎓 Run End-of-Year Rollover</button>' +
+      '</div>' +
+      '<div style="font-size:12px;color:#5a80b8;margin-top:10px;">Always download a backup first — rollover cannot be undone.</div>' +
+    '</div>';
+}
+
+function confirmRollover() {
+  const b = rolloverBuckets();
+  openModal(
+    '<div class="modal-title">Confirm End-of-Year Rollover</div>' +
+    '<div style="font-size:13px;line-height:1.6;color:#0d1f3c;">' +
+      '<p style="margin-bottom:6px;">This will:</p>' +
+      '<ul style="margin:0 0 10px 18px;">' +
+        '<li><strong>' + b.promote.length + '</strong> student(s) promoted one grade.</li>' +
+        '<li><strong>' + b.grads.length + '</strong> grade-' + esc(b.top) + ' student(s) exported to CSV, then removed.</li>' +
+        '<li>Last year\'s scores, period schedules, and all store balances cleared.</li>' +
+        (b.ungraded.length ? '<li>' + b.ungraded.length + ' ungraded student(s) skipped.</li>' : '') +
+      '</ul>' +
+      '<div class="iep-alert" style="font-size:12px;">This cannot be undone.</div>' +
+      '<label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:13px;cursor:pointer;"><input type="checkbox" id="roll-confirm" style="width:16px;height:16px;"/> I have downloaded a backup and want to proceed.</label>' +
+    '</div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-danger" onclick="runYearRollover()">Run Rollover</button>' +
+    '</div>'
+  );
+}
+
+function runYearRollover() {
+  const chk = document.getElementById('roll-confirm');
+  if (!chk || !chk.checked) { toast('Please confirm the backup checkbox first.', 'error'); return; }
+  const b = rolloverBuckets();
+
+  // 1) Export graduating students' full records before removing them.
+  if (b.grads.length) downloadCSV('graduating-grade' + b.top + '-' + todayKey() + '.csv', buildStudentsScoreCSV(b.grads));
+
+  // 2) Remove graduating students entirely.
+  b.grads.forEach(function(n) {
+    delete STATE.studentInfo[n]; delete STATE.data[n]; delete STATE.goals[n]; delete STATE.assignments[n];
+  });
+  STATE.students = STATE.students.filter(function(n){ return b.grads.indexOf(n) === -1; });
+
+  // 3) Promote returning students and clear last year's scores + schedule.
+  b.promote.forEach(function(n) {
+    const inf = STATE.studentInfo[n] || {};
+    const idx = GRADES.indexOf(inf.grade);
+    if (idx !== -1 && idx < GRADES.length - 1) inf.grade = GRADES[idx + 1];
+    STATE.studentInfo[n] = inf;
+    STATE.data[n] = {};
+    STATE.assignments[n] = {};
+  });
+
+  // 4) Reset store balances for the new year (all remaining students start at zero).
+  STATE.store.purchases = [];
+  STATE.store.adjust = {};
+  STATE.store.status = {};
+
+  // 5) Persist everything.
+  STATE.selStudent = null;
+  save('students'); save('studentInfo'); save('data'); save('goals'); save('assignments');
+  saveStore('purchases'); saveStore('adjust'); saveStore('status');
+  invalidateEarnedCache();
+
+  closeModal();
+  toast('Rollover complete: ' + b.promote.length + ' promoted, ' + b.grads.length + ' graduated.');
+  renderApp();
+}
+
+/* ═══════════════════════════════════════════════
+   TRACKER PRINT (BUG 4 FIX — in-page overlay)
+═══════════════════════════════════════════════ */
+function printTracker() {
+  const selStudent = STATE.selStudent || (visibleStudents()[0]||'');
+  const goals = getStudentGoals(selStudent);
+  const dayData = (STATE.data[selStudent]||{})[STATE.selDate]||{};
+  const printPeriods = visiblePeriodsFor(selStudent);
+  let ptSum = 0, ptCount = 0;
+  printPeriods.forEach(function(period){ const ps = dayData[period]||{}; goals.forEach(function(g){ const v=ps[g.id]; if(v!=null){ptSum+=v;ptCount++;} }); });
+  const tot = { sum: ptSum, count: ptCount };
+
+  let tables = printPeriods.map(function(period) {
+    const ps = dayData[period]||{};
+    return '<h3 style="margin:12px 0 6px;font-size:13px;color:#1a3a6b;">'+period+'</h3>' +
+      '<table style="border-collapse:collapse;width:100%;">' +
+        '<thead><tr style="background:#1a3a6b;color:#fff;">' +
+          '<th style="padding:6px 10px;text-align:left;font-size:12px;">Goal</th>' +
+          '<th style="padding:6px;text-align:center;font-size:12px;">Score</th>' +
+        '</tr></thead>' +
+        '<tbody>' + goals.map(function(g) {
+          const v = ps[g.id];
+          return '<tr style="border-bottom:1px solid #eee;">' +
+            '<td style="padding:5px 10px;font-size:12px;">'+g.label+'</td>' +
+            '<td style="padding:5px;text-align:center;font-weight:700;font-size:12px;">'+(v!=null?(v===0.5?'½':v):'—')+'</td>' +
+          '</tr>';
+        }).join('') + '</tbody>' +
+      '</table>';
+  }).join('');
+
+  openPrint(
+    '<style>@media print{button{display:none!important;}}h2,h3{font-family:sans-serif;}</style>' +
+    '<h2 style="font-family:sans-serif;margin-bottom:4px;">'+selStudent+' — Behavior Sheet</h2>' +
+    '<p style="font-family:sans-serif;font-size:12px;color:#666;margin-bottom:16px;">Date: '+fmtDate(STATE.selDate)+'</p>' +
+    tables +
+    '<p style="font-family:sans-serif;font-size:12px;margin-top:16px;border-top:1px solid #ccc;padding-top:10px;">Daily total: '+(tot.count?pct(tot.sum,tot.count)+'%':'No data')+'</p>' +
+    '<button onclick="window.print()" style="margin-top:16px;background:#1a3a6b;color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:13px;">🖨 Print</button>'
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   CSV EXPORT
+═══════════════════════════════════════════════ */
+function exportDayCSV() {
+  const students = visibleStudents();
+  const date = STATE.selDate;
+  let rows = [['Student','Period','Goal','Score']];
+  students.forEach(function(name) {
+    const goals = getStudentGoals(name);
+    const dayData = (STATE.data[name]||{})[date]||{};
+    visiblePeriodsFor(name).forEach(function(period) {
+      const ps = dayData[period]||{};
+      goals.forEach(function(g) {
+        const v = ps[g.id];
+        rows.push([name, period, g.label, v!=null?v:'']);
+      });
+    });
+  });
+  downloadCSV('behavior-'+date+'.csv', rows);
+}
+
+function exportStudentCSV() {
+  const rows = [['Name','First','Last','Grade','IEP Date','Email']];
+  STATE.students.forEach(function(n) {
+    const inf = STATE.studentInfo[n]||{};
+    rows.push([n, inf.firstName||'', inf.lastName||'', inf.grade||'', inf.iepDate||'', inf.email||'']);
+  });
+  downloadCSV('students.csv', rows);
+}
+
+function downloadCSV(filename, rows) {
+  const csv = rows.map(r => r.map(function(c){ const s=String(c); return s.includes(',')||s.includes('"')||s.includes('\n') ? '"'+s.replace(/"/g,'""')+'"' : s; }).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+  a.download = filename;
+  a.click();
+}
+
+/* ═══════════════════════════════════════════════
+   XLSX ENGINE — CRC32 & ZIP HELPERS
+═══════════════════════════════════════════════ */
+const CRC_TABLE = (function(){
+  const t = new Uint32Array(256);
+  for(let i=0;i<256;i++){
+    let c=i;
+    for(let j=0;j<8;j++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);
+    t[i]=c;
+  }
+  return t;
+})();
+
+function crc32(buf) {
+  let crc = 0xFFFFFFFF;
+  for(let i=0;i<buf.length;i++) crc = CRC_TABLE[(crc^buf[i])&0xFF]^(crc>>>8);
+  return (crc^0xFFFFFFFF)>>>0;
+}
+
+function strBytes(s) { return new TextEncoder().encode(s); }
+function u16le(n) { return [n&0xFF,(n>>8)&0xFF]; }
+function u32le(n) { return [n&0xFF,(n>>8)&0xFF,(n>>16)&0xFF,(n>>24)&0xFF]; }
+function concat(...arrs) {
+  const total = arrs.reduce((s,a)=>s+a.length,0);
+  const out = new Uint8Array(total);
+  let off=0;
+  for(const a of arrs){ out.set(a,off); off+=a.length; }
+  return out;
+}
+
+async function deflateRaw(data) {
+  const ds = new CompressionStream('deflate-raw');
+  const w = ds.writable.getWriter();
+  w.write(data); w.close();
+  const chunks = [];
+  const reader = ds.readable.getReader();
+  while(true) {
+    const {done,value} = await reader.read();
+    if(done) break;
+    chunks.push(value);
+  }
+  return concat(...chunks);
+}
+
+async function inflateRaw(data) {
+  const ds = new DecompressionStream('deflate-raw');
+  const w = ds.writable.getWriter();
+  w.write(data); w.close();
+  const chunks = [];
+  const reader = ds.readable.getReader();
+  while(true) {
+    const {done,value} = await reader.read();
+    if(done) break;
+    chunks.push(value);
+  }
+  return concat(...chunks);
+}
+
+async function zipWrite(files) {
+  // files: [{name, data (Uint8Array)}]
+  const entries = [];
+  let offset = 0;
+
+  for(const f of files) {
+    const nameBytes = strBytes(f.name);
+    const compressed = await deflateRaw(f.data);
+    const crc = crc32(f.data);
+    const localHeader = new Uint8Array([
+      0x50,0x4B,0x03,0x04, // sig
+      20,0,                 // version needed
+      0,0,                  // flags
+      8,0,                  // method: deflate
+      0,0,0,0,              // mod time/date
+      ...u32le(crc),
+      ...u32le(compressed.length),
+      ...u32le(f.data.length),
+      ...u16le(nameBytes.length),
+      0,0,                  // extra len
+      ...nameBytes,
+    ]);
+    entries.push({name:nameBytes, crc, compSize:compressed.length, origSize:f.data.length, offset, localHeader, compressed});
+    offset += localHeader.length + compressed.length;
+  }
+
+  const centralDir = entries.map(function(e) {
+    return new Uint8Array([
+      0x50,0x4B,0x01,0x02, // sig
+      20,0,20,0,           // versions
+      0,0,8,0,             // flags, method
+      0,0,0,0,             // time/date
+      ...u32le(e.crc),
+      ...u32le(e.compSize),
+      ...u32le(e.origSize),
+      ...u16le(e.name.length),
+      0,0,0,0,0,0,         // extra, comment, disk, attrs
+      ...u32le(0),
+      ...u32le(e.offset),
+      ...e.name,
+    ]);
+  });
+
+  const cdSize = centralDir.reduce((s,c)=>s+c.length,0);
+  const eocd = new Uint8Array([
+    0x50,0x4B,0x05,0x06,
+    0,0,0,0,
+    ...u16le(entries.length),
+    ...u16le(entries.length),
+    ...u32le(cdSize),
+    ...u32le(offset),
+    0,0,
+  ]);
+
+  return concat(...entries.map(e=>concat(e.localHeader,e.compressed)), ...centralDir, eocd);
+}
+
+/* ═══════════════════════════════════════════════
+   XLSX READER (BUG 6 FIX — permissive sheet regex)
+═══════════════════════════════════════════════ */
+async function readXLSXBytes(arrayBuffer) {
+  const bytes = new Uint8Array(arrayBuffer);
+  const zip = parseZip(bytes);
+  return zip;
+}
+
+function parseZip(bytes) {
+  const files = {};
+  let i = 0;
+  while(i < bytes.length - 4) {
+    if(bytes[i]===0x50&&bytes[i+1]===0x4B&&bytes[i+2]===0x03&&bytes[i+3]===0x04) {
+      const nameLen = bytes[i+26]|(bytes[i+27]<<8);
+      const extraLen = bytes[i+28]|(bytes[i+29]<<8);
+      const method = bytes[i+8]|(bytes[i+9]<<8);
+      const compSize = bytes[i+18]|(bytes[i+19]<<8)|(bytes[i+20]<<16)|(bytes[i+21]<<24);
+      const name = new TextDecoder().decode(bytes.slice(i+30,i+30+nameLen));
+      const dataStart = i+30+nameLen+extraLen;
+      files[name] = {method, data: bytes.slice(dataStart, dataStart+compSize)};
+      i = dataStart + compSize;
+    } else { i++; }
+  }
+  return files;
+}
+
+async function decompressZipEntry(entry) {
+  if(entry.method===0) return entry.data;
+  return inflateRaw(entry.data);
+}
+
+// BUG 6 FIX: regex handles both self-closing <sheet .../> and open/close <sheet ...></sheet>
+function parseWorkbookSheets(xml) {
+  const sheets = [];
+  const re = /<sheet[^>]*name="([^"]*)"[^>]*r:id="([^"]+)"[^>]*(?:\/>|>)/g;
+  let m;
+  while((m=re.exec(xml))!==null) sheets.push({name:m[1], rId:m[2]});
+  return sheets;
+}
+
+function parseRelationships(xml) {
+  const rels = {};
+  const re = /<Relationship[^>]*Id="([^"]*)"[^>]*Target="([^"]*)"[^>]*/g;
+  let m;
+  while((m=re.exec(xml))!==null) rels[m[1]] = m[2];
+  return rels;
+}
+
+function parseSharedStrings(xml) {
+  const strings = [];
+  const re = /<si>(?:<t[^>]*>([^<]*)<\/t>|.*?)<\/si>/gs;
+  let m;
+  while((m=re.exec(xml))!==null) strings.push(m[1]||'');
+  return strings;
+}
+
+function parseSheetCells(xml, sharedStrings) {
+  const rows = {};
+  const rowRe = /<row[^>]*r="(\d+)"[^>]*>([\s\S]*?)<\/row>/g;
+  const cellRe = /<c r="([A-Z]+)(\d+)"[^>]*(?:t="([^"]*)")?[^>]*>[\s\S]*?<v>([^<]*)<\/v>/g;
+  let rMatch;
+  while((rMatch=rowRe.exec(xml))!==null) {
+    const rowNum = parseInt(rMatch[1]);
+    const rowXml = rMatch[2];
+    const cells = {};
+    let cMatch;
+    while((cMatch=cellRe.exec(rowXml))!==null) {
+      const col = cMatch[1];
+      const t = cMatch[3];
+      let val = cMatch[4];
+      if(t==='s') val = sharedStrings[parseInt(val)] || '';
+      cells[col] = val;
+    }
+    rows[rowNum] = cells;
+  }
+  return rows;
+}
+
+function colIndex(col) {
+  let n=0;
+  for(let i=0;i<col.length;i++) n=n*26+(col.charCodeAt(i)-64);
+  return n-1;
+}
+
+async function parseStudentExcel(arrayBuffer) {
+  const zip = parseZip(new Uint8Array(arrayBuffer));
+  // Read workbook
+  const wbXml = new TextDecoder().decode(await decompressZipEntry(zip['xl/workbook.xml']));
+  const sheets = parseWorkbookSheets(wbXml);
+  const relsXml = new TextDecoder().decode(await decompressZipEntry(zip['xl/_rels/workbook.xml.rels']));
+  const rels = parseRelationships(relsXml);
+  const ssEntry = zip['xl/sharedStrings.xml'];
+  const sharedStrings = ssEntry ? parseSharedStrings(new TextDecoder().decode(await decompressZipEntry(ssEntry))) : [];
+
+  // Use first sheet
+  if(!sheets.length) throw new Error('No sheets found');
+  const target = rels[sheets[0].rId];
+  const sheetPath = 'xl/' + target.replace(/^\.\.\//,'');
+  const sheetXml = new TextDecoder().decode(await decompressZipEntry(zip[sheetPath]));
+  const rows = parseSheetCells(sheetXml, sharedStrings);
+
+  // Row 1 = headers
+  const headers = rows[1] ? Object.keys(rows[1]).sort((a,b)=>colIndex(a)-colIndex(b)).map(k=>rows[1][k]) : [];
+  const data = [];
+  const maxRow = Math.max(...Object.keys(rows).map(Number));
+  for(let r=2;r<=maxRow;r++) {
+    if(!rows[r]) continue;
+    const obj = {};
+    Object.keys(rows[r]).sort((a,b)=>colIndex(a)-colIndex(b)).forEach(function(col,i) {
+      if(headers[i]) obj[headers[i]] = rows[r][col];
+    });
+    data.push(obj);
+  }
+  return data;
+}
+
+function importStudentXLSX() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.xlsx';
+  inp.onchange = async function(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+    try {
+      const data = await parseStudentExcel(await file.arrayBuffer());
+      if(!data.length) { toast('No data rows found.','error'); return; }
+      let added=0, updated=0;
+      data.forEach(function(row) {
+        const name = (row['Name']||row['name']||'').trim();
+        if(!name) return;
+        if(!STATE.students.includes(name)) { STATE.students.push(name); added++; }
+        else { updated++; }
+        STATE.studentInfo[name] = Object.assign(STATE.studentInfo[name]||{},{
+          firstName: row['First']||row['FirstName']||'',
+          lastName:  row['Last']||row['LastName']||'',
+          grade:     row['Grade']||'',
+          iepDate:   row['IEP Date']||row['IEPDate']||'',
+          email:     row['Email']||row['ParentEmail']||'',
+        });
+      });
+      save('students'); save('studentInfo');
+      toast('Imported: '+added+' added, '+updated+' updated.');
+      renderContent();
+    } catch(err) {
+      toast('Import failed: '+err.message,'error');
+    }
+  };
+  inp.click();
+}
+
+/* PUBLIC DEMO: Excel writer removed. */
+</script>
+<script>
+/* ═══════════════════════════════════════════════
+   PUBLIC DEMO — saving, backups, exports, store and syncing are not included.
+═══════════════════════════════════════════════ */
+function demoOnly() { toast('That\u2019s part of the full version \u2014 get it at alchemistclassroom.com', 'error'); }
+function dfScheduleSave() {}
+function dfInitOnLoad() {}
+function renderFullVersionCard(title, items) {
+  return '<div class="section-header"><div class="section-title">' + title + '</div></div>' +
+    '<div class="card"><div style="font-size:14px;font-weight:700;color:#0d1f3c;margin-bottom:8px;">In the full version</div>' +
+    '<ul style="font-size:13px;color:#1e4d8c;line-height:1.8;padding-left:18px;margin-bottom:14px;">' + items.map(function(i){ return '<li>' + i + '</li>'; }).join('') + '</ul>' +
+    '<a class="btn btn-primary" href="https://alchemistclassroom.com/#behavior-system-pro" target="_blank" rel="noopener">Get the full version</a></div>';
+}
+function renderDataFile() {
+  return renderFullVersionCard('Data File', ['Everything auto-saves to a data file on your computer or your school\u2019s network drive.',
+    'Several staff computers can share one file \u2014 entries merge, so no one overwrites anyone.',
+    'Password-protected backups, and exports to Excel and CSV.']);
+}
+function renderSettings() {
+  return renderFullVersionCard('Settings', ['Your school name on every screen and report.', 'Your own default goals for every student.']);
+}
+function renderSetupGuide() {
+  return renderFullVersionCard('Setup Guide', ['Setup screens walk you through your school, staff logins, periods and goals.',
+    'Import your roster from a spreadsheet.', 'A Quick Start guide and an IT Setup Guide come with the download.']);
+}
+function downloadCSV() { demoOnly(); }
+function downloadXLSX() { demoOnly(); }
+function exportFullXLSX() { demoOnly(); }
+function exportFullBackup() { demoOnly(); }
+function exportDayCSV() { demoOnly(); }
+function exportStudentCSV() { demoOnly(); }
+function dfExportJson() { demoOnly(); }
+function dfImportJson() { demoOnly(); }
+
+/* ═══════════════════════════════════════════════
+   STORE — POS / CHECKOUT
+═══════════════════════════════════════════════ */
+function renderPOS() {
+  const students = STATE.students;
+  const sel = STATE.store.posStudent || (students[0]||'');
+  const cart = STATE.store.cart;
+  const status = STATE.store.status[sel];
+  const balance = balanceOf(sel);
+
+  let cartTotal = 0;
+  Object.values(cart).forEach(function(li){ cartTotal += li.price*li.qty; });
+
+  const cartItems = Object.values(cart).map(function(li) {
+    return '<div class="cart-item">' +
+      '<span>' + li.emoji + ' ' + esc(li.name) + ' x' + li.qty + '</span>' +
+      '<span style="font-weight:700;">' + (li.price*li.qty) + ' pts</span>' +
+      '<button class="btn btn-icon" onclick="removeFromCart(\'' + esc(li.id) + '\')">✕</button>' +
+    '</div>';
+  });
+
+  const activeItems = STATE.store.inventory.filter(i=>i.active && (i.stock===-1||i.stock>0));
+
+  const storeItemsHtml = activeItems.map(function(item) {
+    const inCart = cart[item.id];
+    return '<div class="store-item-card" style="cursor:pointer;" onclick="addToCart(\'' + esc(item.id) + '\')">' +
+      '<div class="store-item-emoji">' + item.emoji + '</div>' +
+      '<div class="store-item-name">' + esc(item.name) + '</div>' +
+      '<div class="store-item-price">' + item.price + ' pts</div>' +
+      '<div class="store-item-stock">' + (item.stock===-1?'∞':item.stock+' left') + '</div>' +
+      (inCart ? '<div class="badge badge-green" style="margin-top:6px;">In cart: '+inCart.qty+'</div>' : '') +
+    '</div>';
+  }).join('');
+
+  const paused = status === 'paused';
+
+  return '<div class="section-header">' +
+    '<div class="section-title">Checkout</div>' +
+  '</div>' +
+  '<div class="pos-layout">' +
+    '<div class="pos-items">' +
+      '<div class="form-row mb-12">' +
+        '<label style="font-size:12px;font-weight:700;color:#1e4d8c;">Student:</label>' +
+        '<select onchange="STATE.store.posStudent=this.value;STATE.store.cart={};renderContent()">' +
+          students.map(n=>'<option value="'+esc(n)+'"'+(n===sel?' selected':'')+'>'+esc(n)+'</option>').join('') +
+        '</select>' +
+        '<span class="badge '+(balance>=0?'badge-green':'badge-red')+'" style="font-size:13px;padding:5px 12px;">' + balance + ' pts available</span>' +
+        (paused ? '<span class="badge badge-gold">Store Paused</span>' : '') +
+      '</div>' +
+      (paused ? '<div class="iep-alert">⚠️ Store access is paused for this student.</div>' : '') +
+      '<div class="store-item-grid">' + storeItemsHtml + '</div>' +
+    '</div>' +
+    '<div class="cart-panel" style="min-width:220px;">' +
+      '<div style="font-size:13px;font-weight:800;color:#0d1f3c;margin-bottom:12px;">🛒 Cart</div>' +
+      (cartItems.length ? cartItems.join('') : '<div class="text-muted" style="text-align:center;padding:20px 0;">Cart is empty</div>') +
+      (cartTotal ? '<div style="border-top:2px solid #eef2f8;margin-top:10px;padding-top:10px;font-weight:800;font-size:14px;display:flex;justify-content:space-between;">' +
+        '<span>Total</span><span>' + cartTotal + ' pts</span></div>' : '') +
+      (Object.keys(cart).length ?
+        (cartTotal <= balance && !paused
+          ? '<button class="btn btn-gold" style="width:100%;margin-top:12px;" onclick="doCheckout()">Checkout →</button>'
+          : '<div class="text-muted" style="margin-top:10px;font-size:12px;text-align:center;">' +
+              (paused?'Store paused':'Not enough points') + '</div>') : '') +
+    '</div>' +
+  '</div>';
+}
+
+function addToCart(itemId) {
+  const item = STATE.store.inventory.find(i=>i.id===itemId);
+  if(!item) return;
+  const cart = STATE.store.cart;
+  if(cart[itemId]) { cart[itemId].qty++; }
+  else { cart[itemId] = {id:item.id, name:item.name, emoji:item.emoji, price:item.price, qty:1}; }
+  renderContent();
+}
+
+function removeFromCart(itemId) {
+  delete STATE.store.cart[itemId];
+  renderContent();
+}
+
+function doCheckout() {
+  const sel = STATE.store.posStudent;
+  const cart = STATE.store.cart;
+  if(!Object.keys(cart).length) return;
+  let total=0;
+  const items = Object.values(cart).map(function(li){ total+=li.price*li.qty; return {id:li.id,name:li.name,emoji:li.emoji,qty:li.qty,price:li.price}; });
+  // Deduct stock
+  items.forEach(function(li) {
+    const inv = STATE.store.inventory.find(i=>i.id===li.id);
+    if(inv && inv.stock!==-1) inv.stock -= li.qty;
+  });
+  const purchase = {
+    id: 'pur_'+Date.now(),
+    student: sel,
+    date: todayKey(),
+    items, total,
+    refunded: false,
+  };
+  STATE.store.purchases.push(purchase);
+  STATE.store.cart = {};
+  saveStore('inventory'); saveStore('purchases');
+  invalidateEarnedCache();
+  toast('Checkout complete! -'+total+' pts for '+sel+'.','ok');
+  renderContent();
+}
+
+/* ═══════════════════════════════════════════════
+   STORE — INVENTORY (BUG 8 FIX: import validation)
+═══════════════════════════════════════════════ */
+function renderInventory() {
+  const items = STATE.store.inventory;
+  const rows = items.map(function(item) {
+    return '<tr>' +
+      '<td style="font-size:20px;">' + item.emoji + '</td>' +
+      '<td style="font-weight:700;">' + esc(item.name) + '</td>' +
+      '<td>' + esc(item.category) + '</td>' +
+      '<td style="font-weight:700;">' + item.price + ' pts</td>' +
+      '<td>' + (item.stock===-1?'∞':item.stock) + '</td>' +
+      '<td><span class="badge '+(item.active?'badge-green':'badge-red')+'">'+(item.active?'Active':'Inactive')+'</span></td>' +
+      '<td>' +
+        '<button class="btn btn-secondary btn-sm" onclick="openEditItem(\'' + esc(item.id) + '\')">Edit</button> ' +
+        '<button class="btn btn-danger btn-sm" onclick="confirmRemoveItem(\'' + esc(item.id) + '\')">Remove</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  return '<div class="section-header">' +
+    '<div class="section-title">Inventory</div>' +
+    '<div style="display:flex;gap:8px;">' +
+      '<button class="btn btn-secondary btn-sm" onclick="exportStoreJson()">⬇ Export</button>' +
+      '<button class="btn btn-secondary btn-sm" onclick="importStoreJson()">⬆ Import</button>' +
+      '<button class="btn btn-primary" onclick="openAddItem()">+ Add Item</button>' +
+    '</div>' +
+  '</div>' +
+  '<div class="card" style="overflow-x:auto;">' +
+    '<table class="data-table">' +
+      '<thead><tr><th>Emoji</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>' +
+      '<tbody>' + (rows||'<tr><td colspan="7" style="text-align:center;color:#9ab0cc;">No items yet</td></tr>') + '</tbody>' +
+    '</table>' +
+  '</div>';
+}
+
+function openAddItem() {
+  openModal(
+    '<div class="modal-title">+ Add Store Item</div>' +
+    '<div class="modal-field"><label>Name</label><input type="text" id="it-name"/></div>' +
+    '<div class="modal-field"><label>Emoji</label><input type="text" id="it-emoji" placeholder="🎁" style="font-size:20px;width:80px;"/></div>' +
+    '<div class="modal-field"><label>Category</label><input type="text" id="it-cat" placeholder="Supplies, Fun, Privileges…"/></div>' +
+    '<div class="modal-field"><label>Price (points)</label><input type="number" id="it-price" min="1" value="5"/></div>' +
+    '<div class="modal-field"><label>Stock (-1 = unlimited)</label><input type="number" id="it-stock" value="-1"/></div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-primary" onclick="doAddItem()">Add</button>' +
+    '</div>'
+  );
+}
+
+function doAddItem() {
+  const name  = (document.getElementById('it-name').value||'').trim();
+  const emoji = (document.getElementById('it-emoji').value||'🎁').trim();
+  const cat   = (document.getElementById('it-cat').value||'General').trim();
+  const price = parseInt(document.getElementById('it-price').value)||5;
+  const stock = parseInt(document.getElementById('it-stock').value);
+  if(!name) { toast('Name required.','error'); return; }
+  const id = 'itm_'+Date.now();
+  STATE.store.inventory.push({id, name, emoji, category:cat, price, stock:isNaN(stock)?-1:stock, active:true});
+  saveStore('inventory');
+  closeModal();
+  toast('Item added.');
+  renderContent();
+}
+
+function openEditItem(id) {
+  const item = STATE.store.inventory.find(i=>i.id===id);
+  if(!item) return;
+  openModal(
+    '<div class="modal-title">Edit: ' + esc(item.name) + '</div>' +
+    '<div class="modal-field"><label>Name</label><input type="text" id="it-name" value="'+esc(item.name)+'"/></div>' +
+    '<div class="modal-field"><label>Emoji</label><input type="text" id="it-emoji" value="'+esc(item.emoji)+'" style="font-size:20px;width:80px;"/></div>' +
+    '<div class="modal-field"><label>Category</label><input type="text" id="it-cat" value="'+esc(item.category)+'"/></div>' +
+    '<div class="modal-field"><label>Price (points)</label><input type="number" id="it-price" value="'+item.price+'"/></div>' +
+    '<div class="modal-field"><label>Stock (-1 = unlimited)</label><input type="number" id="it-stock" value="'+item.stock+'"/></div>' +
+    '<div class="modal-field"><label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="it-active"'+(item.active?' checked':'')+'/> Active (visible in store)</label></div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-primary" onclick="doEditItem(\''+esc(id)+'\')">Save</button>' +
+    '</div>'
+  );
+}
+
+function doEditItem(id) {
+  const item = STATE.store.inventory.find(i=>i.id===id);
+  if(!item) return;
+  item.name     = (document.getElementById('it-name').value||'').trim() || item.name;
+  item.emoji    = (document.getElementById('it-emoji').value||'🎁').trim();
+  item.category = (document.getElementById('it-cat').value||'General').trim();
+  item.price    = parseInt(document.getElementById('it-price').value)||item.price;
+  item.stock    = parseInt(document.getElementById('it-stock').value);
+  if(isNaN(item.stock)) item.stock=-1;
+  item.active   = document.getElementById('it-active').checked;
+  saveStore('inventory');
+  closeModal();
+  toast('Item updated.');
+  renderContent();
+}
+
+function confirmRemoveItem(id) {
+  const item = STATE.store.inventory.find(i=>i.id===id);
+  if(!item) return;
+  openModal(
+    '<div class="modal-title">Remove Item?</div>' +
+    '<div style="margin-bottom:16px;">Remove <strong>'+esc(item.name)+'</strong>? Cannot be undone.</div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-danger" onclick="doRemoveItem(\''+esc(id)+'\')">Remove</button>' +
+    '</div>'
+  );
+}
+
+function doRemoveItem(id) {
+  STATE.store.inventory = STATE.store.inventory.filter(i=>i.id!==id);
+  saveStore('inventory');
+  closeModal(); toast('Item removed.'); renderContent();
+}
+
+// BUG 8 FIX: validate schema before replacing state
+function importStoreJson() {
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='.json';
+  inp.onchange = function(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+    const r = new FileReader();
+    r.onload = function() {
+      try {
+        const j = JSON.parse(r.result);
+        let changed = false;
+        if(j.inventory !== undefined) {
+          if(!Array.isArray(j.inventory)) { toast('Invalid: inventory must be an array.','error'); return; }
+          STATE.store.inventory = j.inventory;
+          saveStore('inventory'); changed=true;
+        }
+        if(j.purchases !== undefined) {
+          if(!Array.isArray(j.purchases)) { toast('Invalid: purchases must be an array.','error'); return; }
+          STATE.store.purchases = j.purchases;
+          saveStore('purchases'); changed=true;
+        }
+        if(j.config && typeof j.config==='object') {
+          Object.assign(STATE.store.config, j.config);
+          saveStore('config'); changed=true;
+        }
+        if(!changed) { toast('Nothing to import.','error'); return; }
+        invalidateEarnedCache();
+        toast('Store data imported.');
+        renderContent();
+      } catch(err) { toast('Import failed: '+err.message,'error'); }
+    };
+    r.readAsText(file);
+  };
+  inp.click();
+}
+
+function exportStoreJson() {
+  const obj = {inventory:STATE.store.inventory, purchases:STATE.store.purchases, config:STATE.store.config};
+  const blob = new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='store-data.json'; a.click();
+}
+
+/* ═══════════════════════════════════════════════
+   STORE — BALANCES
+═══════════════════════════════════════════════ */
+function renderBalances() {
+  const students = STATE.students;
+  const rows = students.map(function(name) {
+    const earned = earnedPoints(name);
+    const spent  = spentPoints(name);
+    const bal    = Math.max(0, earned - spent);
+    const status = STATE.store.status[name];
+    return '<tr>' +
+      '<td style="font-weight:700;">' + esc(name) + '</td>' +
+      '<td style="text-align:right;">' + earned + '</td>' +
+      '<td style="text-align:right;">' + spent + '</td>' +
+      '<td style="text-align:right;font-weight:800;color:' + (bal>0?'#1a5c3a':'#9ab0cc') + ';">' + bal + '</td>' +
+      '<td><span class="badge '+(status==='paused'?'badge-gold':'badge-green')+'">'+(status==='paused'?'Paused':'Active')+'</span></td>' +
+      '<td>' +
+        '<button class="btn btn-secondary btn-sm" onclick="openAdjust(\''+esc(name)+'\')" style="margin-right:4px;">± Adjust</button>' +
+        '<button class="btn btn-secondary btn-sm" onclick="toggleStorePause(\''+esc(name)+'\')">' +
+          (status==='paused'?'Unpause':'Pause') +
+        '</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  return '<div class="section-header"><div class="section-title">Balances</div></div>' +
+    '<div class="card" style="overflow-x:auto;">' +
+      '<table class="data-table">' +
+        '<thead><tr><th>Student</th><th style="text-align:right;">Earned</th><th style="text-align:right;">Spent</th><th style="text-align:right;">Balance</th><th>Status</th><th>Actions</th></tr></thead>' +
+        '<tbody>'+rows+'</tbody>' +
+      '</table>' +
+    '</div>';
+}
+
+function toggleStorePause(name) {
+  if(!STATE.store.status) STATE.store.status = {};
+  STATE.store.status[name] = STATE.store.status[name]==='paused' ? 'active' : 'paused';
+  saveStore('status');
+  renderContent();
+}
+
+/* ═══════════════════════════════════════════════
+   STORE — PURCHASES (BUG 9 FIX: refund toast)
+═══════════════════════════════════════════════ */
+function renderPurchasesView() {
+  const purchases = [...STATE.store.purchases].reverse();
+  const rows = purchases.map(function(p) {
+    const items = p.items.map(function(li){ return li.emoji+' '+li.name+(li.qty>1?' x'+li.qty:''); }).join(', ');
+    return '<tr>' +
+      '<td>' + fmtDate(p.date) + '</td>' +
+      '<td style="font-weight:700;">' + esc(p.student) + '</td>' +
+      '<td>' + esc(items) + '</td>' +
+      '<td style="font-weight:700;">' + p.total + ' pts</td>' +
+      '<td>' + (p.refunded ? '<span class="badge badge-red">Refunded</span>' : '<span class="badge badge-green">Completed</span>') + '</td>' +
+      '<td>' + (!p.refunded ? '<button class="btn btn-secondary btn-sm" onclick="confirmRefund(\''+esc(p.id)+'\')">Refund</button>' : '') + '</td>' +
+    '</tr>';
+  }).join('');
+
+  return '<div class="section-header"><div class="section-title">Purchases</div></div>' +
+    '<div class="card" style="overflow-x:auto;">' +
+      '<table class="data-table">' +
+        '<thead><tr><th>Date</th><th>Student</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>' +
+        '<tbody>' + (rows||'<tr><td colspan="6" style="text-align:center;color:#9ab0cc;">No purchases yet</td></tr>') + '</tbody>' +
+      '</table>' +
+    '</div>';
+}
+
+// BUG 9 FIX: toast warning when refunded item missing from inventory
+function confirmRefund(id) {
+  const p = STATE.store.purchases.find(x=>x.id===id);
+  if(!p||p.refunded) return;
+  openModal(
+    '<div class="modal-title">Confirm Refund</div>' +
+    '<div style="margin-bottom:16px;font-size:14px;">Refund purchase for <strong>'+esc(p.student)+'</strong>? (+'+p.total+' pts restored)</div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn btn-danger" onclick="doRefund(\''+esc(id)+'\')">Refund</button>' +
+    '</div>'
+  );
+}
+
+function doRefund(id) {
+  const p = STATE.store.purchases.find(x=>x.id===id);
+  if(!p||p.refunded) return;
+  const missing = [];
+  p.items.forEach(function(li) {
+    const it = STATE.store.inventory.find(x=>x.id===li.id);
+    if(it && it.stock!==-1) { it.stock += li.qty; }
+    else if(!it) { missing.push(li.name); }
+  });
+  p.refunded = true;
+  saveStore('inventory'); saveStore('purchases');
+  invalidateEarnedCache();
+  closeModal();
+  if(missing.length) {
+    toast('Refunded — note: '+missing.join(', ')+' no longer in inventory (stock not restored).', 'error');
+  } else {
+    toast('Purchase refunded. Points restored.');
+  }
+  renderContent();
+}
+
+/* PUBLIC DEMO: Excel Sync, weekly email and kiosk removed (the Store stays). */
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   PWA — installable single-file app
+   Generates icons + manifest at runtime (no extra
+   files). Served over http(s)/localhost so the
+   browser offers "Install". Login is unchanged.
+═══════════════════════════════════════════════ */
+function pwaDrawIcon(size) {
+  var c = document.createElement("canvas");
+  c.width = c.height = size;
+  var x = c.getContext("2d");
+  var s = size / 40; // logo designed on a 40-unit grid
+  // rounded-square background so maskable icons look right
+  x.fillStyle = "#1a3a6b";
+  x.fillRect(0, 0, size, size);
+  // gold ring
+  x.strokeStyle = "#d4a017";
+  x.lineWidth = 2 * s;
+  x.beginPath();
+  x.arc(20 * s, 20 * s, 15 * s, 0, Math.PI * 2);
+  x.stroke();
+  // gold checkmark
+  x.strokeStyle = "#d4a017";
+  x.lineWidth = 3.2 * s;
+  x.lineCap = "round";
+  x.lineJoin = "round";
+  x.beginPath();
+  x.moveTo(12 * s, 20 * s);
+  x.lineTo(18 * s, 26 * s);
+  x.lineTo(29 * s, 14 * s);
+  x.stroke();
+  return c.toDataURL("image/png");
+}
+function pwaInit() {
+  try {
+    var icon192 = pwaDrawIcon(192);
+    var icon512 = pwaDrawIcon(512);
+    // apple touch icon (iOS home-screen)
+    var apple = document.createElement("link");
+    apple.rel = "apple-touch-icon";
+    apple.href = icon192;
+    document.head.appendChild(apple);
+    // favicon
+    var fav = document.createElement("link");
+    fav.rel = "icon";
+    fav.href = icon192;
+    document.head.appendChild(fav);
+    // manifest built at runtime so start_url/scope are correct absolute URLs
+    var base = location.href.substring(0, location.href.lastIndexOf("/") + 1);
+    var manifest = {
+      name: "Behavior System Pro",
+      short_name: "Behavior Pro",
+      description: "IEP Behavior Tracker & Reward Store",
+      start_url: location.href.split("#")[0].split("?")[0],
+      scope: base,
+      display: "standalone",
+      orientation: "any",
+      background_color: "#0d1f3c",
+      theme_color: "#1a3a6b",
+      icons: [
+        { src: icon192, sizes: "192x192", type: "image/png", purpose: "any" },
+        { src: icon512, sizes: "512x512", type: "image/png", purpose: "any" },
+        { src: icon512, sizes: "512x512", type: "image/png", purpose: "maskable" }
+      ]
+    };
+    var blob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
+    var mlink = document.createElement("link");
+    mlink.rel = "manifest";
+    mlink.href = URL.createObjectURL(blob);
+    document.head.appendChild(mlink);
+  } catch (e) { /* PWA metadata is best-effort */ }
+
+  // Register the service worker (sw.js, alongside this file) for offline app-shell caching.
+  // Only runs on a secure context; silently skipped on file:// or plain http.
+  // Backend-safe: sw.js caches only the app shell and never intercepts API/data requests.
+  if ('serviceWorker' in navigator &&
+      (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+    try { navigator.serviceWorker.register('sw.js'); } catch (e) {}
+  }
+
+  // Install button — appears only when the browser says the app is installable
+  var deferredPrompt = null;
+  var btn = document.createElement("button");
+  btn.id = "pwa-install-btn";
+  btn.textContent = "⬇ Install App";
+  btn.style.cssText = "position:fixed;bottom:16px;right:16px;z-index:9999;display:none;" +
+    "background:#d4a017;color:#0d1f3c;font-weight:800;font-size:13px;border:none;" +
+    "border-radius:10px;padding:11px 16px;box-shadow:0 6px 18px rgba(0,0,0,.3);cursor:pointer;";
+  btn.onclick = function () {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.finally(function () {
+      deferredPrompt = null;
+      btn.style.display = "none";
+    });
+  };
+  document.body.appendChild(btn);
+
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    btn.style.display = "block";
+  });
+  window.addEventListener("appinstalled", function () {
+    btn.style.display = "none";
+    if (typeof toast === "function") toast("App installed.");
+  });
+}
+
+/* PUBLIC DEMO: store import/export files are part of the full version */
+function exportStoreJson() { demoOnly(); }
+function importStoreJson() { demoOnly(); }
+
+(function init() {
+  STATE.weekStart = getMondayOfWeek(todayKey());
+  buildPeriods();
+  restoreSession();
+  normalizeAssignments();
+  startDemo();                      // open straight into the demo
+})();
+</script>
+</body>
+</html>

@@ -195,15 +195,17 @@ var APPS = [
     name: "Behavior System Pro",
     price: "$29",
     icon: "images/app-behavior.png",
-    short: "Daily behavior points by period, with goals and reports for your whole team.",
-    description: "Score each student's goals for every class period, see who is on track this week, and print reports in seconds. Built for special education teams, with separate logins for admins, case managers and staff.",
+    short: "Daily behavior points by period, goals, reports and a reward store for your whole team.",
+    description: "Score each student's goals for every class period, see who is on track this week, and print reports in seconds. Students earn points they can spend in a built-in reward store. Built for special education teams, with separate logins for admins, case managers and staff.",
     features: [
       ["Points by period", "Score each student's goals for every class period, including Home Base. You set the periods and the goals."],
       ["Reports that write themselves", "Class summary, weekly report, and a tabulate view that totals a student's week. Print them or export to CSV and Excel."],
       ["Built for teams", "Separate logins for admins, case managers and staff. Each person sees only the students assigned to them."],
+      ["Reward store", "Students earn a point for every goal they meet. Set up prizes with prices and stock, check out purchases, and track balances and refunds."],
       ["Quick setup", "Import your roster from a spreadsheet, and roll everything over at the end of the year."],
       ["Works offline", "One file that opens in Chrome or Edge. No accounts, no subscription, no internet needed."]
     ],
+    demoUrl: "demos/behavior-system-pro/",   // free demo: made-up class, nothing saved
     install: true,                    // shows the "one computer / district server" options
     screens: [                        // screenshots shown in the app window (sample students only)
       ["images/bsp-1-entry.jpg", "Data entry: tap 0, ½ or 1 for each goal, every period."],
