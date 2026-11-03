@@ -34,7 +34,7 @@
   function app(id) { for (var i = 0; i < APPS.length; i++) if (APPS[i].id === id) return APPS[i]; }
   function appsIn(id) {
     var sec = section(id);
-    return APPS.filter(function (a) { return a.section === id || (sec && sec.subjects && a.subjects && a.subjects.length); });
+    return APPS.filter(function (a) { return a.section === id || (a.alsoIn || []).indexOf(id) > -1 || (sec && sec.subjects && a.subjects && a.subjects.length); });
   }
   function appsInSubject(subId) { return APPS.filter(function (a) { return (a.subjects || []).indexOf(subId) > -1; }); }
   var SUBJECT_ICONS = {

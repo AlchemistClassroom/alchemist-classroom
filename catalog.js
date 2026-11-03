@@ -7,6 +7,7 @@
    ADD A NEW SECTION:  copy a section block in SECTIONS and give it a new id.
                        It appears as a new glowing node on the index screen.
    "Coming soon" sections: set soon: true — they show as dim placeholder nodes.
+   SHOW AN APP IN MORE THAN ONE SECTION: add  alsoIn: ["sel-behavior"]  to the app.
    SUBJECT FOLDERS: Curriculum Tools has subject folders. To put an app in one, add
                     subjects: ["math"]   (or "english", "science", "social-studies", "reading")
                     to the app. It still shows in its own section too.
@@ -59,6 +60,14 @@ var SECTIONS = [
       { id: "social-studies", name: "Social Studies" },
       { id: "reading",        name: "Reading" }
     ]
+  },
+  {
+    id: "sel-behavior",
+    name: "SEL & Behavior",
+    short: "Social-emotional learning and behavior support tools.",
+    blurb: "Tools for teaching social-emotional skills and supporting student behavior \u2014 from quick classroom activities to complete point-and-reward systems.",
+    emblem: "images/section-sel.png",
+    color: "#F472B6"
   }
 ];
 
@@ -117,6 +126,7 @@ var APPS = [
   {
     id: "sel-activity-pack",
     section: "in-class-apps",
+    alsoIn: ["sel-behavior"],
     name: "SEL Activity Pack",
     price: "$5",
     icon: "images/app-sel-pack.png",
@@ -220,6 +230,7 @@ var APPS = [
   {
     id: "behavior-system-pro",
     section: "pro-apps",
+    alsoIn: ["sel-behavior"],
     name: "Behavior System Pro",
     price: "$29",
     icon: "images/app-behavior.png",
