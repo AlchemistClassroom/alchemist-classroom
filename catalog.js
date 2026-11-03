@@ -115,6 +115,31 @@ var APPS = [
     buyUrl: ""
   },
   {
+    id: "sentence-probe",
+    section: "in-class-apps",
+    name: "Sentence Probe",
+    price: "$5",
+    icon: "images/app-sentence-probe.png",
+    short: "A one-sentence writing probe: students find and fix their own errors, and you get CWS and error data.",
+    description: "Students write one sentence and see only how many errors it has. They get one chance to find and fix them, then see exactly what was still wrong, color-coded by type. You get a report with both tries, every error, and written-expression scores (TWW, WSC, CWS, CIWS), scored automatically and offline.",
+    features: [
+      ["Self-editing practice", "Students see the error count, not the answers, so they have to find each mistake themselves."],
+      ["Clear results", "Fixed, still there and new errors, color-coded for capitalization, spelling, grammar and punctuation."],
+      ["Progress-monitoring scores", "Total words written, words spelled correctly, correct and incorrect word sequences, CIWS and percent CWS for both tries."],
+      ["The student's own writing", "Pasting and Chromebook autocorrect are blocked, and read-aloud is built in."],
+      ["A report for you", "Students type your email once and send their report with Gmail, Outlook or their email app."]
+    ],
+    demoUrl: "demos/sentence-probe/",
+    screens: [
+      ["images/sentence-3.jpg", "Results: what was fixed, what's still there, and why."],
+      ["images/sentence-2.jpg", "Fix round: students see how many errors, then find them."],
+      ["images/sentence-1.jpg", "Write one sentence. Autocorrect and pasting are blocked."]
+    ],
+    includes: ["Sentence Probe app file (one offline file)", "Quick Start guide", "Free updates to version 1"],
+    requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grades 3\u201312 writing and special education.",
+    buyUrl: ""
+  },
+  {
     id: "microscope-simulator",
     section: "in-class-apps",
     name: "Microscope Simulator",
