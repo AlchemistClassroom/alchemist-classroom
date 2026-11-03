@@ -7,6 +7,9 @@
    ADD A NEW SECTION:  copy a section block in SECTIONS and give it a new id.
                        It appears as a new glowing node on the index screen.
    "Coming soon" sections: set soon: true — they show as dim placeholder nodes.
+   SUBJECT FOLDERS: Curriculum Tools has subject folders. To put an app in one, add
+                    subjects: ["math"]   (or "english", "science", "social-studies", "reading")
+                    to the app. It still shows in its own section too.
    Art: put the image file in /images with the file name used below.
    Screenshots: list them in an app's "screens" — they show in a small app window.
    ========================================================================= */
@@ -42,13 +45,28 @@ var SECTIONS = [
     emblem: "images/section-free.png",
     color: "#F5B942"
   },
-  { id: "soon-2", name: "Coming soon", short: "A new section is on its way.", emblem: "images/section-soon.png", soon: true }
+  {
+    id: "curriculum-tools",
+    name: "Curriculum Tools",
+    short: "Tools for teaching your core subjects, sorted into subject folders.",
+    blurb: "Pick a subject to see its tools. An app can live in a subject folder and in another section at the same time.",
+    emblem: "images/section-curriculum.png",
+    color: "#60A5FA",
+    subjects: [                       // folders inside this section; tag apps with  subjects: ["science"]
+      { id: "math",           name: "Math" },
+      { id: "english",        name: "English" },
+      { id: "science",        name: "Science" },
+      { id: "social-studies", name: "Social Studies" },
+      { id: "reading",        name: "Reading" }
+    ]
+  }
 ];
 
 var APPS = [
   {
     id: "cell-lab",
     section: "in-class-apps",
+    subjects: ["science"],
     name: "Cell Lab",
     price: "$4",
     icon: "images/app-cell-lab.png",
@@ -74,6 +92,7 @@ var APPS = [
   {
     id: "lab-builder",
     section: "in-class-apps",
+    subjects: ["science"],
     name: "Lab Builder + 3 Solo Labs",
     price: "$10",
     icon: "images/app-lab-builder.png",
@@ -124,6 +143,7 @@ var APPS = [
   {
     id: "sentence-probe",
     section: "in-class-apps",
+    subjects: ["english"],
     name: "Sentence Probe",
     price: "$5",
     icon: "images/app-sentence-probe.png",
@@ -149,6 +169,7 @@ var APPS = [
   {
     id: "microscope-simulator",
     section: "in-class-apps",
+    subjects: ["science"],
     name: "Microscope Simulator",
     price: "$4",
     icon: "images/app-microscope.png",

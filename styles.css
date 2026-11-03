@@ -215,3 +215,16 @@ p{margin:0 0 1em;max-width:var(--measure)}
 /* demo button on app pages */
 .btn-demo{display:flex;margin-top:.6rem;background:transparent;border:1px solid rgba(45,212,191,.55);color:#2DD4BF}
 .btn-demo:hover{background:rgba(45,212,191,.12)}
+
+/* subject folders (Curriculum Tools) */
+.folders{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1rem}
+.folder{position:relative;display:flex;flex-direction:column;gap:.35rem;padding:1.6rem 1.3rem 1.3rem;border-radius:4px 18px 18px 18px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line);text-decoration:none;color:var(--text);transition:transform .2s,box-shadow .2s}
+.folder::before{content:"";position:absolute;top:-10px;left:0;width:42%;height:12px;border-radius:8px 8px 0 0;background:var(--panel);box-shadow:inset 1px 1px 0 var(--line),inset -1px 0 0 var(--line)}
+.folder:hover,.folder:focus-visible{color:var(--text);transform:translateY(-2px);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 60%,transparent),0 14px 34px rgba(0,0,0,.35)}
+.folder-icon svg{width:44px;height:44px}
+.folder-name{font-family:var(--display);font-weight:600;font-size:1.2rem}
+.folder-count{color:var(--muted);font-size:.9rem}
+.subj-emblem{display:grid;place-items:center;width:120px;height:120px;border-radius:28px;background:var(--panel);box-shadow:0 0 0 1px var(--line),0 0 40px color-mix(in srgb,var(--c) 30%,transparent)}
+.subj-emblem svg{width:64px;height:64px}
+.folders{margin-top:.5rem}
+.demo-tag{align-self:flex-start;font-size:.8rem;font-weight:700;color:var(--teal);background:rgba(45,212,191,.12);border-radius:999px;padding:.2rem .65rem}

@@ -32,7 +32,21 @@
   /* ---- data helpers ---- */
   function section(id) { for (var i = 0; i < SECTIONS.length; i++) if (SECTIONS[i].id === id) return SECTIONS[i]; }
   function app(id) { for (var i = 0; i < APPS.length; i++) if (APPS[i].id === id) return APPS[i]; }
-  function appsIn(id) { return APPS.filter(function (a) { return a.section === id; }); }
+  function appsIn(id) {
+    var sec = section(id);
+    return APPS.filter(function (a) { return a.section === id || (sec && sec.subjects && a.subjects && a.subjects.length); });
+  }
+  function appsInSubject(subId) { return APPS.filter(function (a) { return (a.subjects || []).indexOf(subId) > -1; }); }
+  var SUBJECT_ICONS = {
+    "math": '<path d="M12 20h24M24 12v16M14 36h20M24 33v.01M24 41v.01" stroke-linecap="round"/>',
+    "english": '<path d="M14 36l10-24 10 24M18 27h12" stroke-linecap="round" stroke-linejoin="round"/>',
+    "science": '<path d="M20 10h8M21 10v10l-8 16a3 3 0 0 0 3 4h16a3 3 0 0 0 3-4l-8-16V10" stroke-linejoin="round"/><path d="M16 31h16"/>',
+    "social-studies": '<circle cx="24" cy="24" r="13"/><path d="M11 24h26M24 11c4 4 6 8.5 6 13s-2 9-6 13c-4-4-6-8.5-6-13s2-9 6-13z"/>',
+    "reading": '<path d="M24 15c-4-3-9-3-13-2v22c4-1 9-1 13 2 4-3 9-3 13-2V13c-4-1-9-1-13 2zM24 15v22" stroke-linejoin="round"/>'
+  };
+  function subjectIcon(id, color) {
+    return '<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="' + color + '" stroke-width="2.6">' + (SUBJECT_ICONS[id] || '<rect x="12" y="12" width="24" height="24" rx="4"/>') + '</svg>';
+  }
   function buyLink(a) {
     if (a.buyUrl) return { href: a.buyUrl, text: "Buy " + a.name + " — " + a.price, live: true };
     return { href: "mailto:" + STORE.supportEmail + "?subject=" + encodeURIComponent("Email me when " + a.name + " is available"), text: "Email me when it's available", live: false };
@@ -59,7 +73,30 @@
   function crumbs(parts) {
     return '<p class="crumbs"><a href="#index">Home</a>' + parts.map(function (p) { return " / " + (p[1] ? '<a href="#' + p[1] + '">' + esc(p[0]) + "</a>" : esc(p[0])); }).join("") + "</p>";
   }
+  function folderGrid(s) {
+    return '<div class="folders">' + s.subjects.map(function (sub) {
+      var n = appsInSubject(sub.id).length;
+      return '<a class="folder" href="#' + s.id + '--' + sub.id + '"><span class="folder-icon">' + subjectIcon(sub.id, s.color) + '</span>' +
+        '<span class="folder-name">' + esc(sub.name) + '</span><span class="folder-count">' + (n ? n + (n === 1 ? ' tool' : ' tools') : 'Coming soon') + '</span></a>';
+    }).join('') + '</div>';
+  }
+  function subjectPage(s, sub) {
+    var list = appsInSubject(sub.id);
+    return '<div class="wrap page" style="--c:' + s.color + '">' + crumbs([[s.name, s.id], [sub.name]]) +
+      '<div class="sec-head"><span class="emblem subj-emblem">' + subjectIcon(sub.id, s.color) + '</span><div><h1>' + esc(sub.name) + '</h1><p>' + esc(sub.name) + ' tools from The Alchemist Classroom.</p></div></div>' +
+      (list.length ? '<div class="grid">' + list.map(function (a) { return appCard(a, s.color); }).join('') + '</div>'
+                   : '<div class="empty">' + esc(sub.name) + ' tools are on the way. Check back soon!</div>') + '</div>';
+  }
+  function appCard(a, color) {
+    return '<a class="card" href="#' + a.id + '"><span class="icon">' + slot("", a.icon, "flask", color) + "</span><h3>" + esc(a.name) + "</h3><p>" + esc(a.short) +
+      '</p>' + (a.demoUrl ? '<span class="demo-tag">Free demo</span>' : '') + '<span class="meta"><span class="price">' + esc(a.price) + '</span><span class="go">See details</span></span></a>';
+  }
   function sectionPage(s) {
+    if (s.subjects) {
+      return '<div class="wrap page" style="--c:' + s.color + '">' + crumbs([[s.name]]) +
+        '<div class="sec-head"><span class="emblem">' + slot("", s.emblem, "flask", s.color) + "</span><div><h1>" + esc(s.name) + "</h1><p>" + esc(s.blurb || s.short) + "</p></div></div>" +
+        folderGrid(s) + "</div>";
+    }
     var list = appsIn(s.id);
     return '<div class="wrap page" style="--c:' + s.color + '">' + crumbs([[s.name]]) +
       '<div class="sec-head"><span class="emblem">' + slot("", s.emblem, "flask", s.color) + "</span><div><h1>" + esc(s.name) + "</h1><p>" + esc(s.blurb || s.short) + "</p></div></div>" +
@@ -121,6 +158,17 @@
   /* ---- router: #index, #<section-id>, #<app-id>, #about ---- */
   function route() {
     var id = (location.hash || "#index").slice(1), home = $("#view-home"), page = $("#view-page"), s = section(id), a = app(id);
+    var subParts = id.split("--"), subSec = subParts.length === 2 ? section(subParts[0]) : null;
+    var sub = subSec && subSec.subjects ? subSec.subjects.filter(function (x) { return x.id === subParts[1]; })[0] : null;
+    if (sub) {
+      page.innerHTML = subjectPage(subSec, sub);
+      home.hidden = true; page.hidden = false; fillAll(page);
+      var cs = document.querySelector('#bar-nav a[href="#' + subSec.id + '"]'); if (cs) cs.setAttribute("aria-current", "page");
+      document.title = sub.name + " \u2014 " + subSec.name + " \u2014 The Alchemist Classroom";
+      window.scrollTo(0, 0);
+      var h1 = page.querySelector("h1"); if (h1) { h1.tabIndex = -1; h1.focus({ preventScroll: true }); }
+      return;
+    }
     var links = document.querySelectorAll("#bar-nav a");
     for (var i = 0; i < links.length; i++) links[i].removeAttribute("aria-current");
     if (s && !s.soon || a) {
