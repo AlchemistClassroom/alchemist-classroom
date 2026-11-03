@@ -46,7 +46,8 @@
   SECTIONS.forEach(function (s, i) {
     var ang = (-90 + (360 / n) * i) * Math.PI / 180, r = 38;
     var x = 50 + r * Math.cos(ang), y = 50 + r * Math.sin(ang);
-    var count = s.soon ? "" : appsIn(s.id).length + (appsIn(s.id).length === 1 ? " app" : " apps");
+    var nApps = appsIn(s.id).length;
+    var count = s.soon ? "" : (nApps ? nApps + (nApps === 1 ? " app" : " apps") : "Coming soon");
     html += '<li class="node' + (s.soon ? " soon" : "") + '" style="left:' + x.toFixed(2) + "%;top:" + y.toFixed(2) + "%;--c:" + (s.color || "#94A3B8") + '">' +
       (s.soon ? '<a aria-disabled="true" tabindex="-1">' : '<a href="#' + s.id + '">') +
       '<span class="tile">' + slot("", s.emblem, s.soon ? "plus" : "flask", s.color) + "</span>" +
@@ -65,7 +66,7 @@
       (list.length ? '<div class="grid">' + list.map(function (a) {
         return '<a class="card" href="#' + a.id + '"><span class="icon">' + slot("", a.icon, "flask", s.color) + "</span><h3>" + esc(a.name) + "</h3><p>" + esc(a.short) +
           '</p><span class="meta"><span class="price">' + esc(a.price) + '</span><span class="go">See details</span></span></a>';
-      }).join("") + "</div>" : '<div class="empty">New apps for this section are on the way.</div>') + "</div>";
+      }).join("") + "</div>" : '<div class="empty">' + (s.id === 'free-tools' ? 'The first free tools are on the way. Check back soon!' : 'New apps for this section are on the way.') + '</div>') + "</div>";
   }
   function appPage(a) {
     var s = section(a.section) || {}, b = buyLink(a);

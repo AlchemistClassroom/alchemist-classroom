@@ -34,7 +34,14 @@ var SECTIONS = [
     emblem: "images/section-pro.png",
     color: "#8B5CF6"
   },
-  { id: "soon-1", name: "Coming soon", short: "A new section is on its way.", emblem: "images/section-soon.png", soon: true },
+  {
+    id: "free-tools",
+    name: "Free Tools",
+    short: "Free classroom tools to download and use right away.",
+    blurb: "Small, useful tools for any classroom, free to download. Like everything here, they run offline and keep your students' information on your own computer.",
+    emblem: "images/section-free.png",
+    color: "#F5B942"
+  },
   { id: "soon-2", name: "Coming soon", short: "A new section is on its way.", emblem: "images/section-soon.png", soon: true }
 ];
 
