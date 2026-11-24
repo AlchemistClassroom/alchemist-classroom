@@ -96,7 +96,7 @@ var APPS = [
     ],
     includes: ["Cell Lab app file (one offline file)", "Quick Start guide", "Free updates to version 1"],
     requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grade 7, NGSS MS-LS1-2.",
-    buyUrl: ""
+    buyUrl: "https://payhip.com/b/KnMmy"
   },
   {
     id: "lab-builder",
@@ -121,7 +121,7 @@ var APPS = [
     ],
     includes: ["Lab Builder (one offline file)", "3 ready-made student labs", "Quick Start guide", "Free updates to version 1"],
     requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grade 6 science labs; build your own for any grade.",
-    buyUrl: ""
+    buyUrl: "https://payhip.com/b/DW6Uu"
   },
   {
     id: "sel-activity-pack",
@@ -148,7 +148,7 @@ var APPS = [
     ],
     includes: ["4 activity files (each one offline file)", "Quick Start guide", "Free updates to version 1"],
     requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grades 6\u20138.",
-    buyUrl: ""
+    buyUrl: "https://payhip.com/b/Imnoh"
   },
   {
     id: "sentence-probe",
@@ -200,7 +200,7 @@ var APPS = [
     ],
     includes: ["Microscope Lab app file (one offline file)", "Quick Start guide", "Free updates to version 1"],
     requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grades 6\u20138 life science.",
-    buyUrl: ""
+    buyUrl: "https://payhip.com/b/yWu2q"
   },
   {
     id: "essay-reviewer",
@@ -225,7 +225,7 @@ var APPS = [
     ],
     includes: ["Essay Reviewer app file (one offline file)", "Quick Start guide", "Free updates to version 1"],
     requirements: "Windows, Mac or Chromebook with Chrome or Edge. Works offline. Reads .docx and .pdf essays.",
-    buyUrl: ""
+    buyUrl: "https://payhip.com/b/Mmu6z"
   },
   {
     id: "behavior-system-pro",
@@ -253,6 +253,6 @@ var APPS = [
     ],
     includes: ["Behavior System Pro app file", "Quick Start guide", "IT Setup Guide", "Sample roster", "Free updates to version 1"],
     requirements: "Windows, Mac or Chromebook with Chrome or Edge. Runs on one computer or from a shared network drive.",
-    buyUrl: ""
+    buyUrl: "https://payhip.com/b/g6jOH"
   }
 ];
