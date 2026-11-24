@@ -203,6 +203,30 @@ var APPS = [
     buyUrl: "https://payhip.com/b/yWu2q"
   },
   {
+    id: "science-bundle",
+    section: "in-class-apps",
+    subjects: ["science"],
+    name: "Science Bundle",
+    price: "$14",
+    short: "Cell Lab, Microscope Simulator and Lab Builder + 3 Solo Labs together, $18 if bought separately.",
+    description: "Three offline science apps for middle school. Students learn the microscope, explore and build cells, and run full labs on their own with a scripted lab group. Each app sends you a report, and each works without internet.",
+    features: [
+      ["Microscope Simulator", "Light, focus and three powers on a compound microscope, with a guided onion lab, 14 slides and a parts quiz."],
+      ["Cell Lab", "Explore, build and compare plant and animal cells, then take a quick check."],
+      ["Lab Builder + 3 Solo Labs", "Three ready-made labs students run with a scripted lab group, plus a builder to make your own."],
+      ["A report for you", "Every app sends you the student's work through Gmail or Outlook."],
+      ["Save $4", "All three for $14 instead of $18 bought separately."]
+    ],
+    screens: [
+      ["images/micro-1.jpg", "Microscope Simulator: cheek cells in focus at 400×."],
+      ["images/cell-2.jpg", "Cell Lab: drag each part onto the plant or animal cell."],
+      ["images/labs-1.jpg", "A solo lab: teammates talk the student through it."]
+    ],
+    includes: ["Cell Lab app file", "Microscope Lab app file", "Lab Builder + 3 ready-made student labs", "Quick Start guide for each app", "Free updates to version 1"],
+    requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grades 6–8 science.",
+    buyUrl: "https://payhip.com/b/PkUWc"
+  },
+  {
     id: "essay-reviewer",
     section: "pro-apps",
     name: "Essay Reviewer",
