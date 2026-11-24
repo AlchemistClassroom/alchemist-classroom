@@ -247,7 +247,7 @@ var APPS = [
       ["images/cb-2.jpg", "Make a character: name, pronouns and more, step by step."],
       ["images/cb-3.jpg", "A story page, with read-aloud and text size at the top."]
     ],
-    includes: ["Character Books app file with all 10 books", "Read Me First note", "Free updates to version 1"],
+    includes: ["Character Books app file with all 10 books", "Quick Start guide", "Read Me First note", "Free updates to version 1"],
     requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grade 6 and up.",
     buyUrl: "https://payhip.com/b/0j34s"
   },
