@@ -26,7 +26,7 @@ var SECTIONS = [
     id: "in-class-apps",
     name: "In-Class Apps",
     short: "Quick, low-cost tools to use with students during a lesson.",
-    blurb: "Small apps you open in class and use right away with your students. Download once, use all year, no internet needed.",
+    blurb: "Small apps you open in class and use right away with your students. Download once, use all year, no internet needed. If an app emails you a report, sending it needs a connection.",
     emblem: "images/section-inclass.png",
     color: "#2DD4BF"
   },
@@ -225,6 +225,31 @@ var APPS = [
     includes: ["Cell Lab app file", "Microscope Lab app file", "Lab Builder + 3 ready-made student labs", "Quick Start guide for each app", "Free updates to version 1"],
     requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grades 6–8 science.",
     buyUrl: "https://payhip.com/b/PkUWc"
+  },
+  {
+    id: "character-books",
+    section: "in-class-apps",
+    subjects: ["reading", "english"],
+    name: "Character Books",
+    price: "$30",
+    short: "Choose-your-own-adventure books where each student's character carries into the next book. First book of every series is free to try.",
+    description: "Ten choose-your-own-adventure books in four series: sci-fi, sports, fantasy and animal adventure. Students make a character, and every choice changes who that character becomes. At the end of a book they get a character code, so the same character can start the next book with everything they gained and lost. Try the first book of every series free in the demo; the full version adds the other six books.",
+    features: [
+      ["Four series", "The Ember Frontier (sci-fi), Under the Lights (football), Oathbound (fantasy) and Wildborn (animal adventure)."],
+      ["Characters that carry on", "Each finished book gives a character code. Students enter it to carry their character into the next book."],
+      ["Reading support", "Read-aloud, bigger or smaller text, and a high-contrast mode on every page."],
+      ["No accounts", "No sign-ins and no student data sent anywhere. Characters are saved in the student's own browser."],
+      ["Free to try", "The demo plays the first book of every series. The full version adds the other six books."]
+    ],
+    demoUrl: "demos/character-books/",
+    screens: [
+      ["images/cb-1.jpg", "The library: pick a series to read."],
+      ["images/cb-2.jpg", "Make a character: name, pronouns and more, step by step."],
+      ["images/cb-3.jpg", "A story page, with read-aloud and text size at the top."]
+    ],
+    includes: ["Character Books app file with all 10 books", "Read Me First note", "Free updates to version 1"],
+    requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grade 6 and up.",
+    buyUrl: "https://payhip.com/b/0j34s"
   },
   {
     id: "essay-reviewer",
