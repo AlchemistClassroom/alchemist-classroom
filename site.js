@@ -48,6 +48,7 @@
     return '<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="' + color + '" stroke-width="2.6">' + (SUBJECT_ICONS[id] || '<rect x="12" y="12" width="24" height="24" rx="4"/>') + '</svg>';
   }
   function buyLink(a) {
+    if (a.buyUrl && a.price === "Free") return { href: a.buyUrl, text: "Get it free", live: true };
     if (a.buyUrl) return { href: a.buyUrl, text: "Buy " + a.name + " — " + a.price, live: true };
     return { href: "mailto:" + STORE.supportEmail + "?subject=" + encodeURIComponent("Email me when " + a.name + " is available"), text: "Email me when it's available", live: false };
   }

@@ -227,6 +227,29 @@ var APPS = [
     buyUrl: "https://payhip.com/b/PkUWc"
   },
   {
+    id: "character-books-starter",
+    section: "free-tools",
+    subjects: ["reading", "english"],
+    name: "Character Books Starter",
+    price: "Free",
+    short: "The first book of all four Character Books series, free to keep. Works offline.",
+    description: "Four choose-your-own-adventure books, one from each Character Books series: sci-fi, sports, fantasy and animal adventure. Students make a character, and every choice changes who that character becomes. It's free to keep and use at your school. Enter your email at checkout to get the download, and we'll send you news when new apps come out.",
+    features: [
+      ["Four first books", "The Ember Frontier, Under the Lights, Oathbound and Wildborn."],
+      ["Reading support", "Read-aloud, bigger or smaller text, and a high-contrast mode on every page."],
+      ["No accounts", "No sign-ins and no student data sent anywhere."],
+      ["Works offline", "One file that opens in Chrome or Edge, with no internet needed."]
+    ],
+    screens: [
+      ["images/cb-1.jpg", "The library: pick a series to read."],
+      ["images/cb-2.jpg", "Make a character: name, pronouns and more, step by step."],
+      ["images/cb-3.jpg", "A story page, with read-aloud and text size at the top."]
+    ],
+    includes: ["Character Books Starter app file with 4 books", "Read Me First note", "License (free for use at your school)"],
+    requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grade 6 and up.",
+    buyUrl: "" /* PAYHIP LINK GOES HERE once the free product exists */
+  },
+  {
     id: "character-books",
     section: "in-class-apps",
     subjects: ["reading", "english"],
