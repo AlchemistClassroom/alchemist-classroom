@@ -114,11 +114,11 @@
       '<div class="opt"><h3>On a district server</h3><ol><li>Put the folder on a shared network drive (IT Setup Guide included).</li><li>Each staff member opens it from there and logs in.</li><li>Everyone shares one data file. Entries merge, so no one overwrites anyone.</li></ol><p class="note">Needs a real network drive, not a OneDrive or SharePoint sync folder.</p></div></div>' : "";
     return '<div class="wrap page" style="--c:' + (s.color || "#2DD4BF") + '">' + crumbs([[s.name, s.id], [a.name]]) +
       '<div class="app"><aside class="buybox"><span class="icon">' + slot("", a.icon, "flask", s.color, a.name + " app icon") + '</span>' +
-      '<div class="price">' + esc(a.price) + "<small>one-time purchase</small></div>" +
+      '<div class="price">' + esc(a.price) + "<small>" + (a.price === "Free" ? "free to keep" : "one-time purchase") + "</small></div>" +
       '<a class="btn btn-glow" href="' + esc(b.href) + '">' + esc(b.text) + "</a>" +
       (a.demoUrl ? '<a class="btn btn-demo" href="' + esc(a.demoUrl) + '" target="_blank" rel="noopener">Try the free demo</a>' : "") +
       (b.live ? "" : '<p class="soon">The store opens soon. This button asks to be emailed when it does.</p>') +
-      '<p class="soon">Download link and instructions arrive by email right after you buy.</p></aside>' +
+      '<p class="soon">' + (a.price === "Free" ? "Enter your email at checkout and the download starts right away." : "Download link and instructions arrive by email right after you buy.") + '</p></aside>' +
       '<div class="app-body"><h1>' + esc(a.name) + '</h1><p class="lead">' + esc(a.description || a.short) + "</p>" + windowHTML(a) + feats + install +
       "<h2>What you get</h2><ul class=\"ticks\">" + (a.includes || []).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>" +
       "<h2>Works on</h2><p>" + esc(a.requirements) + "</p>" +
