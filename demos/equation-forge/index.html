@@ -372,37 +372,7 @@ function hintFor(e){
 function tooBig(e){for(const k of ['L','R'])for(const f of [e[k].x,e[k].c])if(Math.abs(f.n)>100000||f.d>5000)return true;return false}
 
 /* ---------- Custom equation parser (teach mode) ---------- */
-function parseSide(str){
-  let s=str.replace(/\s+/g,'').replace(/[−–]/g,'-').replace(/[·*]/g,'').toLowerCase();
-  if(!s)throw new Error('empty');
-  if(!/^[+-]/.test(s))s='+'+s;
-  const terms=s.match(/[+-][^+-]+/g);
-  if(!terms||terms.join('')!==s)throw new Error('bad');
-  let x=new F(0),c=new F(0),cFirst=null;
-  for(const t of terms){
-    const neg=t[0]==='-';const b=t.slice(1);let m,coef;
-    if(b.includes('x')){
-      if(b==='x')coef=new F(1);
-      else if((m=b.match(/^x\/(\d+)$/))){if(+m[1]===0)throw new Error('bad');coef=new F(1,+m[1])}
-      else if((m=b.match(/^\(?(\d+(?:\.\d+)?(?:\/\d+)?)\)?x$/))){coef=parseNum(m[1]);if(!coef)throw new Error('bad')}
-      else throw new Error('bad');
-      x=x.add(neg?coef.neg():coef);if(cFirst===null)cFirst=false;
-    }else{const v=parseNum(b);if(!v)throw new Error('bad');c=c.add(neg?v.neg():v);if(cFirst===null)cFirst=true}
-  }
-  return {x,c,cFirst:!!cFirst};
-}
-function parseEquation(str){
-  const parts=str.split('=');
-  if(parts.length!==2)return {err:'Use one equals sign, like 3x + 4 = 19.'};
-  let L,R;
-  try{L=parseSide(parts[0]);R=parseSide(parts[1])}catch(e){return {err:'The forge couldn’t read that. Type it like 3x + 4 = 19, x/2 − 5 = 1, or 5x + 2 = 3x + 10.'}}
-  if(L.x.isZero()&&R.x.isZero())return {err:'There’s no x in that equation.'};
-  if(L.x.eq(R.x))return {err:'That equation doesn’t have exactly one answer. Try another.'};
-  const e={L,R,mode:str.includes('.')?'dec':'frac'};
-  if(tooBig(e))return {err:'Those numbers are too big for the forge.'};
-  return {eq:e};
-}
-
+function parseEquation(){return {err:'Typing your own equations is in the full version.'}}
 /* ---------- Problem generator ---------- */
 const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -416,45 +386,6 @@ function gen(rank,neg){
     else if(f===1){const b=ri(1,12);e={L:S(1,-a),R:S(0,b),mode:'frac'}}
     else{const x=ri(1,15);e={L:S(1,a,true),R:S(0,x+a),mode:'frac'}}
     maybeSwap(e,.2);
-  }else if(rank===1){
-    if(Math.random()<.6){const a=ri(2,10),x=ri(1,12);e={L:S(a,0),R:S(0,a*x),mode:'frac'}}
-    else{const a=ri(2,6),b=ri(1,10);e={L:S(new F(1,a),0),R:S(0,b),mode:'frac'}}
-    maybeSwap(e,.2);
-  }else if(rank===2){
-    const f=ri(0,2);
-    if(f===0){const a=ri(2,9),x=ri(1,10),b=ri(1,15);e={L:S(a,b,Math.random()<.25),R:S(0,a*x+b),mode:'frac'}}
-    else if(f===1){const a=ri(2,9),b=ri(1,15);let x=ri(1,10);while(a*x-b<1)x++;e={L:S(a,-b),R:S(0,a*x-b),mode:'frac'}}
-    else{const a=ri(2,5),x=a*ri(1,6),b=ri(1,10);e={L:S(new F(1,a),b),R:S(0,x/a+b),mode:'frac'}}
-    maybeSwap(e,.2);
-  }else if(rank===3){
-    const kinds=neg?['neg','neg','frac','dec']:['frac','dec'];
-    const k=pick(kinds);
-    if(k==='neg'){const a=pick([-9,-8,-7,-6,-5,-4,-3,-2,-1,2,3,4,5,6,7,8,9]);const x=nz(-10,10),b=nz(-15,15);e={L:S(a,b),R:S(0,a*x+b),mode:'frac'}}
-    else if(k==='frac'){
-      const q=ri(2,5);let p;do{p=ri(1,q+3)}while(gcd(p,q)!==1||p===q);
-      const co=new F(p,q),x=q*(neg&&Math.random()<.3?-ri(1,4):ri(1,4));
-      const b=neg&&Math.random()<.3?-ri(1,10):ri(1,10);
-      e={L:{x:co,c:new F(b),cFirst:false},R:{x:new F(0),c:co.mul(x).add(b),cFirst:false},mode:'frac'};
-    }else{
-      const co=parseNum(pick(['0.5','1.5','2.5','0.2','0.4','1.2','0.25','0.75']));
-      let x=ri(2,12);if(co.d===4)x=4*ri(1,4);
-      if(neg&&Math.random()<.3)x=-x;
-      const b=parseNum(pick(['0.5','1','1.5','2','2.5','3','4.5','6']));
-      e={L:{x:co,c:b,cFirst:false},R:{x:new F(0),c:co.mul(x).add(b),cFirst:false},mode:'dec'};
-    }
-    maybeSwap(e,.2);
-  }else{
-    let a,c,x,b,d,tries=0;
-    do{
-      a=ri(2,9);c=ri(1,9);if(a===c)continue;
-      if(neg&&Math.random()<.3)c=-ri(1,5);
-      x=neg?nz(-10,10):ri(1,10);
-      b=neg?ri(-12,15):ri(0,15);
-      d=(a-c)*x+b;
-      tries++;
-    }while((a===c||(!neg&&d<0)||Math.abs(d)>99)&&tries<200);
-    e={L:S(a,b),R:S(c,d),mode:'frac'};
-    if(Math.random()<.5){const t=e.L;e.L=e.R;e.R=t}
   }
   return e;
 }
