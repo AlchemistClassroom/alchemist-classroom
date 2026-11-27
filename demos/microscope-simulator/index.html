@@ -195,7 +195,7 @@ input[type=range]{flex:1;min-width:60px;accent-color:var(--accent)}
 .modal svg{width:100%;max-height:150px;margin:8px 0}
 </style>
 </head>
-<body><div style="background:#2DD4BF;color:#06241f;text-align:center;padding:8px 14px;font:14px system-ui,sans-serif" role="note"><b>Demo</b> · Everything works. Nothing is saved or sent. <a style="color:#06241f;font-weight:800" href="../../#microscope-simulator" target="_top">Get the full version →</a></div>
+<body><div style="background:#2DD4BF;color:#06241f;text-align:center;padding:8px 14px;font:14px system-ui,sans-serif" role="note"><b>Demo</b> · 2 slides and 3 challenges to try. Nothing is saved or sent. <a style="color:#06241f;font-weight:800" href="../../#microscope-simulator" target="_top">Get the full version →</a></div>
 
 <header class="top">
   <div class="brand">&#x1f52c; Microscope Lab <small style="opacity:.6">v1.4</small> <small id="who"></small></div>
@@ -598,94 +598,19 @@ const THREAD_INFO = [
   {name:'Blue', c:['#1f5fae', '#6597da', '#123c72'], ang:-0.78, off:-0.07},
   {name:'Yellow', c:['#d1a116', '#f3cf55', '#97700a'], ang:1.47, off:0.02}
 ];
-function getThreads(){
-  if(CACHE.threads) return CACHE.threads;
-  const R = mulberry32(S.seed ^ 0x7777); const zs = [1.15, 0, -1.15];
-  for(let i = 2; i > 0; i--){ const j = Math.floor(R()*(i + 1)); [zs[i], zs[j]] = [zs[j], zs[i]]; }
-  const fuzz = THREAD_INFO.map(() => { const f = []; for(let i = 0; i < 70; i++) f.push([(R() - .5)*9, R() < .5 ? -1 : 1, R()*0.12 + 0.03, (R() - .5)*1.2]); return f; });
-  const top = zs.indexOf(Math.max(...zs));
-  return CACHE.threads = {zs, fuzz, top};
-}
-function drawThread(ctx, v, i){
-  const T = THREAD_INFO[i], F = getThreads().fuzz[i], w = 0.24;
-  const dx = Math.cos(T.ang), dy = Math.sin(T.ang), nx = -dy, ny = dx;
-  const ox = nx*T.off, oy = ny*T.off;
-  const tc = (v.cx - ox)*dx + (v.cy - oy)*dy;
-  const t0 = clamp(tc - v.r*1.3, -4.6, 4.6), t1 = clamp(tc + v.r*1.3, -4.6, 4.6); if(t1 <= t0) return;
-  const P = (t, s) => [ox + dx*t + nx*s, oy + dy*t + ny*s];
-  ctx.beginPath(); let p = P(t0, -w/2); ctx.moveTo(...p); p = P(t1, -w/2); ctx.lineTo(...p); p = P(t1, w/2); ctx.lineTo(...p); p = P(t0, w/2); ctx.lineTo(...p); ctx.closePath();
-  ctx.fillStyle = T.c[0]; ctx.globalAlpha = .9; ctx.fill(); ctx.globalAlpha = 1;
-  if(v.ppm > 40){
-    const step = Math.max((t1 - t0)/220, 0.0015), pitch = 0.32;
-    for(let f = 0; f < 10; f++){
-      const ph = f/10*TAU; ctx.beginPath(); let pen = false;
-      for(let t = t0; t <= t1; t += step){ const a = TAU*t/pitch + ph; const front = Math.cos(a) > 0; const q = P(t, (w/2)*0.92*Math.sin(a)); if(front){ pen ? ctx.lineTo(...q) : ctx.moveTo(...q); pen = true; } else pen = false; }
-      ctx.strokeStyle = f % 2 ? T.c[1] : T.c[2]; ctx.globalAlpha = .6; ctx.lineWidth = Math.max(w/12, lw(v, 1)); ctx.stroke(); ctx.globalAlpha = 1;
-    }
-  }
-  ctx.strokeStyle = T.c[2]; ctx.lineWidth = Math.max(lw(v, 0.8), 0.005); ctx.globalAlpha = .7; ctx.beginPath();
-  for(const [t, side, len, bend] of F){ if(t < t0 || t > t1) continue; const a = P(t, side*w/2), b = P(t + bend*len, side*(w/2 + len)); ctx.moveTo(...a); ctx.quadraticCurveTo((a[0] + b[0])/2 + nx*0.01, (a[1] + b[1])/2 + ny*0.01, ...b); }
-  ctx.stroke(); ctx.globalAlpha = 1;
-}
+function getThreads(){ throw new Error("Not in the demo"); }
+function drawThread(){ throw new Error("Not in the demo"); }
 
 /* ----- cheek cells ----- */
-function getCheek(){
-  if(CACHE.cheek) return CACHE.cheek;
-  const R = mulberry32(S.seed ^ 0x0C4E); const cells = [], bact = [];
-  const centers = [[0, 0], [0.55, 0.3], [-0.5, 0.35], [0.15, -0.55], [-0.3, -0.25]];
-  for(const [cx, cy] of centers){ const n = 7 + Math.floor(R()*8); for(let i = 0; i < n; i++){
-    const x = cx + (R() - .5)*0.42, y = cy + (R() - .5)*0.36, r = 0.028 + R()*0.014, rot = R()*TAU; const pts = [];
-    for(let k = 0; k < 10; k++){ const a = k/10*TAU + rot, kk = 1 + (R() - .5)*0.42; pts.push([x + Math.cos(a)*r*kk, y + Math.sin(a)*r*kk*0.92]); }
-    cells.push({x, y, r, pts, nx:x + (R() - .5)*r*0.5, ny:y + (R() - .5)*r*0.5, nr:0.0042 + R()*0.0016, fold:R() < .35 ? [R()*TAU, 0.4 + R()*0.4] : null});
-  } }
-  for(let i = 0; i < 420; i++){ const c = cells[Math.floor(R()*cells.length)]; const a = R()*TAU, d = c.r*(0.4 + R()*1.4); bact.push([c.x + Math.cos(a)*d, c.y + Math.sin(a)*d, 0.0007 + R()*0.0005]); }
-  return CACHE.cheek = {cells, bact};
-}
-function drawCheek(ctx, v){
-  const C = getCheek(), st = S.stain.cheek;
-  const fill = st ? 'rgba(112,142,210,.32)' : 'rgba(205,205,195,.22)', edge = st ? 'rgba(40,72,155,.6)' : 'rgba(150,150,138,.4)', nuc = st ? 'rgba(28,40,125,.88)' : 'rgba(140,140,128,.35)';
-  ctx.lineJoin = 'round';
-  for(const c of C.cells){
-    if(Math.hypot(c.x - v.cx, c.y - v.cy) > v.r + c.r*1.5) continue;
-    ctx.beginPath(); const p = c.pts; ctx.moveTo((p[0][0] + p[1][0])/2, (p[0][1] + p[1][1])/2);
-    for(let k = 1; k <= p.length; k++){ const a = p[k % p.length], b = p[(k + 1) % p.length]; ctx.quadraticCurveTo(a[0], a[1], (a[0] + b[0])/2, (a[1] + b[1])/2); }
-    ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); ctx.strokeStyle = edge; ctx.lineWidth = Math.max(lw(v, 1), 0.0012); ctx.stroke();
-    if(c.fold && v.ppm > 150){ const [a, k] = c.fold; ctx.beginPath(); ctx.moveTo(c.x + Math.cos(a)*c.r*0.9, c.y + Math.sin(a)*c.r*0.9); ctx.quadraticCurveTo(c.x, c.y, c.x + Math.cos(a + 2.4*k)*c.r*0.9, c.y + Math.sin(a + 2.4*k)*c.r*0.9); ctx.strokeStyle = edge; ctx.globalAlpha = .6; ctx.stroke(); ctx.globalAlpha = 1; }
-    if(v.ppm > 35){ ctx.beginPath(); ctx.ellipse(c.nx, c.ny, c.nr*1.15, c.nr, 0.3, 0, TAU); ctx.fillStyle = nuc; ctx.fill(); }
-  }
-  if(v.ppm > 220){ ctx.fillStyle = st ? 'rgba(25,40,120,.7)' : 'rgba(120,120,110,.4)'; ctx.beginPath(); for(const [x, y, r] of C.bact){ if(Math.abs(x - v.cx) > v.r || Math.abs(y - v.cy) > v.r) continue; ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, TAU); } ctx.fill(); }
-}
+function getCheek(){ throw new Error("Not in the demo"); }
+function drawCheek(){ throw new Error("Not in the demo"); }
 
 /* ----- cork ----- */
-function getCork(){
-  if(CACHE.cork) return CACHE.cork;
-  const R = mulberry32(S.seed ^ 0xC0C0);
-  const outline = blobOutline(R, 2.5, 1.8, 48);
-  const rows = buildSheet(R, {x0:-2.9, x1:2.9, y0:-2.2, y1:2.2, hMin:0.026, hMax:0.038, wMin:0.028, wMax:0.046, nMin:0, nMax:0, tilt:0.012});
-  return CACHE.cork = {outline, rows};
-}
-function drawCork(ctx, v){
-  const K = getCork();
-  ctx.save(); tracePoly(ctx, K.outline); ctx.fillStyle = '#ead6ad'; ctx.fill(); ctx.clip();
-  drawSheet(ctx, v, K.rows, {tints:v.ppm > 200 ? ['#efe0c0', '#e9d6b0', '#f2e6cc'] : null, nuc:null, wall:'rgba(112,66,28,.9)', wallMid:'rgba(190,140,80,.6)', wallW:0.0035, wob:0.003});
-  ctx.restore();
-  tracePoly(ctx, K.outline); ctx.lineWidth = Math.max(lw(v, 2), 0.02); ctx.strokeStyle = 'rgba(100,60,25,.7)'; ctx.stroke();
-}
+function getCork(){ throw new Error("Not in the demo"); }
+function drawCork(){ throw new Error("Not in the demo"); }
 
 /* ----- pond water ----- */
-function getPond(){
-  if(CACHE.pond) return CACHE.pond;
-  const R = mulberry32(S.seed ^ 0x9090); const orgs = [], fil = [], deb = [];
-  const add = (type, n, f) => { for(let i = 0; i < n; i++){ const a = R()*TAU, d = Math.sqrt(R())*1.5; orgs.push(Object.assign({type, x:Math.cos(a)*d, y:Math.sin(a)*d, h:R()*TAU, ph:R()*10, turn:0}, f())); } };
-  add('para', 6, () => ({len:0.19 + R()*0.05, sp:0.09 + R()*0.05}));
-  add('eug', 10, () => ({len:0.055 + R()*0.02, sp:0.025 + R()*0.02, green:true}));
-  add('amoeba', 3, () => ({len:0.16 + R()*0.06, sp:0.004}));
-  add('volvox', 3, () => ({len:0.36 + R()*0.1, sp:0.012, green:true}));
-  add('diatom', 12, () => ({len:0.05 + R()*0.035, sp:0.006}));
-  for(let i = 0; i < 3; i++) fil.push({x:(R() - .5)*2, y:(R() - .5)*2, a:R()*TAU, len:1.2 + R()*0.8, w:0.034, green:true});
-  for(let i = 0; i < 160; i++) deb.push([(R() - .5)*5, (R() - .5)*5, 0.004 + R()*0.03, R()]);
-  return CACHE.pond = {orgs, fil, deb};
-}
+function getPond(){ throw new Error("Not in the demo"); }
 function updatePond(dt){
   const P = getPond();
   for(const o of P.orgs){
@@ -697,55 +622,7 @@ function updatePond(dt){
     o.x += Math.cos(o.h)*o.sp*dt; o.y += Math.sin(o.h)*o.sp*dt;
   }
 }
-function drawPond(ctx, v){
-  const P = getPond();
-  ctx.beginPath(); ctx.arc(0, 0, 3, 0, TAU); ctx.fillStyle = 'rgba(210,228,200,.35)'; ctx.fill();
-  ctx.beginPath(); ctx.arc(0, 0, 3, 0, TAU); ctx.lineWidth = Math.max(lw(v, 3), 0.02); ctx.strokeStyle = 'rgba(120,140,120,.4)'; ctx.stroke();
-  const near = (x, y, r) => Math.abs(x - v.cx) < v.r + r && Math.abs(y - v.cy) < v.r + r;
-  ctx.fillStyle = 'rgba(120,95,60,.45)'; ctx.beginPath(); for(const [x, y, r, s] of P.deb){ if(!near(x, y, r)) continue; ctx.moveTo(x + r, y); ctx.ellipse(x, y, r, r*(0.5 + s*0.5), s*3, 0, TAU); } ctx.fill();
-  for(const f of P.fil){
-    if(!near(f.x, f.y, f.len)) continue;
-    ctx.save(); ctx.translate(f.x, f.y); ctx.rotate(f.a);
-    ctx.fillStyle = 'rgba(190,220,170,.5)'; ctx.fillRect(-f.len/2, -f.w/2, f.len, f.w);
-    ctx.strokeStyle = 'rgba(70,120,50,.6)'; ctx.lineWidth = Math.max(lw(v, 1), 0.0015); ctx.strokeRect(-f.len/2, -f.w/2, f.len, f.w);
-    ctx.beginPath(); for(let x = -f.len/2; x < f.len/2; x += 0.11){ ctx.moveTo(x, -f.w/2); ctx.lineTo(x, f.w/2); } ctx.stroke();
-    if(v.ppm > 60){ ctx.beginPath(); for(let x = -f.len/2, i = 0; x <= f.len/2; x += 0.003, i++){ const y = Math.sin(x*TAU/0.045)*f.w*0.38; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.strokeStyle = 'rgba(45,130,35,.85)'; ctx.lineWidth = f.w*0.22; ctx.stroke(); }
-    ctx.restore();
-  }
-  for(const o of P.orgs){
-    if(!near(o.x, o.y, o.len)) continue;
-    ctx.save(); ctx.translate(o.x, o.y); ctx.rotate(o.h); const L = o.len;
-    if(o.type === 'para'){
-      ctx.beginPath(); ctx.moveTo(L/2, 0); ctx.bezierCurveTo(L/2, -L*0.2, -L*0.4, -L*0.2, -L/2, -L*0.02); ctx.bezierCurveTo(-L*0.45, L*0.2, L*0.05, L*0.12, L*0.1, L*0.07); ctx.bezierCurveTo(L*0.2, L*0.17, L/2, L*0.16, L/2, 0);
-      ctx.fillStyle = 'rgba(216,208,170,.6)'; ctx.fill(); ctx.strokeStyle = 'rgba(100,90,55,.8)'; ctx.lineWidth = Math.max(lw(v, 1), L*0.012); ctx.stroke();
-      ctx.beginPath(); ctx.ellipse(-L*0.05, 0, L*0.12, L*0.06, 0, 0, TAU); ctx.fillStyle = 'rgba(150,135,95,.55)'; ctx.fill();
-      ctx.beginPath(); ctx.arc(L*0.3, -L*0.04, L*0.035, 0, TAU); ctx.arc(-L*0.32, -L*0.02, L*0.035, 0, TAU); ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.fill();
-      if(v.ppm > 250){ ctx.beginPath(); for(let i = 0; i < 46; i++){ const a = i/46*TAU; const ex = Math.cos(a)*L*0.5, ey = Math.sin(a)*L*0.18; const k = 1.08 + 0.04*Math.sin(o.ph*20 + i); ctx.moveTo(ex, ey); ctx.lineTo(ex*k, ey*k*1.15); } ctx.strokeStyle = 'rgba(100,90,55,.5)'; ctx.lineWidth = lw(v, .7); ctx.stroke(); }
-    } else if(o.type === 'eug'){
-      ctx.beginPath(); ctx.moveTo(L/2, 0); ctx.quadraticCurveTo(0, -L*0.2, -L/2, 0); ctx.quadraticCurveTo(0, L*0.2, L/2, 0);
-      ctx.fillStyle = 'rgba(70,145,50,.82)'; ctx.fill(); ctx.strokeStyle = 'rgba(30,90,25,.8)'; ctx.lineWidth = Math.max(lw(v, .8), L*0.01); ctx.stroke();
-      if(v.ppm > 200){ ctx.fillStyle = 'rgba(30,110,25,.9)'; for(let i = 0; i < 8; i++){ ctx.beginPath(); ctx.arc(-L*0.35 + i*L*0.09, ((i % 2) - .5)*L*0.06, L*0.025, 0, TAU); ctx.fill(); }
-        ctx.beginPath(); ctx.moveTo(L/2, 0); for(let s = 0; s <= 1; s += 0.05) ctx.lineTo(L/2 + s*L*0.8, Math.sin(s*9 + o.ph*12)*L*0.06); ctx.strokeStyle = 'rgba(40,80,30,.6)'; ctx.lineWidth = lw(v, .8); ctx.stroke(); }
-      ctx.beginPath(); ctx.arc(L*0.36, -L*0.02, L*0.03, 0, TAU); ctx.fillStyle = '#d22'; ctx.fill();
-    } else if(o.type === 'amoeba'){
-      const r = L/2; ctx.beginPath();
-      for(let i = 0; i <= 16; i++){ const a = i/16*TAU; const k = 1 + 0.28*Math.sin(3*a + o.ph*0.4) + 0.18*Math.sin(5*a - o.ph*0.25); const x = Math.cos(a)*r*k, y = Math.sin(a)*r*k*0.8; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
-      ctx.closePath(); ctx.fillStyle = 'rgba(206,200,186,.5)'; ctx.fill(); ctx.strokeStyle = 'rgba(115,110,95,.65)'; ctx.lineWidth = Math.max(lw(v, 1), 0.0015); ctx.stroke();
-      ctx.beginPath(); ctx.arc(r*0.1, 0, r*0.16, 0, TAU); ctx.fillStyle = 'rgba(140,130,110,.6)'; ctx.fill();
-      ctx.fillStyle = 'rgba(160,150,120,.4)'; for(let i = 0; i < 5; i++){ ctx.beginPath(); ctx.arc(Math.cos(i*1.3)*r*0.45, Math.sin(i*2.1)*r*0.35, r*0.07, 0, TAU); ctx.fill(); }
-    } else if(o.type === 'volvox'){
-      const r = L/2; ctx.rotate(o.ph*0.3);
-      ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fillStyle = 'rgba(130,195,100,.22)'; ctx.fill(); ctx.strokeStyle = 'rgba(55,125,40,.75)'; ctx.lineWidth = Math.max(lw(v, 1), r*0.015); ctx.stroke();
-      if(v.ppm > 50){ ctx.fillStyle = 'rgba(50,130,35,.8)'; ctx.beginPath(); for(let i = 0; i < 90; i++){ const a = i*2.39996, d = r*Math.sqrt((i + .5)/90)*0.96; ctx.moveTo(Math.cos(a)*d + r*0.03, Math.sin(a)*d); ctx.arc(Math.cos(a)*d, Math.sin(a)*d, r*0.03, 0, TAU); } ctx.fill(); }
-      ctx.fillStyle = 'rgba(40,115,30,.6)'; for(const [a, d] of [[0.5, 0.45], [2.6, 0.5], [4.4, 0.35]]){ ctx.beginPath(); ctx.arc(Math.cos(a)*r*d, Math.sin(a)*r*d, r*0.2, 0, TAU); ctx.fill(); }
-    } else if(o.type === 'diatom'){
-      ctx.beginPath(); ctx.moveTo(L/2, 0); ctx.lineTo(L*0.3, -L*0.13); ctx.lineTo(-L*0.3, -L*0.13); ctx.lineTo(-L/2, 0); ctx.lineTo(-L*0.3, L*0.13); ctx.lineTo(L*0.3, L*0.13); ctx.closePath();
-      ctx.fillStyle = 'rgba(205,165,70,.72)'; ctx.fill(); ctx.strokeStyle = 'rgba(120,90,25,.85)'; ctx.lineWidth = Math.max(lw(v, .8), L*0.012); ctx.stroke();
-      if(v.ppm > 280){ ctx.beginPath(); for(let x = -L*0.4; x <= L*0.4; x += L*0.045){ ctx.moveTo(x, -L*0.11); ctx.lineTo(x, L*0.11); } ctx.strokeStyle = 'rgba(120,90,25,.4)'; ctx.lineWidth = lw(v, .7); ctx.stroke(); }
-    }
-    ctx.restore();
-  }
-}
+function drawPond(){ throw new Error("Not in the demo"); }
 function pondPick(x, y){
   const P = getPond();
   for(const o of P.orgs){ if(Math.hypot(o.x - x, o.y - y) < o.len*0.6 + 0.01) return o; }
@@ -774,14 +651,7 @@ function ell(p, x, y, rx, ry, a){
 function circ(p, x, y, r){ p.moveTo(x + r, y); p.arc(x, y, r, 0, TAU); }
 
 /* ----- Elodea leaf ----- */
-function getElodea(){
-  if(CACHE.elodea) return CACHE.elodea;
-  const R = mulberry32(S.seed ^ 0xE10D), L = 1.9, N = 90, top = [], bot = [];
-  for(let i = 0; i <= N; i++){ const x = -L + 2*L*i/N; const w = 0.58*Math.sqrt(Math.max(0, 1 - (x/L)*(x/L)))*(1 - 0.2*(x/L)); const tooth = i % 4 === 0 ? 0.025 : 0; top.push([x, -(w + tooth)]); bot.push([x, w + tooth]); }
-  const outline = top.concat(bot.reverse());
-  const rows = buildSheet(R, {x0:-2.1, x1:2.1, y0:-0.75, y1:0.75, hMin:0.022, hMax:0.03, wMin:0.065, wMax:0.11, nMin:0, nMax:0, tilt:0.006});
-  return CACHE.elodea = {outline, rows};
-}
+function getElodea(){ throw new Error("Not in the demo"); }
 function drawChloro(ctx, v, rows){
   const ri = visRows(rows, v), xl = v.cx - v.r, xr = v.cx + v.r, p = new Path2D(), cr = 0.0026, m = 0.0045;
   for(const r of ri){ const R = rows[r]; for(let k = 0; k < R.xs.length - 1; k++){ const a = R.xs[k], b = R.xs[k + 1]; if(b < xl || a > xr) continue;
@@ -797,206 +667,36 @@ function drawChloro(ctx, v, rows){
   ctx.fillStyle = 'rgba(38,118,30,.9)'; ctx.fill(p);
   if(v.ppm > 300){ ctx.strokeStyle = 'rgba(18,70,14,.8)'; ctx.lineWidth = lw(v, .8); ctx.stroke(p); }
 }
-function drawElodea(ctx, v){
-  const E = getElodea();
-  ctx.save(); tracePoly(ctx, E.outline); ctx.fillStyle = '#b6d98a'; ctx.fill(); ctx.clip();
-  drawSheet(ctx, v, E.rows, {tints:['#c3e19b', '#b2d684', '#cbe5a8'], nuc:null, wall:'rgba(64,110,36,.85)', wallMid:'rgba(205,232,170,.6)', wallW:0.0018, wob:0.002});
-  if(v.ppm > 140) drawChloro(ctx, v, E.rows);
-  else speckle(ctx, v, 0xE1, 0.2, 40, 1.3, 'rgba(50,125,40,.6)');
-  ctx.restore();
-  tracePoly(ctx, E.outline); ctx.lineWidth = Math.max(lw(v, 1.5), 0.008); ctx.strokeStyle = 'rgba(60,105,35,.8)'; ctx.stroke();
-}
+function drawElodea(){ throw new Error("Not in the demo"); }
 
 /* ----- leaf peel with stomata ----- */
-function getLeaf(){
-  if(CACHE.leaf) return CACHE.leaf;
-  const R = mulberry32(S.seed ^ 0x1EAF);
-  const outline = blobOutline(R, 2.4, 1.7, 48);
-  const rows = buildSheet(R, {x0:-2.9, x1:2.9, y0:-2.1, y1:2.1, hMin:0.035, hMax:0.05, wMin:0.04, wMax:0.065, nMin:0.0028, nMax:0.0036, tilt:0.006});
-  const st = []; for(let i = 0; i < 700; i++){ const a = R()*TAU, d = Math.sqrt(R()); st.push([Math.cos(a)*d*2.3, Math.sin(a)*d*1.6, R()*Math.PI, 0.9 + R()*0.25]); }
-  return CACHE.leaf = {outline, rows, st};
-}
-function drawLeaf(ctx, v){
-  const L = getLeaf();
-  ctx.save(); tracePoly(ctx, L.outline); ctx.fillStyle = '#eef1e2'; ctx.fill(); ctx.clip();
-  const lo = v.ppm < 150; drawSheet(ctx, v, L.rows, {tints:lo ? null : ['#eff2e4', '#e9eddb', '#f2f4e9'], nuc:lo ? null : 'rgba(150,150,120,.3)', nucEdge:null, nucleolus:'rgba(0,0,0,0)', gran:'rgba(0,0,0,0)', wall:'rgba(92,108,66,.75)', wallMid:null, wallW:0.0012, wob:0.004, wobF:lo ? 1 : 20, vwob:lo ? 0 : 0.004});
-  const sp = new Path2D(), inner = new Path2D(), pore = new Path2D(), chl = new Path2D(), det = v.ppm > 300;
-  for(const [x, y, a, s] of L.st){
-    if(!near(x, y, v, 0.03)) continue;
-    const rx = 0.017*s, ry = 0.012*s;
-    ell(sp, x, y, rx, ry, a); ell(inner, x, y, rx*0.62, ry*0.4, a); ell(pore, x, y, rx*0.5, ry*0.14, a);
-    if(det){ for(const side of [1, -1]) for(let i = 0; i < 5; i++){ const th = side*(0.45 + i*0.56), lx = Math.cos(th)*rx*0.8, ly = Math.sin(th)*ry*0.72; circ(chl, x + lx*Math.cos(a) - ly*Math.sin(a), y + lx*Math.sin(a) + ly*Math.cos(a), 0.0012*s); } }
-  }
-  ctx.fillStyle = 'rgba(205,228,172,.97)'; ctx.fill(sp);
-  ctx.strokeStyle = 'rgba(58,88,38,.85)'; ctx.lineWidth = Math.max(lw(v, 1), 0.0008); ctx.stroke(sp);
-  ctx.strokeStyle = 'rgba(58,88,38,.55)'; ctx.stroke(inner);
-  ctx.fillStyle = 'rgba(45,55,35,.9)'; ctx.fill(pore);
-  ctx.fillStyle = 'rgba(45,125,35,.9)'; ctx.fill(chl);
-  ctx.restore();
-  tracePoly(ctx, L.outline); ctx.lineWidth = Math.max(lw(v, 1.5), 0.01); ctx.strokeStyle = 'rgba(100,115,80,.55)'; ctx.stroke();
-}
+function getLeaf(){ throw new Error("Not in the demo"); }
+function drawLeaf(){ throw new Error("Not in the demo"); }
 
 /* ----- blood smear ----- */
-function getBlood(){ if(CACHE.blood) return CACHE.blood; const R = mulberry32(S.seed ^ 0xB100); return CACHE.blood = {outline:blobOutline(R, 3.4, 1.5, 48)}; }
-function drawBlood(ctx, v){
-  const B = getBlood();
-  ctx.save(); tracePoly(ctx, B.outline); ctx.fillStyle = 'rgba(232,196,204,.55)'; ctx.fill(); ctx.clip();
-  if(v.ppm < 150){ speckle(ctx, v, 0xB1, 0.25, 34, 1.6, 'rgba(200,110,125,.55)'); ctx.restore(); return; }
-  const rbc = new Path2D(), ctr = new Path2D(), wc = new Path2D(), wn = new Path2D(), pl = new Path2D(), det = v.ppm > 300, T = 0.05;
-  eachTile(v, T, 0.01, (i, j) => {
-    const R = tileRand(i, j, 0xB2);
-    for(let k = 0; k < 11; k++){ const x = (i + R())*T, y = (j + R())*T, r = 0.0036 + R()*0.0008; circ(rbc, x, y, r); if(det) circ(ctr, x, y, r*0.42); }
-    if(R() < 0.07){ const x = (i + R())*T, y = (j + R())*T, r = 0.0062; circ(wc, x, y, r);
-      if(R() < .65){ const a0 = R()*TAU; for(let l = 0; l < 3; l++){ const a = a0 + l*2.1, d = r*0.36; circ(wn, x + Math.cos(a)*d, y + Math.sin(a)*d, r*0.32); } }
-      else circ(wn, x, y, r*0.78); }
-    const np = R() < .6 ? 1 + Math.floor(R()*3) : 0; for(let l = 0; l < np; l++) circ(pl, (i + R())*T, (j + R())*T, 0.0011);
-  });
-  ctx.fillStyle = 'rgba(214,112,128,.88)'; ctx.fill(rbc);
-  if(det){ ctx.strokeStyle = 'rgba(150,55,70,.75)'; ctx.lineWidth = lw(v, 1); ctx.stroke(rbc); ctx.fillStyle = 'rgba(242,196,204,.85)'; ctx.fill(ctr); }
-  ctx.fillStyle = 'rgba(208,192,232,.97)'; ctx.fill(wc); ctx.fillStyle = 'rgba(82,36,132,.95)'; ctx.fill(wn); ctx.fillStyle = 'rgba(110,60,150,.9)'; ctx.fill(pl);
-  ctx.restore();
-}
+function getBlood(){ throw new Error("Not in the demo"); }
+function drawBlood(){ throw new Error("Not in the demo"); }
 
 /* ----- potato starch ----- */
-function getPotato(){
-  if(CACHE.potato) return CACHE.potato;
-  const R = mulberry32(S.seed ^ 0x9070), g = [];
-  for(let i = 0; i < 1400; i++){ const a = R()*TAU, d = Math.sqrt(R()), big = R(), ra = 0.006 + big*big*0.03; g.push({x:Math.cos(a)*d*1.75, y:Math.sin(a)*d*1.35, a:ra, b:ra*(0.68 + R()*0.22), rot:R()*Math.PI, h:0.35 + R()*0.3, n:3 + Math.floor(R()*4)}); }
-  return CACHE.potato = {outline:blobOutline(R, 1.9, 1.5, 48), g};
-}
-function drawPotato(ctx, v){
-  const P = getPotato(), st = S.stain.potato;
-  tracePoly(ctx, P.outline); ctx.fillStyle = st ? 'rgba(225,200,140,.35)' : 'rgba(232,232,224,.3)'; ctx.fill();
-  const body = new Path2D(), ring = new Path2D(), hil = new Path2D();
-  for(const q of P.g){
-    if(!near(q.x, q.y, v, q.a)) continue;
-    ell(body, q.x, q.y, q.a, q.b, q.rot);
-    if(v.ppm > 220 && q.a*v.ppm > 8){
-      const hx = q.x - Math.cos(q.rot)*q.a*q.h, hy = q.y - Math.sin(q.rot)*q.a*q.h;
-      for(let k = 1; k <= q.n; k++){ const s = k/(q.n + 1); ell(ring, hx + (q.x - hx)*s, hy + (q.y - hy)*s, q.a*s, q.b*s, q.rot); }
-      circ(hil, hx, hy, q.b*0.08);
-    }
-  }
-  ctx.fillStyle = st ? 'rgba(50,34,104,.93)' : 'rgba(246,246,240,.85)'; ctx.fill(body);
-  ctx.strokeStyle = st ? 'rgba(24,14,58,.9)' : 'rgba(105,105,90,.75)'; ctx.lineWidth = Math.max(lw(v, 1), 0.0008); ctx.stroke(body);
-  ctx.strokeStyle = st ? 'rgba(125,105,195,.5)' : 'rgba(130,130,110,.38)'; ctx.lineWidth = lw(v, .7); ctx.stroke(ring);
-  ctx.fillStyle = st ? 'rgba(150,130,210,.6)' : 'rgba(100,100,85,.5)'; ctx.fill(hil);
-}
+function getPotato(){ throw new Error("Not in the demo"); }
+function drawPotato(){ throw new Error("Not in the demo"); }
 
 /* ----- baker's yeast ----- */
-function getYeast(){ if(CACHE.yeast) return CACHE.yeast; const R = mulberry32(S.seed ^ 0x7EA5); return CACHE.yeast = {outline:blobOutline(R, 1.8, 1.4, 40)}; }
-function drawYeast(ctx, v){
-  const Y = getYeast();
-  ctx.save(); tracePoly(ctx, Y.outline); ctx.fillStyle = 'rgba(236,230,206,.4)'; ctx.fill(); ctx.clip();
-  if(v.ppm < 150){ speckle(ctx, v, 0x7E, 0.2, 40, 1.4, 'rgba(150,130,80,.5)'); ctx.restore(); return; }
-  const cells = new Path2D(), vac = new Path2D(), det = v.ppm > 300, T = 0.06;
-  eachTile(v, T, 0.01, (i, j) => {
-    const R = tileRand(i, j, 0x7E2), nc = 2 + Math.floor(R()*3);
-    for(let c = 0; c < nc; c++){ const cx = (i + R())*T, cy = (j + R())*T, m = 1 + Math.floor(R()*4);
-      for(let k = 0; k < m; k++){ const x = cx + (R() - .5)*0.018, y = cy + (R() - .5)*0.018, rx = 0.0042 + R()*0.0018, ry = rx*(0.75 + R()*0.15), rot = R()*Math.PI;
-        ell(cells, x, y, rx, ry, rot);
-        if(R() < 0.35){ const ba = R()*TAU, br = rx*(0.35 + R()*0.25); ell(cells, x + Math.cos(ba)*(rx + br*0.6), y + Math.sin(ba)*(rx + br*0.6), br, br*0.85, ba); }
-        if(det) circ(vac, x + (R() - .5)*rx*0.6, y + (R() - .5)*ry*0.6, rx*0.33);
-      } }
-  });
-  ctx.fillStyle = det ? 'rgba(232,220,182,.92)' : 'rgba(196,180,135,.9)'; ctx.fill(cells);
-  if(det){ ctx.strokeStyle = 'rgba(118,98,52,.85)'; ctx.lineWidth = Math.max(lw(v, 1), 0.0006); ctx.stroke(cells); }
-  if(det){ ctx.fillStyle = 'rgba(250,248,238,.9)'; ctx.fill(vac); ctx.strokeStyle = 'rgba(150,135,95,.5)'; ctx.stroke(vac); }
-  ctx.restore();
-}
+function getYeast(){ throw new Error("Not in the demo"); }
+function drawYeast(){ throw new Error("Not in the demo"); }
 
 /* ----- bread mold ----- */
-function getMold(){
-  if(CACHE.mold) return CACHE.mold;
-  const R = mulberry32(S.seed ^ 0x3010), hy = [], sp = [], spores = [];
-  const grow = (x, y, h, n, depth) => {
-    const pts = [[x, y]];
-    for(let i = 0; i < n; i++){
-      h += (R() - .5)*0.5; x += Math.cos(h)*0.04; y += Math.sin(h)*0.04; pts.push([x, y]);
-      if(depth < 2 && R() < 0.06) grow(x, y, h + (R() < .5 ? 1 : -1)*(0.6 + R()*0.6), 10 + Math.floor(R()*25), depth + 1);
-      if(R() < 0.035){ const sa = h + (R() < .5 ? 1 : -1)*(0.8 + R()*0.8), sl = 0.12 + R()*0.3; sp.push({x, y, ex:x + Math.cos(sa)*sl, ey:y + Math.sin(sa)*sl, r:0.03 + R()*0.03, burst:R() < .2}); }
-    }
-    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; for(const [a, b] of pts){ x0 = Math.min(x0, a); x1 = Math.max(x1, a); y0 = Math.min(y0, b); y1 = Math.max(y1, b); }
-    hy.push({pts, bb:[x0, y0, x1, y1]});
-  };
-  for(let i = 0; i < 26; i++){ const a = R()*TAU, d = Math.sqrt(R())*1.6; grow(Math.cos(a)*d, Math.sin(a)*d, R()*TAU, 25 + Math.floor(R()*35), 0); }
-  for(const s of sp) if(s.burst) for(let k = 0; k < 40; k++){ const a = R()*TAU, d = s.r*(1 + R()*2.5); spores.push([s.ex + Math.cos(a)*d, s.ey + Math.sin(a)*d]); }
-  for(let k = 0; k < 500; k++){ const a = R()*TAU, d = Math.sqrt(R())*2; spores.push([Math.cos(a)*d, Math.sin(a)*d]); }
-  return CACHE.mold = {hy, sp, spores};
-}
-function drawMold(ctx, v){
-  const M = getMold(), w = 0.009, tube = new Path2D(), sporeP = new Path2D(), ball = new Path2D(), col = new Path2D(), tex = new Path2D();
-  for(const h of M.hy){ const [x0, y0, x1, y1] = h.bb; if(x1 < v.cx - v.r || x0 > v.cx + v.r || y1 < v.cy - v.r || y0 > v.cy + v.r) continue; h.pts.forEach(([x, y], i) => i ? tube.lineTo(x, y) : tube.moveTo(x, y)); }
-  for(const s of M.sp){ if(!near(s.ex, s.ey, v, 0.5)) continue; tube.moveTo(s.x, s.y); tube.lineTo(s.ex, s.ey);
-    if(s.burst) circ(col, s.ex, s.ey, s.r*0.55);
-    else { circ(ball, s.ex, s.ey, s.r); if(v.ppm > 220){ for(let k = 0; k < 60; k++){ const a = k*2.39996, d = s.r*0.92*Math.sqrt((k + .5)/60); circ(tex, s.ex + Math.cos(a)*d, s.ey + Math.sin(a)*d, s.r*0.07); } } } }
-  for(const [x, y] of M.spores) if(near(x, y, v, 0.01)) circ(sporeP, x, y, 0.0025);
-  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  ctx.strokeStyle = 'rgba(118,124,102,.8)'; ctx.lineWidth = Math.max(w, lw(v, 1.5)); ctx.stroke(tube);
-  if(v.ppm > 150){ ctx.strokeStyle = 'rgba(232,236,222,.92)'; ctx.lineWidth = w*0.55; ctx.stroke(tube); }
-  ctx.fillStyle = 'rgba(150,150,138,.85)'; ctx.fill(col);
-  ctx.fillStyle = 'rgba(32,32,28,.94)'; ctx.fill(ball);
-  ctx.fillStyle = 'rgba(95,95,85,.75)'; ctx.fill(tex);
-  ctx.fillStyle = 'rgba(48,48,40,.8)'; ctx.fill(sporeP);
-}
+function getMold(){ throw new Error("Not in the demo"); }
+function drawMold(){ throw new Error("Not in the demo"); }
 
 /* ----- hair and fibers ----- */
 const FIBERS = [{k:'hair', ang:0.35, off:0.12, w:0.075}, {k:'cotton', ang:-0.95, off:-0.18, w:0.024}, {k:'poly', ang:1.75, off:0.08, w:0.02}];
 function band(ctx, v, P, t0, t1, w, fill, edge){ ctx.beginPath(); ctx.moveTo(...P(t0, -w/2)); ctx.lineTo(...P(t1, -w/2)); ctx.lineTo(...P(t1, w/2)); ctx.lineTo(...P(t0, w/2)); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); ctx.strokeStyle = edge; ctx.lineWidth = Math.max(lw(v, 1.2), w*0.04); ctx.stroke(); }
-function drawFibers(ctx, v){
-  for(const F of FIBERS){
-    const L = lineView(v, F.ang, F.off, 4.5); if(L.t1 <= L.t0) continue;
-    const P = (t, s) => [L.ox + L.dx*t + L.nx*s, L.oy + L.dy*t + L.ny*s], w = F.w;
-    if(F.k === 'hair'){
-      band(ctx, v, P, L.t0, L.t1, w, '#8d5e30', 'rgba(70,40,15,.95)');
-      if(v.ppm > 120){ const st = 0.004; ctx.fillStyle = 'rgba(58,30,10,.55)'; ctx.beginPath(); for(let t = Math.ceil(L.t0/st)*st; t < L.t1; t += st){ const n = Math.round(t/st); for(let g = 0; g < 2; g++){ const h = hsh(n, 7 + g); const q = P(t + h*st, (hsh(n + 3, g) - .5)*w*0.8); const r = 0.0011 + h*0.0012; ctx.moveTo(q[0] + r, q[1]); ctx.arc(q[0], q[1], r, 0, TAU); } } ctx.fill(); }
-      ctx.strokeStyle = 'rgba(52,28,8,.7)'; ctx.lineWidth = w*0.18; ctx.setLineDash([w*1.3, w*0.5]); ctx.beginPath(); ctx.moveTo(...P(L.t0, 0)); ctx.lineTo(...P(L.t1, 0)); ctx.stroke(); ctx.setLineDash([]);
-      if(v.ppm > 200){ const st = 0.008; ctx.beginPath(); for(let t = Math.ceil(L.t0/st)*st; t < L.t1; t += st){ ctx.moveTo(...P(t, -w/2)); ctx.quadraticCurveTo(...P(t + st*0.7, 0), ...P(t, w/2)); } ctx.strokeStyle = 'rgba(48,26,8,.45)'; ctx.lineWidth = lw(v, 1); ctx.stroke(); }
-    } else if(F.k === 'cotton'){
-      const st = Math.min(0.004, (L.t1 - L.t0)/400), top = [], bot = [];
-      for(let t = L.t0; t <= L.t1; t += st){ const tw = 0.3 + 0.7*Math.abs(Math.cos(t*TAU/0.09)); top.push(P(t, -w/2*tw)); bot.push(P(t, w/2*tw)); }
-      ctx.beginPath(); top.forEach((q, i) => i ? ctx.lineTo(...q) : ctx.moveTo(...q)); for(let i = bot.length - 1; i >= 0; i--) ctx.lineTo(...bot[i]); ctx.closePath();
-      ctx.fillStyle = 'rgba(244,244,236,.9)'; ctx.fill(); ctx.strokeStyle = 'rgba(112,112,98,.85)'; ctx.lineWidth = Math.max(lw(v, 1), 0.0015); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(...P(L.t0, 0)); ctx.lineTo(...P(L.t1, 0)); ctx.strokeStyle = 'rgba(150,150,135,.5)'; ctx.lineWidth = lw(v, .8); ctx.stroke();
-    } else {
-      band(ctx, v, P, L.t0, L.t1, w, 'rgba(212,227,244,.88)', 'rgba(58,84,125,.85)');
-      ctx.beginPath(); ctx.moveTo(...P(L.t0, -w*0.15)); ctx.lineTo(...P(L.t1, -w*0.15)); ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = w*0.14; ctx.stroke();
-    }
-  }
-}
+function drawFibers(){ throw new Error("Not in the demo"); }
 
 /* ----- salt and sugar crystals ----- */
-function getCrystals(){
-  if(CACHE.crys) return CACHE.crys;
-  const R = mulberry32(S.seed ^ 0x5A17), salt = [], sugar = [];
-  for(let i = 0; i < 45; i++) salt.push({x:-1.5 + R()*1.2, y:(R() - .5)*1.6, s:0.05 + R()*R()*0.28, a:R()*Math.PI/2});
-  for(let i = 0; i < 22; i++){ const L = 0.2 + R()*0.4; sugar.push({x:0.3 + R()*1.3, y:(R() - .5)*1.6, L, W:L*(0.45 + R()*0.3), a:R()*Math.PI, c:0.2 + R()*0.15}); }
-  return CACHE.crys = {salt, sugar};
-}
-function drawCrystals(ctx, v){
-  const C = getCrystals();
-  for(const c of C.salt){
-    if(!near(c.x, c.y, v, c.s)) continue; const s = c.s;
-    ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.a);
-    ctx.fillStyle = 'rgba(236,241,246,.65)'; ctx.fillRect(-s/2, -s/2, s, s);
-    ctx.strokeStyle = 'rgba(90,100,110,.4)'; ctx.lineWidth = Math.max(lw(v, 1), s*0.01); ctx.beginPath();
-    for(const k of [0.7, 0.45, 0.2]) ctx.rect(-s*k/2, -s*k/2, s*k, s*k);
-    for(const [a, b] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]){ ctx.moveTo(a*s/2, b*s/2); ctx.lineTo(a*s*0.1, b*s*0.1); } ctx.stroke();
-    ctx.strokeStyle = 'rgba(52,62,72,.9)'; ctx.lineWidth = Math.max(lw(v, 1.4), s*0.02); ctx.strokeRect(-s/2, -s/2, s, s);
-    ctx.restore();
-  }
-  for(const c of C.sugar){
-    if(!near(c.x, c.y, v, c.L)) continue; const L = c.L/2, W = c.W/2, k = c.c*c.L;
-    const pts = [[L, 0], [L - k, W], [-L + k, W], [-L, 0], [-L + k, -W], [L - k, -W]];
-    ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.a);
-    ctx.beginPath(); pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
-    ctx.fillStyle = 'rgba(244,244,236,.6)'; ctx.fill(); ctx.strokeStyle = 'rgba(68,68,58,.9)'; ctx.lineWidth = Math.max(lw(v, 1.4), c.L*0.012); ctx.stroke();
-    ctx.beginPath(); pts.forEach(([x, y], i) => { const q = [x*0.55 + L*0.08, y*0.55 - W*0.1]; i ? ctx.lineTo(...q) : ctx.moveTo(...q); }); ctx.closePath();
-    ctx.moveTo(L - k, W); ctx.lineTo((L - k)*0.55 + L*0.08, W*0.45); ctx.moveTo(-L, 0); ctx.lineTo(-L*0.55 + L*0.08, -W*0.1);
-    ctx.strokeStyle = 'rgba(100,100,88,.4)'; ctx.lineWidth = Math.max(lw(v, 1), c.L*0.006); ctx.stroke();
-    ctx.restore();
-  }
-}
+function getCrystals(){ throw new Error("Not in the demo"); }
+function drawCrystals(){ throw new Error("Not in the demo"); }
 function crystalAt(cx, cy, r){ const C = getCrystals(); return C.salt.some(c => Math.hypot(c.x - cx, c.y - cy) < r + c.s*0.6) || C.sugar.some(c => Math.hypot(c.x - cx, c.y - cy) < r + c.L*0.5); }
 
 /* ----- slide catalog ----- */
@@ -1005,39 +705,9 @@ const outlined = get => ({inView:(cx, cy, r) => polyNear(cx, cy, get(), r), cent
 const SLIDES = {
   onion:Object.assign({cat:'Plant cells', name:'Onion skin', short:'Plant cells', clue:'brick-shaped cells with walls and a nucleus.', info:'Onion skin is one layer of plant cells. Look for the cell wall (the outline of each brick) and the nucleus (a round spot in each cell). Iodine stain makes them easier to see.',
     layers:() => [{z:0, draw:drawOnion}], pale:() => !S.stain.onion}, outlined(() => getOnion().outline)),
-  elodea:Object.assign({cat:'Plant cells', name:'Elodea leaf', short:'Chloroplasts', clue:'green rectangle cells full of chloroplasts.', info:'Elodea is a pond plant with leaves only two cells thick. Each box is a cell with a cell wall. The green dots are chloroplasts, where the plant makes food from sunlight. At 400' + X + ' watch closely: the chloroplasts slowly ride around the cell (this is called cytoplasmic streaming).',
-    layers:() => [{z:0, draw:drawElodea}], pale:() => false, anim:() => FOV() < 0.7}, outlined(() => getElodea().outline)),
-  leaf:Object.assign({cat:'Plant cells', name:'Leaf peel (stomata)', short:'Leaf pores', clue:'puzzle-piece cells with stomata.', info:'A thin peel from the underside of a leaf. The cells fit together like puzzle pieces. Look for stomata: tiny openings with two bean-shaped guard cells. Stomata let carbon dioxide in and oxygen and water vapor out. Guard cells have chloroplasts, but the other skin cells do not.',
-    layers:() => [{z:0, draw:drawLeaf}], pale:() => false}, outlined(() => getLeaf().outline)),
-  potato:Object.assign({cat:'Plant cells', name:'Potato starch', short:'Iodine test', clue:'oval grains with rings that turn blue-black with iodine.', info:'Potato scrapings full of starch grains, the plant\'s stored food. Each oval grain has rings, like a tree. Without stain they are nearly see-through. Add iodine: starch turns blue-black. That is the iodine starch test.',
-    layers:() => [{z:0, draw:drawPotato}], pale:() => !S.stain.potato}, outlined(() => getPotato().outline)),
-  cork:Object.assign({cat:'Plant cells', name:'Cork', short:"Hooke's cells", clue:'empty boxes left by dead plant cells.', info:'A thin slice of cork. In 1665 Robert Hooke saw these little empty boxes and named them "cells." They are the walls of dead plant cells.',
-    layers:() => [{z:0, draw:drawCork}], pale:() => false}, outlined(() => getCork().outline)),
-  cheek:{cat:'Animal cells', name:'Cheek cells', short:'Animal cells', clue:'flat cells with a nucleus but no cell wall.', info:'Cheek cells are animal cells scraped from inside a cheek. They are flat with a nucleus, but have no cell wall. Methylene blue stain makes them show up. The tiny dots are bacteria.',
-    layers:() => [{z:0, draw:drawCheek}], pale:() => !S.stain.cheek,
-    inView:(cx, cy, r) => getCheek().cells.some(c => Math.hypot(c.x - cx, c.y - cy) < r + c.r), centered:(cx, cy) => getCheek().cells.some(c => Math.hypot(c.x - cx, c.y - cy) < Math.max(0.05, FOV()*0.2))},
-  blood:Object.assign({cat:'Animal cells', name:'Blood smear', short:'Blood cells', clue:'many small pink discs and a few purple cells.', info:'A prepared slide of human blood, stained so the cells show. Most cells are red blood cells: pink discs with a pale middle and no nucleus. They carry oxygen. Look for the bigger white blood cells with a purple nucleus. They fight germs. The tiny purple specks are platelets, which help blood clot.',
-    layers:() => [{z:0, draw:drawBlood}], pale:() => false}, outlined(() => getBlood().outline)),
-  pond:{cat:'Tiny living things', name:'Pond water', short:'Living things', clue:'living things swimming around.', info:'A drop of pond water. Look for paramecia (slipper shapes), euglena (small green swimmers), amoebas (blobs), volvox (green balls), diatoms (gold boats), and green algae strands. They move, so follow them with the slide arrows!',
-    layers:() => [{z:0, draw:drawPond}], pale:() => false, anim:() => true, update:dt => updatePond(dt),
-    inView:(cx, cy) => Math.hypot(cx, cy) < 3, centered:() => true},
-  yeast:Object.assign({cat:'Tiny living things', name:"Baker's yeast", short:'Fungus cells', clue:'tiny oval cells, some with little buds.', info:'Yeast is a fungus made of single cells. It is what makes bread rise. Look for the little bumps on some cells: those are buds. Yeast reproduces by budding: a new cell grows out of the old one and then breaks off.',
-    layers:() => [{z:0, draw:drawYeast}], pale:() => false}, outlined(() => getYeast().outline)),
-  mold:{cat:'Tiny living things', name:'Bread mold', short:'Fungus threads', clue:'thin threads with black balls on stalks.', info:'Mold from old bread. It is a fungus made of long thin threads called hyphae. The black balls on stalks are sporangia, full of thousands of spores. Some have burst open. Each spore can grow into new mold.',
-    layers:() => [{z:0, draw:drawMold}], pale:() => false,
-    inView:(cx, cy, r) => Math.hypot(cx, cy) < 2.2 + r, centered:(cx, cy) => Math.hypot(cx, cy) < 2},
   e:{cat:'Everyday things & practice', name:'Letter e', short:'Which way is up?', clue:'a letter e.', info:'A tiny letter e cut from newspaper. Compare how it sits on the slide with how it looks in the eyepiece. At high power you can see paper fibers.',
     layers:() => [{z:0, draw:drawE}], pale:() => false,
-    inView:(cx, cy, r) => Math.hypot(cx, cy) < r + 0.9, centered:(cx, cy) => Math.hypot(cx, cy) < Math.max(0.6, FOV()*0.18)},
-  threads:{cat:'Everyday things & practice', name:'Crossed threads', short:'Depth of focus', clue:'three colored threads.', info:'Three colored threads lie on top of each other. Only one layer can be sharp at a time. Use fine focus to find which thread is on top.',
-    layers:() => { const T = getThreads(); return [0, 1, 2].map(i => ({z:T.zs[i], draw:(c, v) => drawThread(c, v, i)})).sort((a, b) => a.z - b.z); }, pale:() => false,
-    inView:(cx, cy, r) => THREAD_INFO.some(T => Math.abs(-Math.sin(T.ang)*cx + Math.cos(T.ang)*cy - T.off) < r + 0.12), centered:(cx, cy) => Math.hypot(cx, cy) < Math.max(0.12, FOV()*0.3)},
-  fibers:{cat:'Everyday things & practice', name:'Hair and fibers', short:'Forensics', clue:'a brown hair with scales and two other fibers.', info:'Three fibers, like a crime lab would compare. The brown one is a human hair: see the overlapping scales (cuticle) and the dark line down the middle (medulla). The flat twisted ribbon is cotton, a plant fiber. The smooth, perfectly straight rod is polyester, a fiber made by people.',
-    layers:() => [{z:0, draw:drawFibers}], pale:() => false,
-    inView:(cx, cy, r) => FIBERS.some(F => nearLine(cx, cy, F.ang, F.off, r + F.w)), centered:(cx, cy) => FIBERS.some(F => nearLine(cx, cy, F.ang, F.off, Math.max(0.03, FOV()*0.25)))},
-  crystals:{cat:'Everyday things & practice', name:'Salt and sugar', short:'Crystals', clue:'clear crystals: cubes and long shapes.', info:'Grains of table salt and sugar. Salt crystals are cubes, often with stair-step patterns inside. Sugar crystals are longer, slanted shapes. On the slide, salt is on the left and sugar on the right. Remember: the image is flipped!',
-    layers:() => [{z:0, draw:drawCrystals}], pale:() => false,
-    inView:(cx, cy, r) => crystalAt(cx, cy, r), centered:(cx, cy) => crystalAt(cx, cy, Math.max(0.03, FOV()*0.15))}
+    inView:(cx, cy, r) => Math.hypot(cx, cy) < r + 0.9, centered:(cx, cy) => Math.hypot(cx, cy) < Math.max(0.6, FOV()*0.18)}
 };
 function slideName(id){ return S.hideName && id === S.slide ? 'Mystery slide' : SLIDES[id].name; }
 
@@ -1415,43 +1085,8 @@ const CHALL = [
     onStart:() => { S.flags.movedRight = false; },
     ready:() => S.slide === 'e' && isSharp() && specInView() && S.flags.movedRight,
     q:{prompt:'You moved the slide to the right. Which way did the e move in the eyepiece?', opts:['Left', 'Right', 'Up', 'It did not move'], ans:0, why:'the image is flipped, so it moves the opposite way.'}},
-  {id:'threads', title:'Which thread is on top?', goal:() => 'Put the crossed threads slide on the stage. Center the spot where the threads cross. Use the 10' + X + ' or 40' + X + ' objective.', hint:'Lower the stage, then raise it slowly with FINE focus. The FIRST thread to get sharp is the one on top (closest to the lens).',
-    ready:() => S.slide === 'threads' && S.obj >= 10 && centered() && lightOK() && bestBlur() < 2,
-    q:() => ({prompt:'Which thread is on top?', opts:THREAD_INFO.map(t => t.name + ' thread'), ans:getThreads().top, why:'it came into focus first as the stage went up.'})},
   {id:'nucleus', title:'Nucleus hunt', goal:() => 'Use the onion skin WITH iodine stain at 400' + X + ' total or more. Get it sharp, then click a nucleus in the view.', hint:'The guided lab shows how to add iodine. Use the 40' + X + ' objective.',
-    ready:() => S.slide === 'onion' && S.stain.onion && S.eye*S.obj >= 400 && isSharp() && lightOK(), click:'nucleus'},
-  {id:'cheek', title:'Plant cell vs. animal cell', goal:() => 'Look at the cheek cells at 400' + X + ' total or more. Get them sharp and centered.', hint:'Find a clump of cells at low power first, center it, then go up.',
-    ready:() => S.slide === 'cheek' && S.eye*S.obj >= 400 && isSharp() && specInView() && lightOK(),
-    q:{prompt:'Cheek cells are animal cells. What do onion (plant) cells have that cheek cells do NOT?', opts:['A cell wall', 'A nucleus', 'Cytoplasm', 'A cell membrane'], ans:0, why:'plant cells have a stiff cell wall around the cell membrane. Animal cells do not.'}},
-  {id:'cork', title:"Robert Hooke's cork", goal:() => 'Look at the cork at exactly 100' + X + ' total. Get it sharp.', hint:'100' + X + ' = 10' + X + ' eyepiece ' + X + ' 10' + X + ' objective.',
-    ready:() => S.slide === 'cork' && S.eye*S.obj === 100 && isSharp() && specInView() && lightOK(),
-    q:{prompt:'In 1665 Robert Hooke saw these little boxes in cork and called them "cells." What are they?', opts:['Walls left behind by dead plant cells', 'Living animal cells', 'Air bubbles', 'Grains of sand'], ans:0, why:'cork cells are dead. Only their walls are left.'}},
-  {id:'pond', title:'Pond life', goal:() => 'Look at pond water at 100' + X + ' total or more. Find a GREEN living thing and click it.', hint:'Things move! Follow them with the slide arrows.',
-    ready:() => S.slide === 'pond' && S.eye*S.obj >= 100 && isSharp() && lightOK(), click:'green',
-    q:{prompt:'Green living things have chlorophyll. What does chlorophyll let them do?', opts:['Make food from sunlight', 'Swim faster', 'See in the dark', 'Stay warm'], ans:0, why:'chlorophyll captures light energy to make food.'}},
-  {id:'elodea', title:'Moving chloroplasts', goal:() => 'Look at the Elodea leaf at 400' + X + ' total or more. Get it sharp and watch the green dots.', hint:'Find the leaf at 4' + X + ', center it, then go up to 10' + X + ' and 40' + X + '. Watch for about 10 seconds.',
-    ready:() => S.slide === 'elodea' && S.eye*S.obj >= 400 && isSharp() && specInView() && lightOK(),
-    q:{prompt:'The green dots moving around inside each Elodea cell are...', opts:['Chloroplasts, which make food from sunlight', 'Nuclei', 'Air bubbles', 'Bacteria'], ans:0, why:'chloroplasts do photosynthesis, and the moving cytoplasm carries them around the cell.'}},
-  {id:'stomata', title:'Leaf pores', goal:() => 'Look at the leaf peel at 400' + X + ' total or more. Find a stoma: two bean-shaped guard cells around a tiny opening.', hint:'They look like little green lips scattered between the puzzle-piece cells.',
-    ready:() => S.slide === 'leaf' && S.eye*S.obj >= 400 && isSharp() && specInView() && lightOK(),
-    q:{prompt:'What do stomata do?', opts:['Let gases like carbon dioxide and oxygen in and out of the leaf', 'Hold the leaf onto the stem', 'Store starch', 'Make the leaf green'], ans:0, why:'the guard cells open and close the opening.'}},
-  {id:'starch', title:'Starch test', goal:() => 'Put potato starch on the stage and add a drop of iodine. Look at it sharp at 100' + X + ' total or more.', hint:'An "Add a drop of iodine" button shows up in this box once potato starch is on the stage.',
-    ready:() => S.slide === 'potato' && S.stain.potato && S.eye*S.obj >= 100 && isSharp() && specInView() && lightOK(),
-    q:{prompt:'The potato grains turned blue-black with iodine. What does that tell you?', opts:['The potato has starch', 'The potato is rotten', 'The grains are alive', 'The grains are salt'], ans:0, why:'iodine turns blue-black when it touches starch.'}},
-  {id:'blood', title:'Blood cells', goal:() => 'Look at the blood smear at 400' + X + ' total or more. Most cells are red blood cells. Can you find a purple white blood cell?', hint:'Move the slide around. White blood cells are rare.',
-    ready:() => S.slide === 'blood' && S.eye*S.obj >= 400 && isSharp() && specInView() && lightOK(),
-    q:{prompt:'What is the main job of red blood cells?', opts:['Carry oxygen around the body', 'Fight germs', 'Make food', 'Help you think'], ans:0, why:'red blood cells carry oxygen. White blood cells fight germs.'}},
-  {id:'mag', title:'Magnification math', goal:() => 'Set the microscope to ' + magTarget() + X + ' total magnification. (The total is hidden for this one!) Turn the light on.', hint:'Total = eyepiece ' + X + ' objective. Try different pairs.',
-    ready:() => S.eye*S.obj === magTarget() && S.light, num:true},
-  {id:'fov', title:'Field of view', goal:() => 'Look at onion cells sharp at 40' + X + ' total. Then look at them sharp at 400' + X + ' total.', hint:'40' + X + ' = 10' + X + ' ' + X + ' 4' + X + '. 400' + X + ' = 10' + X + ' ' + X + ' 40' + X + '.',
-    ready:() => S.flags.fov40 && S.flags.fov400,
-    q:{prompt:'At 400' + X + ' compared with 40' + X + ', what do you see?', opts:['Fewer cells, bigger, and a darker view', 'More cells and a brighter view', 'The same number of cells', 'Smaller cells and a wider view'], ans:0, why:'higher power shows a smaller area, magnified more, with less light.'}},
-  {id:'mystery', title:'Mystery slide', goal:() => 'A mystery slide is on the stage. Get it sharp at 100' + X + ' total or more, then figure out what it is.', hint:'Look at shapes and colors. Are there cells? Are they green? Do they have walls? Are they moving?',
-    onStart:() => { if(!S.chal.done.mystery){ S.slide = null; placeSlide(mysteryId(), true); } },
-    ready:() => S.slide === mysteryId() && S.eye*S.obj >= 100 && isSharp() && specInView() && lightOK(),
-    q:() => { const id = mysteryId(), R = mulberry32(S.seed ^ 0x4158), o = MYSTERY_POOL.filter(x => x !== id);
-      for(let k = o.length - 1; k > 0; k--){ const r = Math.floor(R()*(k + 1)); [o[k], o[r]] = [o[r], o[k]]; }
-      return {prompt:'What is on the mystery slide?', opts:[SLIDES[id].name].concat(o.slice(0, 3).map(x => SLIDES[x].name)), ans:0, why:'it has ' + SLIDES[id].clue}; }}
+    ready:() => S.slide === 'onion' && S.stain.onion && S.eye*S.obj >= 400 && isSharp() && lightOK(), click:'nucleus'}
 ];
 const MYSTERY_POOL = ['elodea', 'leaf', 'potato', 'cork', 'blood', 'cheek', 'yeast', 'mold', 'fibers', 'crystals'];
 function mysteryId(){ if(!S.chal.mystery){ const R = mulberry32(S.seed ^ 0x4157); S.chal.mystery = MYSTERY_POOL[Math.floor(R()*MYSTERY_POOL.length)]; } return S.chal.mystery; }
@@ -1577,7 +1212,7 @@ function copyReport(){ const t = buildReport(); const done = () => toast('Report
 
 /* =================== PANEL =================== */
 function slideBox(){
-  return `<h3>Slide box</h3>` + CATS.map(c => `<div class="cathead">${esc(c)}</div><div class="slides">${Object.entries(SLIDES).filter(([k, s]) => s.cat === c).map(([k, s]) => `<button class="slidebtn ${S.slide === k && !S.hideName ? 'on' : ''}" data-slide="${k}"><b>${esc(s.name)}</b>${esc(s.short)}</button>`).join('')}</div>`).join('');
+  return `<h3>Slide box</h3>` + CATS.filter(c => Object.values(SLIDES).some(s => s.cat === c)).map(c => `<div class="cathead">${esc(c)}</div><div class="slides">${Object.entries(SLIDES).filter(([k, s]) => s.cat === c).map(([k, s]) => `<button class="slidebtn ${S.slide === k && !S.hideName ? 'on' : ''}" data-slide="${k}"><b>${esc(s.name)}</b>${esc(s.short)}</button>`).join('')}</div>`).join('') + '<p class="info">12 more slides and 11 more challenges (cheek cells, blood, pond water, Elodea, stomata and more) are in the <a href="../../#microscope-simulator" target="_top">full version</a>.</p>';
 }
 function slideTools(){
   let h = '';
