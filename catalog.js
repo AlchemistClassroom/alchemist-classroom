@@ -175,7 +175,7 @@ var APPS = [
     ],
     includes: ["Equation Forge app file (one offline file)", "Quick Start guide", "Free updates to version 1"],
     requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grades 6\u20138: 6.EE.B.7, 7.EE.B.4a, 8.EE.C.7.",
-    buyUrl: ""
+    buyUrl: "https://payhip.com/b/wFvO5"
   },
   {
     id: "sentence-probe",
