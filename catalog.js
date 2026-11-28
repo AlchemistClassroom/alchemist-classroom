@@ -201,7 +201,7 @@ var APPS = [
     ],
     includes: ["Claim Court app file (one offline file)", "Quick Start guide", "Free updates to version 1"],
     requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grades 6\u20138: RI.6.8, RI.7.8, RI.8.8, W.8.1.",
-    buyUrl: ""
+    buyUrl: "https://payhip.com/b/9S6Do"
   },
   {
     id: "microscope-simulator",
