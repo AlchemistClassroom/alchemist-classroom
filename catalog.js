@@ -204,6 +204,33 @@ var APPS = [
     buyUrl: ""
   },
   {
+    id: "claim-court",
+    section: "in-class-apps",
+    subjects: ["english", "reading"],
+    name: "Claim Court",
+    price: "$5",
+    icon: "images/app-claim-court.png",
+    short: "Students are the judge: find the claim, weigh the evidence and answer the other side.",
+    description: "Students read short arguments on school topics and work each case like a judge. They find the claim, sort the evidence, pick the reasoning that connects them, then catch weak reasoning or answer the counterclaim. Nine original cases in three dockets build from Grade 6 to Grade 8, with a hint after every miss and an explanation for every answer.",
+    features: [
+      ["Find the claim", "Students click the sentence that says what the author wants them to believe."],
+      ["Weigh the evidence", "Sort each fact as supporting or not, then as strong, weak or not relevant."],
+      ["Check the reasoning", "Pick the sentence that explains how the evidence proves the claim."],
+      ["Catch weak reasoning", "Spot bandwagon, slippery slope and \u201ceveryone knows\u201d arguments."],
+      ["Answer the other side", "Find the counterclaim and choose the strongest answer to it."],
+      ["Works offline", "One file. Hints, read-aloud, light and dark mode. No accounts and no student names saved."]
+    ],
+    demoUrl: "demos/claim-court/",
+    screens: [
+      ["images/cc-1.jpg", "Weigh the evidence: strong, weak or not relevant."],
+      ["images/cc-2.jpg", "Grade 8: find the counterclaim, then answer it."],
+      ["images/cc-3.jpg", "Three dockets from Grade 6 to Grade 8."]
+    ],
+    includes: ["Claim Court app file (one offline file)", "Quick Start guide", "Free updates to version 1"],
+    requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grades 6\u20138: RI.6.8, RI.7.8, RI.8.8, W.8.1.",
+    buyUrl: "https://payhip.com/b/9S6Do"
+  },
+  {
     id: "microscope-simulator",
     section: "in-class-apps",
     subjects: ["science"],
