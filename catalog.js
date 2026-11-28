@@ -247,7 +247,7 @@ var APPS = [
     ],
     includes: ["Character Books Starter app file with 4 books", "Read Me First note", "License (free for use at your school)"],
     requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grade 6 and up.",
-    buyUrl: "https://payhip.com/b/pJQsH"
+    buyUrl: "https://payhip.com/b/KpU3Q"
   },
   {
     id: "character-books",
