@@ -151,6 +151,33 @@ var APPS = [
     buyUrl: "https://payhip.com/b/Imnoh"
   },
   {
+    id: "equation-forge",
+    section: "in-class-apps",
+    subjects: ["math"],
+    name: "Equation Forge",
+    price: "$5",
+    icon: "images/app-equation-forge.png",
+    short: "Students solve equations on a glowing balance scale, so every step shows why it works.",
+    description: "Students solve equations by keeping an alchemist's scale balanced. Every move happens to both sides at once, and the written algebra updates next to the scale, so students see why each step works instead of memorizing it. Five Forge Ranks run from one-step equations (Grade 6) to variables on both sides (Grade 8). There's also a Teach Mode for leading the class on the projector.",
+    features: [
+      ["See the balance", "x-crystals and ore stones sit on a real balance scale. Whatever students do to one side happens to the other."],
+      ["Five Forge Ranks", "One-step, two-step, negatives, decimals and fractions, then variables on both sides. Score 80% to unlock the next rank."],
+      ["Help without the answer", "A gentle note when a move doesn't help, a hint, then the next step only if they need it. No timer."],
+      ["Check it", "Students put their answer back into the original equation and watch it balance."],
+      ["Teach Mode", "Project a rank's problems or type your own equation. Ask the class, then reveal each step."],
+      ["Works offline", "One file. No accounts, no internet, and no student names saved."]
+    ],
+    demoUrl: "demos/equation-forge/",
+    screens: [
+      ["images/ef-1.jpg", "Grandmaster: variables on both sides of the scale."],
+      ["images/ef-2.jpg", "Every move is shown in algebra, then checked by putting x back in."],
+      ["images/ef-3.jpg", "Five Forge Ranks from Grade 6 to Grade 8."]
+    ],
+    includes: ["Equation Forge app file (one offline file)", "Quick Start guide", "Free updates to version 1"],
+    requirements: "Chromebook, Windows or Mac with Chrome or Edge. Works offline. Grades 6\u20138: 6.EE.B.7, 7.EE.B.4a, 8.EE.C.7.",
+    buyUrl: "https://payhip.com/b/wFvO5"
+  },
+  {
     id: "sentence-probe",
     section: "in-class-apps",
     subjects: ["english"],
